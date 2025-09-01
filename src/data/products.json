@@ -1,0 +1,4192 @@
+[
+  {
+    "name": "GUSTOSO AGUARDIENTE - RUM",
+    "price": 8,
+    "weight": 0
+  },
+  {
+    "name": "QUESO COTIJA",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "DON JULIO REPOSADO - TEQUILA",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "Test Item",
+    "price": 3,
+    "weight": 0
+  },
+  {
+    "name": "DON FULANO REPOSADO - TEQUILA",
+    "price": 15,
+    "weight": 0
+  },
+  {
+    "name": "TRES GENERACIONES REPOSADO - TEQUILA",
+    "price": 11,
+    "weight": 0
+  },
+  {
+    "name": "KOMOS AÑEJO RESERVA - TEQUILA",
+    "price": 40,
+    "weight": 0
+  },
+  {
+    "name": "CAZADORES ANEJO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "DULCE VIDA BLANCO - TEQUILA",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "FORTALEZA REPOSADO - TEQUILA",
+    "price": 15,
+    "weight": 0
+  },
+  {
+    "name": "SMALL QUESO COTIJA - 2OZ",
+    "price": 1.5,
+    "weight": 0
+  },
+  {
+    "name": "CORONA",
+    "price": 6,
+    "weight": 0
+  },
+  {
+    "name": "TOGO PREMIUM MARGARITA",
+    "price": 17,
+    "weight": 0
+  },
+  {
+    "name": "CASA NOBLE ANEJO - TEQUILA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "CASA NOBLE REPOSADO - TEQUILA",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "CHACKRAS - CABERNET",
+    "price": 9,
+    "weight": 0
+  },
+  {
+    "name": "CONSOME",
+    "price": 3,
+    "weight": 0
+  },
+  {
+    "name": "MANGO & PINEAPPLE - PITCHER MOCKTAIL",
+    "price": 28,
+    "weight": 0
+  },
+  {
+    "name": "SIDE OF TOMATO",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "CAVA DE ORO REPOSADO - TEQUILA",
+    "price": 16,
+    "weight": 0
+  },
+  {
+    "name": "SHREDDED CHEESE",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "Rreal Margarita",
+    "price": 12.5,
+    "weight": 0
+  },
+  {
+    "name": "SINGLE",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "SHOTS",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "FORTALEZA ANEJO - TEQUILA",
+    "price": 23,
+    "weight": 0
+  },
+  {
+    "name": "CHRISTMAS QUESABIRRIA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "SIEMPRE REPOSADO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "MEXICAN COKE 1 LITRO",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "GRACIAS A DIOS REPOSADO - MEZCAL",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "CLASE AZUL MARGARITA",
+    "price": 40,
+    "weight": 0
+  },
+  {
+    "name": "LA CETTO - WHITE WINE",
+    "price": 9,
+    "weight": 0
+  },
+  {
+    "name": "SMOKEY TAMARINDO",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "ARETTE REPOSADO - TEQUILA",
+    "price": 11,
+    "weight": 0
+  },
+  {
+    "name": "HENNESSY VS - COGNAC",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "JALISCO MULE (TEQUILA)",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "AGUA FRESCA PIÑA",
+    "price": 4.2,
+    "weight": 0
+  },
+  {
+    "name": "SMOKEY TAMARINDO - PITCHER",
+    "price": 52,
+    "weight": 0
+  },
+  {
+    "name": "MARGARITA FLIGHT",
+    "price": 30,
+    "weight": 0
+  },
+  {
+    "name": "MIX VEGGIES TACOS",
+    "price": 4.2,
+    "weight": 0
+  },
+  {
+    "name": "AVION REPOSADO - TEQUILA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "LOS NAHUALES REPOSADO - MEZCAL",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "BOZAL CHINO VERDE ANCESTRAL - MEZCAL",
+    "price": 22,
+    "weight": 0
+  },
+  {
+    "name": "TRES GENERACIONES ANEJO - TEQUILA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "LALO BLANCO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "SMOKEY TAMARINDO MARGARITA",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "SIDE OF LIMES",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "MAESTRO DOBEL DIAMANTE - TEQUILA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "MEXICAN RICE",
+    "price": 3.99,
+    "weight": 0
+  },
+  {
+    "name": "CROTALO BLANCO - TEQUILA",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "PORK CARNITAS",
+    "price": 4.49,
+    "weight": 0
+  },
+  {
+    "name": "CASA DRAGONES REPOSADO - TEQUILA",
+    "price": 35,
+    "weight": 0
+  },
+  {
+    "name": "ADICTIVO REPOSADO - TEQUILA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "PICO DE GALLO",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "KOMOS ANEJO CRISTALINO - TEQUILA",
+    "price": 28,
+    "weight": 0
+  },
+  {
+    "name": "SPICY PINEAPPLE - PITCHER",
+    "price": 52,
+    "weight": 0
+  },
+  {
+    "name": "FROZEN MARGARITA",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "CASA MEXICO SILVER - TEQUILA",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "PUEBLO VIEJO BLANCO - TEQUILA",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "PLATANO MACHO",
+    "price": 6.55,
+    "weight": 0
+  },
+  {
+    "name": "VAGO ELOTE - MEZCAL",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "DON FULANO ANEJO - TEQUILA",
+    "price": 17,
+    "weight": 0
+  },
+  {
+    "name": "BACARDI SUPERIOR - RUM",
+    "price": 9,
+    "weight": 0
+  },
+  {
+    "name": "KIMO SABE JOVEN - MEZCAL",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "QUIEREME MUCHO CUISHE - MEZCAL",
+    "price": 16,
+    "weight": 0
+  },
+  {
+    "name": "GUACAMOLE & CHIPS",
+    "price": 8.88,
+    "weight": 0
+  },
+  {
+    "name": "HERRADURA LEGEND - TEQUILA",
+    "price": 38,
+    "weight": 0
+  },
+  {
+    "name": "TOGO MANGO RREAL MARGARITA",
+    "price": 16,
+    "weight": 0
+  },
+  {
+    "name": "DON JULIO ANEJO - TEQUILA",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "LA CATRINA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "DIET COKE",
+    "price": 3.5,
+    "weight": 0
+  },
+  {
+    "name": "CLASE AZUL DURANGO - MEZCAL",
+    "price": 55,
+    "weight": 0
+  },
+  {
+    "name": "MALVERDE - PITCHER",
+    "price": 45,
+    "weight": 0
+  },
+  {
+    "name": "INSÓLITO REPOSADO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "MAYOR BLANCO - TEQUILA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "HARKEN CHARDONNAY - WHITE WINE",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "CREYENTE JOVEN - MEZCAL",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "CORZO ANEJO - TEQUILA",
+    "price": 15,
+    "weight": 0
+  },
+  {
+    "name": "HERRADURA BLANCO - TEQUILA",
+    "price": 8,
+    "weight": 0
+  },
+  {
+    "name": "CASAMIGOS REPOSADO - TEQUILA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "TROPICALIA",
+    "price": 5,
+    "weight": 0
+  },
+  {
+    "name": "FOGO DE CHAO CACHACA - SILVER RUM",
+    "price": 800,
+    "weight": 0
+  },
+  {
+    "name": "SWEET POTATOES",
+    "price": 3.69,
+    "weight": 0
+  },
+  {
+    "name": "PATRON ANEJO - TEQUILA",
+    "price": 16,
+    "weight": 0
+  },
+  {
+    "name": "EL TEQUILENO REPOSADO - TEQUILA",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "SHOCK TOP",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "CASAMIGOS CRISTALINO TITANIC",
+    "price": 100,
+    "weight": 0
+  },
+  {
+    "name": "Trio",
+    "price": 24.99,
+    "weight": 0
+  },
+  {
+    "name": "FOUR ROSES - BOURBON",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "DRAGON FRUIT MARGARITA",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "WOODINVILLE BOURBON - WHISKY",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "JARRITOS LIMON",
+    "price": 3.5,
+    "weight": 0
+  },
+  {
+    "name": "OAXACAN MULE ( MEZCAL)",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "ILLEGAL ANEJO - MEZCAL",
+    "price": 16,
+    "weight": 0
+  },
+  {
+    "name": "TOKI SUNTORY - WHISKEY",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "AGUA FRESCA",
+    "price": 4.2,
+    "weight": 0
+  },
+  {
+    "name": "CAZADORES REPOSADO - TEQUILA",
+    "price": 11,
+    "weight": 0
+  },
+  {
+    "name": "BUCHANAS 18 YEARS - SCOTCH",
+    "price": 21,
+    "weight": 0
+  },
+  {
+    "name": "Crispy Avocado Taco",
+    "price": 5.25,
+    "weight": 0
+  },
+  {
+    "name": "INSÓLITO BLANCO - TEQUILA",
+    "price": 11,
+    "weight": 0
+  },
+  {
+    "name": "LUNAZUL BLANCO - TEQUILA",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "EMPANADA",
+    "price": 3.33,
+    "weight": 0
+  },
+  {
+    "name": "MEZCALITA PITCHER",
+    "price": 60,
+    "weight": 0
+  },
+  {
+    "name": "OLMECA ALTOS AÑEJO - TEQUILA",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "Smart Water",
+    "price": 3.75,
+    "weight": 0
+  },
+  {
+    "name": "2 Al Pastor & Esquite",
+    "price": 17.44,
+    "weight": 0
+  },
+  {
+    "name": "PORK BELLY",
+    "price": 6,
+    "weight": 0
+  },
+  {
+    "name": "ESQUITES",
+    "price": 6.66,
+    "weight": 0
+  },
+  {
+    "name": "MIJENTA BLANCO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "CHORIQUESO DIP",
+    "price": 7.77,
+    "weight": 0
+  },
+  {
+    "name": "JOHNNIE WALKER BLACK - SCOTCH",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "MEZCALITA - PITCHER",
+    "price": 52,
+    "weight": 0
+  },
+  {
+    "name": "CAVA DE ORO ANEJO - TEQUILA",
+    "price": 17,
+    "weight": 0
+  },
+  {
+    "name": "SKINNY MARGARITA",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "QUESO DIP & CHIPS",
+    "price": 8.99,
+    "weight": 0
+  },
+  {
+    "name": "BOTANICAL SPRITZ",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "LYCHEE TITANIC",
+    "price": 35,
+    "weight": 0
+  },
+  {
+    "name": "BANHEZ ENSAMBLE - MEZCAL",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "PADRE AZUL SILVER - TEQUILA",
+    "price": 16,
+    "weight": 0
+  },
+  {
+    "name": "XICARU PECHUGA MOLE - MEZCAL",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "VINORITA - PITCHER",
+    "price": 44,
+    "weight": 0
+  },
+  {
+    "name": "COKE",
+    "price": 3.5,
+    "weight": 0
+  },
+  {
+    "name": "CORAZÓN DE AGAVE SILVER - TEQUILA",
+    "price": 8,
+    "weight": 0
+  },
+  {
+    "name": "ESQUITE",
+    "price": 5.99,
+    "weight": 0
+  },
+  {
+    "name": "EL TEQUILENO BLANCO - TEQUILA",
+    "price": 8,
+    "weight": 0
+  },
+  {
+    "name": "SPICY PINEAPPLE MARGARITA",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "KOMOS EXTRA ANEJO - TEQUILA",
+    "price": 95,
+    "weight": 0
+  },
+  {
+    "name": "PINEAPPLE GUAVA MOCKTAIL",
+    "price": 7,
+    "weight": 0
+  },
+  {
+    "name": "CHIPS & SALSA",
+    "price": 4.2,
+    "weight": 0
+  },
+  {
+    "name": "DON ABRAHAM REPOSADO - TEQUILA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "LONG ISLAND",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "SIETE LEGUAS DECADAS - TEQUILA",
+    "price": 30,
+    "weight": 0
+  },
+  {
+    "name": "ZOMBIE PUNCH",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "BIRRIA PIZZA",
+    "price": 26.99,
+    "weight": 0
+  },
+  {
+    "name": "QUESABIRRIA",
+    "price": 15,
+    "weight": 0
+  },
+  {
+    "name": "WATERMELON - PITCHER",
+    "price": 52,
+    "weight": 0
+  },
+  {
+    "name": "CENTENARIO ANEJO - TEQUILA",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "ARETTE FUERTE ARTESANAL 101 - TEQUILA",
+    "price": 15,
+    "weight": 0
+  },
+  {
+    "name": "NACIONAL 1938 ENSAMBLE - MEZCAL",
+    "price": 15,
+    "weight": 0
+  },
+  {
+    "name": "MILAGRO BLANCO - TEQUILA",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "HERRADURA SILVER - TEQUILA",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "MEXICAN COKE PEQUEÑA",
+    "price": 3.5,
+    "weight": 0
+  },
+  {
+    "name": "Taco Platter",
+    "price": 65,
+    "weight": 0
+  },
+  {
+    "name": "TROPICAL HENNESSY - Mini Bar",
+    "price": 15,
+    "weight": 0
+  },
+  {
+    "name": "Vinegar Jalapenos",
+    "price": 0.63,
+    "weight": 0
+  },
+  {
+    "name": "VALENTINE'S BIRRIA PIZZA",
+    "price": 25,
+    "weight": 0
+  },
+  {
+    "name": "VAGO ESPADIN - MEZCAL",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "JOSH CELLARS - PINOT GRIGIO",
+    "price": 9,
+    "weight": 0
+  },
+  {
+    "name": "SMALL 2OZ QUESO DIP",
+    "price": 1.5,
+    "weight": 0
+  },
+  {
+    "name": "ESPOLON ANEJO - TEQUILA",
+    "price": 11,
+    "weight": 0
+  },
+  {
+    "name": "TEXAS MARGARITA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "ALMA MIEL MARGARITA",
+    "price": 30,
+    "weight": 0
+  },
+  {
+    "name": "SPRITE",
+    "price": 3.5,
+    "weight": 0
+  },
+  {
+    "name": "DON JULIO ALMA MIEL - TEQUILA",
+    "price": 25,
+    "weight": 0
+  },
+  {
+    "name": "TEMPURA FISH",
+    "price": 4.99,
+    "weight": 0
+  },
+  {
+    "name": "3 BIRRIA BARBACOA",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "NIXTA LICOR",
+    "price": 8,
+    "weight": 0
+  },
+  {
+    "name": "400 CONEJOS TOBALA - MEZCAL",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "CAVA DE ORO PLATA - TEQUILA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "MOJITO - PITCHER",
+    "price": 40,
+    "weight": 0
+  },
+  {
+    "name": "BOZAL SINGLE MAGUEY CUISHE - MEZCAL",
+    "price": 15,
+    "weight": 0
+  },
+  {
+    "name": "11:11 TOBALA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "COSTRA",
+    "price": 6.69,
+    "weight": 0
+  },
+  {
+    "name": "PALOMA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "JOSE CUERVO TRADICIONAL CRISTALINO - TEQUILA",
+    "price": 16,
+    "weight": 0
+  },
+  {
+    "name": "DON ABRAHAM BLANCO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "PASSION FRUIT MARGARITA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "SIDE OF ONIONS",
+    "price": 0.25,
+    "weight": 0
+  },
+  {
+    "name": "MIJENTA REPOSADO - TEQUILA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "CAZCANES AÑEJO NO. 7 - TEQUILA",
+    "price": 28,
+    "weight": 0
+  },
+  {
+    "name": "SIDE SMALL SALSA - 2OZ",
+    "price": 1,
+    "weight": 0
+  },
+  {
+    "name": "WATERMELON MARGARITA",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "GRAND CORAMINO REPOSADO - TEQUILA",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "SANGRIA - PITCHER",
+    "price": 38,
+    "weight": 0
+  },
+  {
+    "name": "DON FERNANDO BLANCO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "PADRE AZUL ANEJO - TEQUILA",
+    "price": 20,
+    "weight": 0
+  },
+  {
+    "name": "AL PASTOR",
+    "price": 5.2,
+    "weight": 0
+  },
+  {
+    "name": "ARETTE ARTESENAL ANEJO - TEQUILA",
+    "price": 18,
+    "weight": 0
+  },
+  {
+    "name": "OJO DE TIGRE - MEZCAL",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "FROZEN LARGE MARGARITA",
+    "price": 20,
+    "weight": 0
+  },
+  {
+    "name": "EL MAYOR BLANCO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "DOS HOMBRES - MEZCAL",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "TEXAS PITCHER",
+    "price": 65,
+    "weight": 0
+  },
+  {
+    "name": "CASTA TRIBAL 12YRS ARTESANAL - MEZCAL",
+    "price": 18,
+    "weight": 0
+  },
+  {
+    "name": "DULCE VIDA PINEAPPLE JALAPENO - TEQUILA",
+    "price": 9,
+    "weight": 0
+  },
+  {
+    "name": "CAZCANES BLANCO NO. 7 - TEQUILA",
+    "price": 16,
+    "weight": 0
+  },
+  {
+    "name": "MOJITO",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "BANHEZ WILD TOBALA - MEZCAL",
+    "price": 22,
+    "weight": 0
+  },
+  {
+    "name": "CHIPS FOR TRIO",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "SANTA TERESA 1796 SOLERA - RUM",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "CAZADORES BLANCO - TEQUILA",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "OCHO REPOSADO - TEQUILA",
+    "price": 16,
+    "weight": 0
+  },
+  {
+    "name": "CHICKEN CONSOME",
+    "price": 3,
+    "weight": 0
+  },
+  {
+    "name": "Elote",
+    "price": 7.49,
+    "weight": 0
+  },
+  {
+    "name": "VIRGIN FRESCO CUCUMBER",
+    "price": 7,
+    "weight": 0
+  },
+  {
+    "name": "MODELO NEGRA",
+    "price": 6,
+    "weight": 0
+  },
+  {
+    "name": "SIDE OF RADDISH",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "COLESLAW",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "TRES GENERACIONES BLANCO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "SOUR CREAM",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "KIDS TACO",
+    "price": 6,
+    "weight": 0
+  },
+  {
+    "name": "CROTALO ANEJO - TEQUILA",
+    "price": 15,
+    "weight": 0
+  },
+  {
+    "name": "EL TESORO SILVER - TEQUILA",
+    "price": 11,
+    "weight": 0
+  },
+  {
+    "name": "DEL MAGUEY VIDA - MEZCAL",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "FRIENDS & FAMILY",
+    "price": 1,
+    "weight": 0
+  },
+  {
+    "name": "Beef Barbacoa",
+    "price": 6.24,
+    "weight": 0
+  },
+  {
+    "name": "BLOODY MARIA (TEQUILA)",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "MASCOTA BLANCO - TEQUILA",
+    "price": 35,
+    "weight": 0
+  },
+  {
+    "name": "VIRGIN ORIGINAL MOJITO",
+    "price": 6,
+    "weight": 0
+  },
+  {
+    "name": "DOS XX AMBER",
+    "price": 6,
+    "weight": 0
+  },
+  {
+    "name": "STRAWBERRY MARGARITA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "ASADA",
+    "price": 4.99,
+    "weight": 0
+  },
+  {
+    "name": "FEVER TREE - GINGER BEER",
+    "price": 3,
+    "weight": 0
+  },
+  {
+    "name": "GRAND MARNIER - FLOAT (1/2 OZ)",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "STELLA ARTOIS",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "SIEMPRE ANEJO - TEQUILA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "DON JULIO 1942 EXTRA ANEJO - TEQUILA",
+    "price": 35,
+    "weight": 0
+  },
+  {
+    "name": "PICANHA",
+    "price": 5.69,
+    "weight": 0
+  },
+  {
+    "name": "PIERDE ALMAS LA PURITITA VERDA - MEZCAL",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "PREMIUM PITCHER",
+    "price": 60,
+    "weight": 0
+  },
+  {
+    "name": "JARRITOS TAMARINDO",
+    "price": 3.5,
+    "weight": 0
+  },
+  {
+    "name": "TEQUILA SUNRISE",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "PACIFICO",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "EL SILENCIO ESPADIN - MEZCAL",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "CASAMIGOS REPOSADO CRISTALINO - TEQUILA",
+    "price": 20,
+    "weight": 0
+  },
+  {
+    "name": "GRACIAS A DIOS CUISHE - MEZCAL",
+    "price": 18,
+    "weight": 0
+  },
+  {
+    "name": "FAMILY SIZE TRIO",
+    "price": 35,
+    "weight": 0
+  },
+  {
+    "name": "VINEGAR JALAPEN0",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "MALVERDE PITCHER",
+    "price": 60,
+    "weight": 0
+  },
+  {
+    "name": "LOBOS 1707 REPOSADO - TEQUILA",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "SCORPION REPOSADO - MEZCAL",
+    "price": 15,
+    "weight": 0
+  },
+  {
+    "name": "MEZCALITA",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "EL BUHO JABALI - MEZCAL",
+    "price": 18,
+    "weight": 0
+  },
+  {
+    "name": "CANYON ROAD - CABERNET SAUVIGNON",
+    "price": 9,
+    "weight": 0
+  },
+  {
+    "name": "DOS EQUIS AMBER",
+    "price": 6,
+    "weight": 0
+  },
+  {
+    "name": "LOS SIETE MISTERIOUS DOBA YEJ - MEZCAL",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "DON FULANO FUERTE BLANCO - TEQUILA",
+    "price": 16,
+    "weight": 0
+  },
+  {
+    "name": "WITCHES' BREW",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "LOS AMANTES JOVEN - MEZCAL",
+    "price": 11,
+    "weight": 0
+  },
+  {
+    "name": "2 Asada Tacos and Mexican Rice & Whole Beans",
+    "price": 19.99,
+    "weight": 0
+  },
+  {
+    "name": "SIDE JALAPEÑO TOREADO",
+    "price": 1.5,
+    "weight": 0
+  },
+  {
+    "name": "Tostada",
+    "price": 8.74,
+    "weight": 0
+  },
+  {
+    "name": "GRACIAS A DIOS ESPADIN JOVEN - MEZCAL",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "Open Food",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "Quesadilla Grande",
+    "price": 26.24,
+    "weight": 0
+  },
+  {
+    "name": "SANTO REPOSADO - TEQUILA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "Fresh Jalapeño",
+    "price": 0.63,
+    "weight": 0
+  },
+  {
+    "name": "CROWN ROYAL - WHISKEY",
+    "price": 9,
+    "weight": 0
+  },
+  {
+    "name": "LOS AMANTES ANEJO - MEZCAL",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "NOCHE LUNA - SOTOL",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "VIRIGIN FRECO CUCUMBER",
+    "price": 7,
+    "weight": 0
+  },
+  {
+    "name": "SANGRIA SEÑORIAL",
+    "price": 3.5,
+    "weight": 0
+  },
+  {
+    "name": "CRISPY AVOCADOS APP",
+    "price": 4.2,
+    "weight": 0
+  },
+  {
+    "name": "818 REPOSADO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "AVION CRISTALINO - TEQUILA",
+    "price": 30,
+    "weight": 0
+  },
+  {
+    "name": "DASANI WATER",
+    "price": 3,
+    "weight": 0
+  },
+  {
+    "name": "VIRGIN MICHELADA - AGUA MINERAL",
+    "price": 8,
+    "weight": 0
+  },
+  {
+    "name": "EL MEXICANO BLANCO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "ABASOLO - MEXICAN WHISKEY",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "GRAN CORAMINO ANEJO - TEQUILA",
+    "price": 20,
+    "weight": 0
+  },
+  {
+    "name": "TANQUERAY - GIN",
+    "price": 11,
+    "weight": 0
+  },
+  {
+    "name": "BURRITO BOWL",
+    "price": 10.99,
+    "weight": 0
+  },
+  {
+    "name": "JARRITOS MANDARINE",
+    "price": 3.5,
+    "weight": 0
+  },
+  {
+    "name": "EL JIMADOR ANEJO - TEQUILA",
+    "price": 11,
+    "weight": 0
+  },
+  {
+    "name": "LA POSADA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "JOSE CUERVO TRADICIONAL ANEJO - TEQUILA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "CALYPSO SILVER - RUM",
+    "price": 7,
+    "weight": 0
+  },
+  {
+    "name": "ADICTIVO SINGLE MALT - WHISKEY",
+    "price": 18,
+    "weight": 0
+  },
+  {
+    "name": "PEACH MARGARITA",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "BOZAL CHINO VERDE RESERVA - MEZCAL",
+    "price": 30,
+    "weight": 0
+  },
+  {
+    "name": "AVION ANEJO - TEQUILA",
+    "price": 15,
+    "weight": 0
+  },
+  {
+    "name": "EL MAYOR CRISTALINO - TEQUILA",
+    "price": 15,
+    "weight": 0
+  },
+  {
+    "name": "HERRADURA SILVER TITANIC",
+    "price": 75,
+    "weight": 0
+  },
+  {
+    "name": "CORONA PREMIER",
+    "price": 6,
+    "weight": 0
+  },
+  {
+    "name": "SIDE OF PINEAPPLE",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "Agua Fresca Mango",
+    "price": 5,
+    "weight": 0
+  },
+  {
+    "name": "DRAGON FRUIT - PITCHER",
+    "price": 52,
+    "weight": 0
+  },
+  {
+    "name": "CLASE AZUL PLATA - TEQUILA",
+    "price": 25,
+    "weight": 0
+  },
+  {
+    "name": "PEACH - PITCHER",
+    "price": 52,
+    "weight": 0
+  },
+  {
+    "name": "DON AMADO RUSTICO - TEQUILA",
+    "price": 18,
+    "weight": 0
+  },
+  {
+    "name": "ZACAPA 23 - RUM",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "EL GRINCH",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "SIEMBRA AZUL REPOSADO - TEQUILA",
+    "price": 18,
+    "weight": 0
+  },
+  {
+    "name": "BUDLIGHT",
+    "price": 5,
+    "weight": 0
+  },
+  {
+    "name": "HENNESSY - PITCHER",
+    "price": 60,
+    "weight": 0
+  },
+  {
+    "name": "BULLEIT - BOURBON",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "ESPOLON REPOSADO - TEQUILA",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "CONTRALUZ REPOSADO CRISTALINO - MEZCAL",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "SIETE LEGUAS REPOSADO - TEQUILA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "JARRITOS MANDARINA",
+    "price": 3.5,
+    "weight": 0
+  },
+  {
+    "name": "KENTUCKY MULE",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "CENTENARIO LEYENDA EXTRA ANEJO - TEQUILA",
+    "price": 32,
+    "weight": 0
+  },
+  {
+    "name": "DON FULANO IMPERIAL ANEJO - TEQUILA",
+    "price": 40,
+    "weight": 0
+  },
+  {
+    "name": "JOSH CELLARS - CHARDONNAY",
+    "price": 9,
+    "weight": 0
+  },
+  {
+    "name": "MODELO",
+    "price": 6,
+    "weight": 0
+  },
+  {
+    "name": "EL JIMADOR SILVER - TEQUILA",
+    "price": 9,
+    "weight": 0
+  },
+  {
+    "name": "GRAND MARNIER",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "MOSCOW MULE",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "3 AL PASTOR",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "VICTORIA",
+    "price": 6,
+    "weight": 0
+  },
+  {
+    "name": "MERCER AND PRINCE CANADIAN - WHISKEY",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "CASA DRAGONES BLANCO - TEQUILA",
+    "price": 30,
+    "weight": 0
+  },
+  {
+    "name": "CENTENARIO SILVER - TEQUILA",
+    "price": 11,
+    "weight": 0
+  },
+  {
+    "name": "DON FERNANDO ANEJO - TEQUILA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "CLASE AZUL GUERRERO - MEZCAL",
+    "price": 55,
+    "weight": 0
+  },
+  {
+    "name": "818 ANEJO - TEQUILA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "AGUA FRESCA PINEAPPLE",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "6-PACK",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "BANDERITA - TAMARINDO",
+    "price": 2,
+    "weight": 0
+  },
+  {
+    "name": "CAMPO BRAVO REPOSADO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "CHINOLA PINEAPPLE - LIQUER",
+    "price": 8,
+    "weight": 0
+  },
+  {
+    "name": "MONTE LOBOS JOVEN - MEZCAL",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "FLOR DEL DESIERTO - SOTOL MEZCAL",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "ADICTIVO ANEJO - TEQUILA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "21 SEED CUCUMBER JALAPENO - TEQUILA",
+    "price": 11,
+    "weight": 0
+  },
+  {
+    "name": "TANTEO BLANCO - TEQUILA",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "MI TIERRA REPOSADO - TEQUILA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "CLASE AZUL GOLD - TEQUILA",
+    "price": 75,
+    "weight": 0
+  },
+  {
+    "name": "3 PICANHA",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "AVION 44 EXTRA ANEJO - TEQUILA",
+    "price": 28,
+    "weight": 0
+  },
+  {
+    "name": "TOPOCHICO",
+    "price": 3.5,
+    "weight": 0
+  },
+  {
+    "name": "REZPIRAL ENSAMBLE - MEZCAL",
+    "price": 30,
+    "weight": 0
+  },
+  {
+    "name": "LA LUNA - MEZCAL",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "LA GRITONA REPOSADO - TEQUILA",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "Side Cilantro & Onion",
+    "price": 0.39,
+    "weight": 0
+  },
+  {
+    "name": "CENTENARIO REPOSADO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "MALVERDE  MARGARITA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "SCORPION ANEJO - MEZCAL",
+    "price": 17,
+    "weight": 0
+  },
+  {
+    "name": "AGUA FRESCA GUAVA",
+    "price": 4.2,
+    "weight": 0
+  },
+  {
+    "name": "RREAL NACHOS",
+    "price": 16,
+    "weight": 0
+  },
+  {
+    "name": "KAH BLANCO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "2 Grilled Chicken & Esquite",
+    "price": 17.44,
+    "weight": 0
+  },
+  {
+    "name": "PREMIUM MARGARITA",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "SMARTWATER",
+    "price": 3.5,
+    "weight": 0
+  },
+  {
+    "name": "TECATE",
+    "price": 5,
+    "weight": 0
+  },
+  {
+    "name": "RREAL - PITCHER",
+    "price": 35,
+    "weight": 0
+  },
+  {
+    "name": "SANTA TERESA1796 SOLERA - RUM",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "Christmas Birria Pizza",
+    "price": 31.25,
+    "weight": 0
+  },
+  {
+    "name": "DEAR SANTA",
+    "price": 15,
+    "weight": 0
+  },
+  {
+    "name": "JOSE CUERVO ESPECIAL - TEQUILA",
+    "price": 8,
+    "weight": 0
+  },
+  {
+    "name": "3 GRILLED FISH",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "JOSE CUERVO SILVER - TEQUILA",
+    "price": 8,
+    "weight": 0
+  },
+  {
+    "name": "REAL AZUL BLANCO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "WATERMELON & STRAWBERRY MOCKTAIL",
+    "price": 7,
+    "weight": 0
+  },
+  {
+    "name": "CASA DEL SOL BLANCO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "YUU BAAL JOVEN - MEZCAL",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "PALOMA - PITCHER",
+    "price": 56,
+    "weight": 0
+  },
+  {
+    "name": "CAZCANES REPOSADO NO. 7 - TEQUILA",
+    "price": 22,
+    "weight": 0
+  },
+  {
+    "name": "Side Of Tajin",
+    "price": 0.63,
+    "weight": 0
+  },
+  {
+    "name": "PUNTAGAVE - RAICILLA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "TEREMANA ANEJO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "FORTALEZA BLANCO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "CASA DRAGONES ANEJO - TEQUILA",
+    "price": 38,
+    "weight": 0
+  },
+  {
+    "name": "LOBOS 1707 JOVEN - TEQUILA",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "LOS AMANTES REPOSADO - MEZCAL",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "BABY JESUS",
+    "price": 15,
+    "weight": 0
+  },
+  {
+    "name": "CHILI POWDER",
+    "price": 0.25,
+    "weight": 0
+  },
+  {
+    "name": "LAS CALIFORNIAS NATIVO - GIN",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "CUCUMBER & MINT MOCKTAIL",
+    "price": 7,
+    "weight": 0
+  },
+  {
+    "name": "FLECHA AZUL BLANCO - TEQUILA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "TOGO RREAL MARGARITA 16OZ",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "MANGO MARGARITA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "CHRISTMAS BIRRIA",
+    "price": 5.69,
+    "weight": 0
+  },
+  {
+    "name": "CAMARENA SILVER - TEQUILA",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "3 COSTRA",
+    "price": 5,
+    "weight": 0
+  },
+  {
+    "name": "HENNESSY MARGARITA",
+    "price": 16,
+    "weight": 0
+  },
+  {
+    "name": "EL RUDOLPH",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "Grilled Chicken",
+    "price": 5.61,
+    "weight": 0
+  },
+  {
+    "name": "1800 COCONUT - TEQUILA",
+    "price": 8,
+    "weight": 0
+  },
+  {
+    "name": "TEXAS - PITCHER",
+    "price": 56,
+    "weight": 0
+  },
+  {
+    "name": "CIMARRON BLANCO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "PINEAPPLE GUAVA - PITCHER",
+    "price": 52,
+    "weight": 0
+  },
+  {
+    "name": "GRILLED FISH",
+    "price": 4.99,
+    "weight": 0
+  },
+  {
+    "name": "MILLER LIGHT",
+    "price": 5,
+    "weight": 0
+  },
+  {
+    "name": "MALVERDE",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "BOTONICAL SPRITZ - PITCHER",
+    "price": 52,
+    "weight": 0
+  },
+  {
+    "name": "CASA DEL SOL REPOSADO - TEQUILA",
+    "price": 15,
+    "weight": 0
+  },
+  {
+    "name": "PELIGROSO SILVER - TEQUILA",
+    "price": 9,
+    "weight": 0
+  },
+  {
+    "name": "AGAVE DE CORTES JOVEN - MEZCAL",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "Kids Quesadilla",
+    "price": 6,
+    "weight": 0
+  },
+  {
+    "name": "MI TIERRA BLANCO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "HEINEKEN - ZERO ALCOHOL",
+    "price": 5,
+    "weight": 0
+  },
+  {
+    "name": "ALIPUS JOVEN - MEZCAL",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "EL GRINCH PITCHER",
+    "price": 52,
+    "weight": 0
+  },
+  {
+    "name": "Side Of Pinneapple",
+    "price": 0.63,
+    "weight": 0
+  },
+  {
+    "name": "EL MEXICANO REPOSADO - TEQUILA",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "DON ABRAHAM ANEJO - TEQUILA",
+    "price": 16,
+    "weight": 0
+  },
+  {
+    "name": "FLECHA AZUL REPOSADO - TEQUILA",
+    "price": 18,
+    "weight": 0
+  },
+  {
+    "name": "CLASE AZUL ULTRA ANEJO - TEQUILA",
+    "price": 350,
+    "weight": 0
+  },
+  {
+    "name": "RAEBURN - CABERNET",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "TROPICALIA IPA",
+    "price": 5,
+    "weight": 0
+  },
+  {
+    "name": "Mixed Veggies",
+    "price": 5.25,
+    "weight": 0
+  },
+  {
+    "name": "CAMPO BRAVO SILVER - TEQUILA",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "DONA VEGA - MEZCAL",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "BOZAL CENIZO SINGLE MAGUEY - MEZCAL",
+    "price": 16,
+    "weight": 0
+  },
+  {
+    "name": "ARETTE BLANCO - TEQUILA",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "LA CETTO",
+    "price": 9,
+    "weight": 0
+  },
+  {
+    "name": "JOSH - PINOT NOIR",
+    "price": 9,
+    "weight": 0
+  },
+  {
+    "name": "OLD FORESTER BOURBON - WHISKY",
+    "price": 8,
+    "weight": 0
+  },
+  {
+    "name": "VIRGIN MARGARITA",
+    "price": 6,
+    "weight": 0
+  },
+  {
+    "name": "CORRALEJO REPOSADO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "FROZEN - PITCHER",
+    "price": 48,
+    "weight": 0
+  },
+  {
+    "name": "EL TIEMPO DEL CONEXION ESPADIN - MEZCAL",
+    "price": 9,
+    "weight": 0
+  },
+  {
+    "name": "DULCE VIDA LIME - TEQUILA",
+    "price": 9,
+    "weight": 0
+  },
+  {
+    "name": "SIDE OF CHIPS",
+    "price": 1,
+    "weight": 0
+  },
+  {
+    "name": "REFRIED BEANS",
+    "price": 3.69,
+    "weight": 0
+  },
+  {
+    "name": "CASAMIGOS ANEJO - TEQUILA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "ST. GERMAIN LIQUEUR",
+    "price": 7,
+    "weight": 0
+  },
+  {
+    "name": "JARRITOS FRUIT PUNCH",
+    "price": 3.5,
+    "weight": 0
+  },
+  {
+    "name": "DOS EQUIS LAGER",
+    "price": 6,
+    "weight": 0
+  },
+  {
+    "name": "QUIEREME MUCHO ESPADIN - MEZCAL",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "VALENTINES CONSOME",
+    "price": 3,
+    "weight": 0
+  },
+  {
+    "name": "CHICKEN BIRRIA PIZZA",
+    "price": 24.99,
+    "weight": 0
+  },
+  {
+    "name": "FIRE BALL - WHISKEY",
+    "price": 8,
+    "weight": 0
+  },
+  {
+    "name": "AGUA FRESCA HORCHATA",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "CASILLERO DEL DIABLO - ROSE",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "SANGRIA",
+    "price": 11,
+    "weight": 0
+  },
+  {
+    "name": "400 CONEJOS ESPADIN - MEZCAL",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "CAIPIRINHA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "Side Of Cilantro",
+    "price": 0.31,
+    "weight": 0
+  },
+  {
+    "name": "LEMONADE",
+    "price": 3.5,
+    "weight": 0
+  },
+  {
+    "name": "VINORITA",
+    "price": 11,
+    "weight": 0
+  },
+  {
+    "name": "DON AMADO ARROQUENO - TEQUILA",
+    "price": 19,
+    "weight": 0
+  },
+  {
+    "name": "TANTEO HABANERO - TEQUILA",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "SCORPION JOVEN - MEZCAL",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "IPA",
+    "price": 6,
+    "weight": 0
+  },
+  {
+    "name": "LEYENDA DE MEXICO BLANCO 24K - TEQUILA",
+    "price": 25,
+    "weight": 0
+  },
+  {
+    "name": "QUIEREME MUCHO TEPEXTATE - MEZCAL",
+    "price": 16,
+    "weight": 0
+  },
+  {
+    "name": "DULCE VIDA EXTRA ANEJO 100% PROOF - TEQUILA",
+    "price": 40,
+    "weight": 0
+  },
+  {
+    "name": "SACA ESPANTOS ESPADIN - MEZCAL",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "ARTE NOM SELECCION 1123 PLATA - TEQUILA",
+    "price": 18,
+    "weight": 0
+  },
+  {
+    "name": "REZPIRAL ENSAMBLE DE 7 LEONARDO - MEZCAL",
+    "price": 30,
+    "weight": 0
+  },
+  {
+    "name": "CORRALEJO EXTRA ANEJO - TEQUILA",
+    "price": 16,
+    "weight": 0
+  },
+  {
+    "name": "BIRRIAQUESO DIP",
+    "price": 7.77,
+    "weight": 0
+  },
+  {
+    "name": "CORN TORTILLA",
+    "price": 0.25,
+    "weight": 0
+  },
+  {
+    "name": "DULVE VIDA EXTRA ANEJO 100% PROOF - TEQUILA",
+    "price": 40,
+    "weight": 0
+  },
+  {
+    "name": "AGUA FRESCA PASSION FRUIT",
+    "price": 4.2,
+    "weight": 0
+  },
+  {
+    "name": "Jarritos Piña",
+    "price": 3.75,
+    "weight": 0
+  },
+  {
+    "name": "OCHO PLATA - TEQUILA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "HARKEN CHARDONNAY",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "INSÓLITO AÑEJO - TEQUILA",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "EL BUHO - MEZCAL",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "CAVA DE ORO EXTRA ANEJO - TEQUILA",
+    "price": 18,
+    "weight": 0
+  },
+  {
+    "name": "LYCHEE LOVE",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "GRAN CORAMINO REPOSADO CRISTALINO - TEQUILA",
+    "price": 15,
+    "weight": 0
+  },
+  {
+    "name": "ARETTE ANEJO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "CAPTAIN MORGAN - SPICED RUM",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "HERRADURA ANEJO - TEQUILA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "ARETTE ARTESENAL BLANCO - TEQUILA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "TORTA",
+    "price": 10.99,
+    "weight": 0
+  },
+  {
+    "name": "EL HOT CHOCOLATE",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "Burrito",
+    "price": 13.74,
+    "weight": 0
+  },
+  {
+    "name": "CINCORO BLANCO - TEQUILA",
+    "price": 25,
+    "weight": 0
+  },
+  {
+    "name": "DRAGON FRUIT - PITCHER MOCKTAIL",
+    "price": 28,
+    "weight": 0
+  },
+  {
+    "name": "SWEET WATER 420",
+    "price": 5,
+    "weight": 0
+  },
+  {
+    "name": "CAZCANES REPOSADO - TEQUILA",
+    "price": 22,
+    "weight": 0
+  },
+  {
+    "name": "EL JIMADOR REPOSADO - TEQUILA",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "MEXICAT RACILLA - MEZCAL",
+    "price": 15,
+    "weight": 0
+  },
+  {
+    "name": "DRAGON FRUIT MOCKTAIL",
+    "price": 7,
+    "weight": 0
+  },
+  {
+    "name": "Molletes",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "DON JULIO 70 - TEQUILA",
+    "price": 20,
+    "weight": 0
+  },
+  {
+    "name": "TEPACHE CIDER",
+    "price": 9,
+    "weight": 0
+  },
+  {
+    "name": "DON JULIO ALMA MIEL JOVEN - TEQUILA",
+    "price": 30,
+    "weight": 0
+  },
+  {
+    "name": "6 CORN TORILLA - TACO FEAST",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "JALAPENO FRESCO",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "MICHELOB ULTRA",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "WATERMELON & STRAWBERRY - PITCHER MOCKTAIL",
+    "price": 28,
+    "weight": 0
+  },
+  {
+    "name": "LOS NAHUALES JOVEN - MEZCAL",
+    "price": 11,
+    "weight": 0
+  },
+  {
+    "name": "FORTALEZA BLANCO HIGH PROOF - TEQUILA",
+    "price": 15,
+    "weight": 0
+  },
+  {
+    "name": "Side Of Chimichurri",
+    "price": 1.25,
+    "weight": 0
+  },
+  {
+    "name": "3 GRILLED CHICKEN",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "Small Queso Cotija",
+    "price": 1.88,
+    "weight": 0
+  },
+  {
+    "name": "KOMOS REPOSADO ROSA - TEQUILA",
+    "price": 25,
+    "weight": 0
+  },
+  {
+    "name": "FEVER TREE - TONIC WATER",
+    "price": 3,
+    "weight": 0
+  },
+  {
+    "name": "BAREFOOT BUBBLY ROSE - SPLIT",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "GRAN CENTERNARIO ANEJO CRISTALINO - TEQUILA",
+    "price": 20,
+    "weight": 0
+  },
+  {
+    "name": "DEL MAGUEY CHICHICAPA - MEZCAL",
+    "price": 16,
+    "weight": 0
+  },
+  {
+    "name": "CINCORO ANEJO - TEQUILA",
+    "price": 30,
+    "weight": 0
+  },
+  {
+    "name": "HIBISCUS MULE",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "SIETE LEGUAS ANEJO - TEQUILA",
+    "price": 16,
+    "weight": 0
+  },
+  {
+    "name": "HALLOWEEN BIRRIA",
+    "price": 5.69,
+    "weight": 0
+  },
+  {
+    "name": "MICHELADA",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "MONTE ALBAN - MEZCAL",
+    "price": 9,
+    "weight": 0
+  },
+  {
+    "name": "SIDE OF FRIES",
+    "price": 3,
+    "weight": 0
+  },
+  {
+    "name": "SOMBRA - MEZCAL",
+    "price": 9,
+    "weight": 0
+  },
+  {
+    "name": "CORZO REPOSADO - TEQUILA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "EL TIEMP0O DEL DESEO TOBALA - MEZCAL",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "KAH REPOSADO - TEQUILA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "FRESCO CUCUMBER",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "CASA MEXICO REPOSADO - TEQUILA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "DR.STONERS - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "AGUA FRESCA STRAWBERRY",
+    "price": 4.2,
+    "weight": 0
+  },
+  {
+    "name": "818 BLANCO - TEQUILA",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "PASSION FRUIT - PITCHER",
+    "price": 44,
+    "weight": 0
+  },
+  {
+    "name": "LUNA NUDA - PINOT GRIGIO",
+    "price": 9,
+    "weight": 0
+  },
+  {
+    "name": "Cilantro Dressing",
+    "price": 1.25,
+    "weight": 0
+  },
+  {
+    "name": "HORNITOS PLATA - TEQUILA",
+    "price": 9,
+    "weight": 0
+  },
+  {
+    "name": "BASEMENT",
+    "price": 5,
+    "weight": 0
+  },
+  {
+    "name": "TITANIC HERRADURA SILVER",
+    "price": 75,
+    "weight": 0
+  },
+  {
+    "name": "PINEAPPLE GUAVA MARGARITA",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "CORRALEJO BLANCO - TEQUILA",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "EL MAYOR ANEJO - TEQUILA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "3 PORK BELLY",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "EL TESORO REPOSADO - TEQUILA",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "BASTON DEL REY BLANCO - TEQUILA",
+    "price": 15,
+    "weight": 0
+  },
+  {
+    "name": "Side Of Cabbage",
+    "price": 0.63,
+    "weight": 0
+  },
+  {
+    "name": "Grilled Shrimp",
+    "price": 5.86,
+    "weight": 0
+  },
+  {
+    "name": "400 CONEJOS CUISHE - MEZCAL",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "HENDRICK'S - GIN",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "SEAGLASS - ROSE",
+    "price": 9,
+    "weight": 0
+  },
+  {
+    "name": "Mexican Coke",
+    "price": 5,
+    "weight": 0
+  },
+  {
+    "name": "CORRALEJO ANEJO - TEQUILA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "PEDRO FURTIVO REPOSADO - TEQUILA",
+    "price": 11,
+    "weight": 0
+  },
+  {
+    "name": "CLASE AZUL ANEJO - TEQUILA",
+    "price": 100,
+    "weight": 0
+  },
+  {
+    "name": "TANTEO JALAPENO - TEQUILA",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "YUU BAAL ANEJO - MEZCAL",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "Sliced Avocado",
+    "price": 3.13,
+    "weight": 0
+  },
+  {
+    "name": "NACHOS",
+    "price": 16,
+    "weight": 0
+  },
+  {
+    "name": "PARTIDA BLANCO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "GUIA DEL ALMA - MEZCAL",
+    "price": 15,
+    "weight": 0
+  },
+  {
+    "name": "FRESCO CUCUMBER - PITCHER",
+    "price": 52,
+    "weight": 0
+  },
+  {
+    "name": "QUESADILLA",
+    "price": 10.69,
+    "weight": 0
+  },
+  {
+    "name": "JACK DANIELS - WHISKEY",
+    "price": 9,
+    "weight": 0
+  },
+  {
+    "name": "CAVA DE ORO CRISTALINO - TEQUILA",
+    "price": 24,
+    "weight": 0
+  },
+  {
+    "name": "1921 BLANCO - TEQUILA",
+    "price": 15,
+    "weight": 0
+  },
+  {
+    "name": "ARETTE ARTESENAL REPOSADO - TEQUILA",
+    "price": 16,
+    "weight": 0
+  },
+  {
+    "name": "TACO FEAST",
+    "price": 60,
+    "weight": 0
+  },
+  {
+    "name": "BOZAL ENSAMBLE - MEZCAL",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "FORTALEZA STILL STRENGTH- TEQUILA",
+    "price": 15,
+    "weight": 0
+  },
+  {
+    "name": "PAQUI ANEJO - TEQUILA",
+    "price": 16,
+    "weight": 0
+  },
+  {
+    "name": "CASA DEL SOL ANEJO RESERVE - TEQUILA",
+    "price": 45,
+    "weight": 0
+  },
+  {
+    "name": "FLAVORED TITANIC",
+    "price": 35,
+    "weight": 0
+  },
+  {
+    "name": "SIETE LEGUAS BLANCO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "TOGO WATERMELON MARGARITA",
+    "price": 17,
+    "weight": 0
+  },
+  {
+    "name": "TANTEO CHIPOTLE - TEQUILA",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "XICARU ANEJO - MEZCAL",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "HACIENDA DE CHIHUAHUA ANEJO - SOTOL",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "CLASE 1111 EXTRA ANEJO - TEQUILA",
+    "price": 48,
+    "weight": 0
+  },
+  {
+    "name": "TRES LECHES",
+    "price": 6.99,
+    "weight": 0
+  },
+  {
+    "name": "DEL MAGUEY CREMA - MEZCAL",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "COMMUNITY VODA",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "EMPRESS INDIGO - GIN",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "CHICKEN TENDERS",
+    "price": 6,
+    "weight": 0
+  },
+  {
+    "name": "TRIO DE QUESOS",
+    "price": 19.69,
+    "weight": 0
+  },
+  {
+    "name": "MEXICAN COKE 1/2 LITRO",
+    "price": 4.25,
+    "weight": 0
+  },
+  {
+    "name": "COMMUNITY VODKA",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "MAESTRO DOBLE DIAMANTE - TEQUILA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "TOPO CHICO",
+    "price": 3.5,
+    "weight": 0
+  },
+  {
+    "name": "BOMBAY SAPPHIRE - GIN",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "JARRITOS GRAPEFRUIT",
+    "price": 3.5,
+    "weight": 0
+  },
+  {
+    "name": "XICARU REPOSADO - MEZCAL",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "OAXACAN MULE (MEZCAL)",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "RREAL OLD FASHION",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "BOZAL CENIZO - MEZCAL",
+    "price": 15,
+    "weight": 0
+  },
+  {
+    "name": "DON FULANO BLANCO - TEQUILA",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "BOZAL RESERVA COYOTE ANCESTRAL - MEZCAL",
+    "price": 22,
+    "weight": 0
+  },
+  {
+    "name": "MADRE ESPADIN - MEZCAL",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "CINCORO REPOSADO - TEQUILA",
+    "price": 28,
+    "weight": 0
+  },
+  {
+    "name": "PITCHER - WITCHES' BREW",
+    "price": 52,
+    "weight": 0
+  },
+  {
+    "name": "CHLOE - CHARDONNAY",
+    "price": 9,
+    "weight": 0
+  },
+  {
+    "name": "DULCE VIDA ANEJO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "TITANICS",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "SIEMPRE PLATA - TEQUILA",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "MONTELOBOS JOVEN TOBALA - MEZCAL",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "COMPLEMENTARY CHIPS",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "Side Of Chips Salsa",
+    "price": 1.25,
+    "weight": 0
+  },
+  {
+    "name": "SIDE OF QUESO FRESCO",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "LAS CALIFORNIAS CITRICO - GIN",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "PAQUI REPOSADO - TEQUILA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "Side Of Chorizo",
+    "price": 1.88,
+    "weight": 0
+  },
+  {
+    "name": "CILANTRO RICE",
+    "price": 3.99,
+    "weight": 0
+  },
+  {
+    "name": "YUU BAAL JOVEN PECHUGA - MEZCAL",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "FOUR ROSES SINGLE BARREL - BOURBON",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "KIMO SABE ANEJO - MEZCAL",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "CORONA LIGHT",
+    "price": 6,
+    "weight": 0
+  },
+  {
+    "name": "DULCE VIDA EXTRA ANEJO 100 PROOF - TEQUILA",
+    "price": 45,
+    "weight": 0
+  },
+  {
+    "name": "Sauted Pepper & Onions",
+    "price": 1.88,
+    "weight": 0
+  },
+  {
+    "name": "MATUA VALLEY - SAUVIGNONG BLANC",
+    "price": 9,
+    "weight": 0
+  },
+  {
+    "name": "HENNESY PITCHER",
+    "price": 65,
+    "weight": 0
+  },
+  {
+    "name": "PREMIUM MARGARITA - Mini Bar",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "3 Mixed Veggie",
+    "price": 15.75,
+    "weight": 0
+  },
+  {
+    "name": "DON FERNANDO REPOSADO - TEQUILA",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "Chicken Birria",
+    "price": 6.87,
+    "weight": 0
+  },
+  {
+    "name": "TECATE - BEER - Mini Bar",
+    "price": 5,
+    "weight": 0
+  },
+  {
+    "name": "1800 SILVER - TEQUILA",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "BIRRIA BARBACOA",
+    "price": 6.69,
+    "weight": 0
+  },
+  {
+    "name": "GREEN TEA SHOT",
+    "price": 8,
+    "weight": 0
+  },
+  {
+    "name": "FLECHA AZUL ANEJO - TEQUILA",
+    "price": 22,
+    "weight": 0
+  },
+  {
+    "name": "EL RUDOLF",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "FRESCO - PITCHER",
+    "price": 45,
+    "weight": 0
+  },
+  {
+    "name": "3 VEGGIE",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "WOODFORD RESERVA - BOURBON",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "RAYU JOVEN - MEZCAL",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "MILLER LITE",
+    "price": 6,
+    "weight": 0
+  },
+  {
+    "name": "SIDE OF PICKLED RED ONIONS",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "AGUA PASSIONFRUIT",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "COKE ZERO",
+    "price": 3.5,
+    "weight": 0
+  },
+  {
+    "name": "SIETE MISTERIOS ESPADIN OLLA DE BARRO - MEZCAL",
+    "price": 26,
+    "weight": 0
+  },
+  {
+    "name": "KETEL ONE - VODKA",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "FROZEN PITCHER",
+    "price": 45,
+    "weight": 0
+  },
+  {
+    "name": "MILAGRO REPOSADO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "TITOS HANDMADE - VODKA",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "HAUNTED TITANIC",
+    "price": 35,
+    "weight": 0
+  },
+  {
+    "name": "AVIATION - GIN",
+    "price": 8,
+    "weight": 0
+  },
+  {
+    "name": "JOSH - CABERNET SAUVIGNON",
+    "price": 9,
+    "weight": 0
+  },
+  {
+    "name": "Rreal Mango Margarita",
+    "price": 15,
+    "weight": 0
+  },
+  {
+    "name": "MANGO & PINEAPPLE MOCKTAIL",
+    "price": 7,
+    "weight": 0
+  },
+  {
+    "name": "MEZCALITA - Mini Bar",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "BLUE POWERADE",
+    "price": 3.5,
+    "weight": 0
+  },
+  {
+    "name": "ILLEGAL JOVEN - MEZCAL",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "Abuela Salad",
+    "price": 13.74,
+    "weight": 0
+  },
+  {
+    "name": "PEDRO FURTIVO BLANCO - TEQUILA",
+    "price": 9,
+    "weight": 0
+  },
+  {
+    "name": "CASA NOBLE BLANCO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "Kids Nachos",
+    "price": 6,
+    "weight": 0
+  },
+  {
+    "name": "YUU BAAL MADRE CUISHE - MEZCAL",
+    "price": 16,
+    "weight": 0
+  },
+  {
+    "name": "ADICTIVO BLANCO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "TOGO PASSION FRUIT MARGARITA",
+    "price": 16,
+    "weight": 0
+  },
+  {
+    "name": "ALIPUS MADRE CUISHE - MEZCAL",
+    "price": 18,
+    "weight": 0
+  },
+  {
+    "name": "3 GRILLED SHRIMP",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "1800 REPOSADO - TEQUILA",
+    "price": 11,
+    "weight": 0
+  },
+  {
+    "name": "PADRE AZUL REPOSADO - TEQUILA",
+    "price": 18,
+    "weight": 0
+  },
+  {
+    "name": "DOS EQUIS AMBER - BEER  - Mini Bar",
+    "price": 6,
+    "weight": 0
+  },
+  {
+    "name": "FANTA GRAPE",
+    "price": 3.5,
+    "weight": 0
+  },
+  {
+    "name": "LA REINA BLANCO - RAICILLA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "Halloween Birria (Limited time only!!!)",
+    "price": 8.88,
+    "weight": 0
+  },
+  {
+    "name": "HACIENDA DE CHIHUAHUA PLATA - SOTOL",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "JARRITOS PINEAPPLE",
+    "price": 3.5,
+    "weight": 0
+  },
+  {
+    "name": "SEX IN THE BEACH",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "MADRE ENSAMBLE - MEZCAL",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "BLOODY MARY (VODKA)",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "HEINEKEN",
+    "price": 5,
+    "weight": 0
+  },
+  {
+    "name": "CHIC BARCELONA - BRUT",
+    "price": 9,
+    "weight": 0
+  },
+  {
+    "name": "PATRON REPOSADO - TEQUILA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "DEL MAGUEY CLASICO - MEZCAL",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "CASILLERO DEL DIABLO - MERLOT",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "PAQUI BLANCO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "AGUA FRESCA BLACKBERRY",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "KAH ANEJO - TEQUILA",
+    "price": 16,
+    "weight": 0
+  },
+  {
+    "name": "TRIVENTO - MALBEC",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "EL MAYOR REPOSADO - TEQUILA",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "SKINNY - PITCHER",
+    "price": 38,
+    "weight": 0
+  },
+  {
+    "name": "MILAGRO ANEJO - TEQUILA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "BACARDI SPICED - RUM",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "SIDE OF SPRINGMIX",
+    "price": 1.5,
+    "weight": 0
+  },
+  {
+    "name": "JOSE CUERVO DE LA FAMILIA PLATA - TEQUILA",
+    "price": 16,
+    "weight": 0
+  },
+  {
+    "name": "CASAMIGOS BLANCO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "RREAL PITCHER",
+    "price": 45,
+    "weight": 0
+  },
+  {
+    "name": "PEDRO MORALES SILVER - TEQUILA",
+    "price": 7,
+    "weight": 0
+  },
+  {
+    "name": "BURRITO SABANERO",
+    "price": 15,
+    "weight": 0
+  },
+  {
+    "name": "CASAMIGOS BLANCO JALAPEÑO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "AGUA FRESCA FRESA",
+    "price": 4.2,
+    "weight": 0
+  },
+  {
+    "name": "Crispy Avocado",
+    "price": 5.25,
+    "weight": 0
+  },
+  {
+    "name": "LA CREMA - CHARDONNAY",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "FIJI WATER",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "SMALL SHREDDED CHEESE - 2OZ",
+    "price": 1.5,
+    "weight": 0
+  },
+  {
+    "name": "MAKER'S MARK - BOURBON",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "LYCHEE LOVE - PITCHER",
+    "price": 48,
+    "weight": 0
+  },
+  {
+    "name": "BOZAL TEPEZTATE - MEZCAL",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "ALIPUS TOBALA - MEZCAL",
+    "price": 20,
+    "weight": 0
+  },
+  {
+    "name": "Small Queso Dip",
+    "price": 1.88,
+    "weight": 0
+  },
+  {
+    "name": "FEVER TREE - GINGER ALE",
+    "price": 3,
+    "weight": 0
+  },
+  {
+    "name": "QUIEREME MUCHO TOBALA - MEZCAL",
+    "price": 16,
+    "weight": 0
+  },
+  {
+    "name": "GRANDIAL BRUT - ROSE",
+    "price": 9,
+    "weight": 0
+  },
+  {
+    "name": "REYES Y DEMONIOS - MEZCAL",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "HOUSE TITANIC",
+    "price": 50,
+    "weight": 0
+  },
+  {
+    "name": "DR PEPPER",
+    "price": 3.5,
+    "weight": 0
+  },
+  {
+    "name": "CLASE AZUL TITANIC",
+    "price": 300,
+    "weight": 0
+  },
+  {
+    "name": "ESPOLON BLANCO - TEQUILA",
+    "price": 9,
+    "weight": 0
+  },
+  {
+    "name": "CHRISTMAS TITANIC",
+    "price": 35,
+    "weight": 0
+  },
+  {
+    "name": "OCHO ANEJO - TEQUILA",
+    "price": 18,
+    "weight": 0
+  },
+  {
+    "name": "CLASE 1111 BLANCO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "FANTA PINEAPPLE",
+    "price": 3.5,
+    "weight": 0
+  },
+  {
+    "name": "SACA ESPANTOS TOBALA - MEZCAL",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "PARTIDA REPOSADO - TEQUILA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "TEREMANA BLANCO - TEQUILA",
+    "price": 9,
+    "weight": 0
+  },
+  {
+    "name": "PERRIER",
+    "price": 3.5,
+    "weight": 0
+  },
+  {
+    "name": "3 ASADA",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "TEARS OF LLORONA EXTRA ANEJO - TEQUILA",
+    "price": 38,
+    "weight": 0
+  },
+  {
+    "name": "Queso No Chips",
+    "price": 8.33,
+    "weight": 0
+  },
+  {
+    "name": "JOSE CUERVO TRADICIONAL REPOSADO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "3 PORK CARNITAS",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "DULCE VIDA GRAPEFRUIT - TEQUILA",
+    "price": 9,
+    "weight": 0
+  },
+  {
+    "name": "4-PACK",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "PREMIUM - PITCHER",
+    "price": 49,
+    "weight": 0
+  },
+  {
+    "name": "TROPICAL HENNESSY",
+    "price": 15,
+    "weight": 0
+  },
+  {
+    "name": "CASA DEL SOL AÑEJO - TEQUILA",
+    "price": 20,
+    "weight": 0
+  },
+  {
+    "name": "YUU BAAL REPOSADO - MEZCAL",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "EXCELLIA REPOSADO - TEQUILA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "BANHEZ TEPEZTATE - MEZCAL",
+    "price": 20,
+    "weight": 0
+  },
+  {
+    "name": "ALIPUS SAN JUAN - MEZCAL",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "OLMECA ALTOS REPOSADO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "CONTRALUZ CRISTALINO - MEZCAL",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "REDBULL SUGAR-FREE",
+    "price": 3,
+    "weight": 0
+  },
+  {
+    "name": "PADRECITO ORGANIC BLANCO - TEQUILA",
+    "price": 15,
+    "weight": 0
+  },
+  {
+    "name": "HACIENDA DE CHIHUAHUA REPOSADO - SOTOL",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "PITCHER - LA CATRINA",
+    "price": 48,
+    "weight": 0
+  },
+  {
+    "name": "GREEN TEA - MARGARITA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "PINEAPPLE GUAVA - PITCHER MOCKTAIL",
+    "price": 28,
+    "weight": 0
+  },
+  {
+    "name": "VALENTINE'S BIRRIA",
+    "price": 6.69,
+    "weight": 0
+  },
+  {
+    "name": "DOS XX LAGER",
+    "price": 6,
+    "weight": 0
+  },
+  {
+    "name": "BOZAL BORREGO SACRIFICIO - MEZCAL",
+    "price": 22,
+    "weight": 0
+  },
+  {
+    "name": "AGUA FRESCA PASSIONFRUIT",
+    "price": 4.2,
+    "weight": 0
+  },
+  {
+    "name": "SIDE OF CHIPOTLE MAYO",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "CORZO BLANCO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "LAS PERLAS DE JALISCO - MEZCAL",
+    "price": 16,
+    "weight": 0
+  },
+  {
+    "name": "LYRIC BY ESTADE - PINOT NOIR",
+    "price": 9,
+    "weight": 0
+  },
+  {
+    "name": "CASILLERO DEL DIABLO - SAUVIGNON BLANC",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "YUU BAAL TOBALA - MEZCAL",
+    "price": 16,
+    "weight": 0
+  },
+  {
+    "name": "3 BEEF BARBACOA",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "SHRIMP",
+    "price": 5.69,
+    "weight": 0
+  },
+  {
+    "name": "PUEBLO VIEJO REPOSADO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "CANYON ROAD CABERNET SAUVIGNON - RED WINE",
+    "price": 9,
+    "weight": 0
+  },
+  {
+    "name": "TEXAS MARGARITA - Mini Bar",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "OLMECA ALTOS PLATA - TEQUILA",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "FANTA ORANGE",
+    "price": 3.5,
+    "weight": 0
+  },
+  {
+    "name": "REDBULL",
+    "price": 3,
+    "weight": 0
+  },
+  {
+    "name": "Rreal Passionfruit Margarita",
+    "price": 15,
+    "weight": 0
+  },
+  {
+    "name": "FIYORI VODKA",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "Small Radish",
+    "price": 0.63,
+    "weight": 0
+  },
+  {
+    "name": "AVION SILVER - TEQUILA",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "FANTA STRAWBERRY",
+    "price": 3.5,
+    "weight": 0
+  },
+  {
+    "name": "GRAN DOVEJO BLANCO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "DOS EQUIS LAGER - BEER - Mini Bar",
+    "price": 6,
+    "weight": 0
+  },
+  {
+    "name": "JÄGERMEISTER - BOTANICAL LIQUEUR",
+    "price": 8,
+    "weight": 0
+  },
+  {
+    "name": "STRAWBERRY - PITCHER",
+    "price": 44,
+    "weight": 0
+  },
+  {
+    "name": "GINGER ALE",
+    "price": 3.5,
+    "weight": 0
+  },
+  {
+    "name": "Side Of Mayo",
+    "price": 0.63,
+    "weight": 0
+  },
+  {
+    "name": "GIN & TONIC",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "HERRADURA REPOSADO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "HERRADURA ULTRA ANEJO - TEQUILA",
+    "price": 20,
+    "weight": 0
+  },
+  {
+    "name": "FISH",
+    "price": 5.69,
+    "weight": 0
+  },
+  {
+    "name": "BACARDI COCONUT - MOJITO",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "Rice",
+    "price": 4.99,
+    "weight": 0
+  },
+  {
+    "name": "Chicken Quesabirria",
+    "price": 17.49,
+    "weight": 0
+  },
+  {
+    "name": "CAZCANES BLANCO - TEQUILA",
+    "price": 16,
+    "weight": 0
+  },
+  {
+    "name": "11:11 ESPADIN",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "FOUR ROSES SMALL BATCH - BOURBON",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "BOZAL CHINO VERDE - MEZCAL",
+    "price": 30,
+    "weight": 0
+  },
+  {
+    "name": "TEREMANA REPOSADO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "GREY GOOSE - VODKA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "ALIPUS SAN LUIS - MEZCAL",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "CONVITE ESPADIN-MADRE CUISHE - MEZCAL",
+    "price": 15,
+    "weight": 0
+  },
+  {
+    "name": "CORAZÓN DE AGAVE REPOSADO - TEQUILA",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "SPRITZ TITANIC",
+    "price": 35,
+    "weight": 0
+  },
+  {
+    "name": "BAILEY IRISH CREAM",
+    "price": 8,
+    "weight": 0
+  },
+  {
+    "name": "DON AMADO ANEJO - TEQUILA",
+    "price": 20,
+    "weight": 0
+  },
+  {
+    "name": "CAZCANES ANEJO - TEQUILA",
+    "price": 28,
+    "weight": 0
+  },
+  {
+    "name": "Rreal Strawberry Margarita",
+    "price": 15,
+    "weight": 0
+  },
+  {
+    "name": "DON JULIO BLANCO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "6 FLOUR TORILLA - TACO FEAST",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "MI TIERRA ANEJO - TEQUILA",
+    "price": 16,
+    "weight": 0
+  },
+  {
+    "name": "MAESTRO DOBEL 50 CRISTALINO EXTRA ANEJO - TEQUILA",
+    "price": 32,
+    "weight": 0
+  },
+  {
+    "name": "SAUTEED PEPPERS & ONIONS",
+    "price": 1.5,
+    "weight": 0
+  },
+  {
+    "name": "LOS NAHUALES ANEJO - MEZCAL",
+    "price": 15,
+    "weight": 0
+  },
+  {
+    "name": "ALIPUS SAN ANDRES - MEZCAL",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "SALSA NO CHIPS",
+    "price": 3.33,
+    "weight": 0
+  },
+  {
+    "name": "JAMESON IRISH 7 YEARS - WHISKEY",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "FEVER TREE - CLUB SODA",
+    "price": 3,
+    "weight": 0
+  },
+  {
+    "name": "KIMO SABE REPOSADO - MEZCAL",
+    "price": 11,
+    "weight": 0
+  },
+  {
+    "name": "CLASE AZUL REPOSADO - TEQUILA",
+    "price": 35,
+    "weight": 0
+  },
+  {
+    "name": "check adjustments",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "SMALL 2OZ GUACAMOLE",
+    "price": 1.5,
+    "weight": 0
+  },
+  {
+    "name": "MODELO ESPECIAL",
+    "price": 6,
+    "weight": 0
+  },
+  {
+    "name": "PATRON SILVER - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "MINUTE MAID - LEMONADE",
+    "price": 3.5,
+    "weight": 0
+  },
+  {
+    "name": "SOUR CREAM - 2OZ",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "CUCUMBER & MINT - PITCHER MOCKTAIL",
+    "price": 28,
+    "weight": 0
+  },
+  {
+    "name": "GUACAMOLE NO CHIPS",
+    "price": 7.77,
+    "weight": 0
+  },
+  {
+    "name": "GRACIAS A DIOS ESPADIN REPOSADO - MEZCAL",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "XICARU SILVER - MEZCAL",
+    "price": 11,
+    "weight": 0
+  },
+  {
+    "name": "LA PENCA - MEZCAL",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "QUESO DIP NO CHIPS",
+    "price": 6.66,
+    "weight": 0
+  },
+  {
+    "name": "CLASE 1111 REPOSADO - TEQUILA",
+    "price": 13,
+    "weight": 0
+  },
+  {
+    "name": "OLMECA ALTOS RESPOSADO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "DULCE VIDA REPOSADO - TEQUILA",
+    "price": 11,
+    "weight": 0
+  },
+  {
+    "name": "CROTALO REPOSADO - TEQUILA",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "NUESTRA SOLEDAD SANTIAGO MATATLAN - MEZCAL",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "EL ULTIMO AGAVE ALMOND - LIQUEUR",
+    "price": 8,
+    "weight": 0
+  },
+  {
+    "name": "Side Pickle Red Onion",
+    "price": 0.63,
+    "weight": 0
+  },
+  {
+    "name": "RREAL MARGARITA - Mini Bar",
+    "price": 9,
+    "weight": 0
+  },
+  {
+    "name": "MEXICAN MULE",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "MINERAGUA",
+    "price": 3.5,
+    "weight": 0
+  },
+  {
+    "name": "SIDE FRESH JALAPEÑOS",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "QUESO DIP",
+    "price": 7.77,
+    "weight": 0
+  },
+  {
+    "name": "Side Lechera",
+    "price": 0.94,
+    "weight": 0
+  },
+  {
+    "name": "BLACK WHOLE BEANS",
+    "price": 3.99,
+    "weight": 0
+  },
+  {
+    "name": "Black Beans Whole",
+    "price": 4.99,
+    "weight": 0
+  },
+  {
+    "name": "1800 ANEJO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "TOGO GUAVA PINEAPPLE MARGARITA",
+    "price": 17,
+    "weight": 0
+  },
+  {
+    "name": "Small Shredded Cheese",
+    "price": 1.88,
+    "weight": 0
+  },
+  {
+    "name": "BACARDI COCONUT - RUM",
+    "price": 7,
+    "weight": 0
+  },
+  {
+    "name": "MAESTRO DOBLE 50 CRISTALINO EXTRA ANEJO - TEQUILA",
+    "price": 32,
+    "weight": 0
+  },
+  {
+    "name": "VEGGIE",
+    "price": 5.2,
+    "weight": 0
+  },
+  {
+    "name": "CHINOLA PASSIONFRUIT - LIQUER",
+    "price": 8,
+    "weight": 0
+  },
+  {
+    "name": "JOSÉ CUERVO TRADICIONAL PLATA - TEQUILA",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "PICO DE GALLO - 2OZ",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "TAMARINDO STICK",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "BOZAL BARRIL - MEZCAL",
+    "price": 30,
+    "weight": 0
+  },
+  {
+    "name": "EL TEQUILENO ANEJO - TEQUILA",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "ILLEGAL REPOSADO - MEZCAL",
+    "price": 14,
+    "weight": 0
+  },
+  {
+    "name": "Jarritos Mandarin",
+    "price": 3.75,
+    "weight": 0
+  },
+  {
+    "name": "TOGO DRAGON FRUIT MARGARITA",
+    "price": 17,
+    "weight": 0
+  },
+  {
+    "name": "EL GRINCH TITANIC",
+    "price": 35,
+    "weight": 0
+  },
+  {
+    "name": "CASAMIGOS - MEZCAL",
+    "price": 15,
+    "weight": 0
+  },
+  {
+    "name": "Open Drink",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "val",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "CASA NOBLE MARQUES - TEQUILA",
+    "price": 28,
+    "weight": 0
+  },
+  {
+    "name": "MIX VEGGIES TACO",
+    "price": 4.2,
+    "weight": 0
+  },
+  {
+    "name": "VEGGIE TACO (Copy)",
+    "price": 4.2,
+    "weight": 0
+  },
+  {
+    "name": "PARTIDA AÑEJO - TEQUILA",
+    "price": 16,
+    "weight": 0
+  },
+  {
+    "name": "CONSOME (Copy)",
+    "price": 3,
+    "weight": 0
+  },
+  {
+    "name": "Birria de Corazon",
+    "price": 8.88,
+    "weight": 0
+  },
+  {
+    "name": "JOSE CUERVO RESERVA DE FAMILIA EXTRA ANEJO - TEQUILA",
+    "price": 32,
+    "weight": 0
+  },
+  {
+    "name": "EL TESORO ANEJO - TEQUILA",
+    "price": 15,
+    "weight": 0
+  },
+  {
+    "name": "THE CROSSING - SAUVIGNON BLANC",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "VIRGIN ORGINAL MOJITO",
+    "price": 6,
+    "weight": 0
+  },
+  {
+    "name": "WOODINVILLE BOURBON - WHISKEY",
+    "price": 12,
+    "weight": 0
+  },
+  {
+    "name": "JOHNNIE WALKER RED - SCOTCH",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "FRIENDS AND FAMILY",
+    "price": 1,
+    "weight": 0
+  },
+  {
+    "name": "FLOUR TORTILLA",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "SPANISH RICE",
+    "price": 3.69,
+    "weight": 0
+  },
+  {
+    "name": "SCOFFLAW",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "CASTA TRIBAL ARTESANAL 18YRS - MEZCAL",
+    "price": 21,
+    "weight": 0
+  },
+  {
+    "name": "1800 CRISTALINO - TEQUILA",
+    "price": 25,
+    "weight": 0
+  },
+  {
+    "name": "JAMESON - WHISKEY",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "PITCHER - ZOMBIE PUNCH",
+    "price": 52,
+    "weight": 0
+  },
+  {
+    "name": "Jalapeno Toreado",
+    "price": 1.88,
+    "weight": 0
+  },
+  {
+    "name": "12-PACK",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "SMALL RADDISH",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "CASAMIGOS CRISTALINO - TEQUILA",
+    "price": 25,
+    "weight": 0
+  },
+  {
+    "name": "DOS EQUIS AMBAR",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "TOGO TEXAS MARGARITA",
+    "price": 18,
+    "weight": 0
+  },
+  {
+    "name": "Small Guacamole",
+    "price": 1.88,
+    "weight": 0
+  },
+  {
+    "name": "SIDE OF CHIMMICHURRI",
+    "price": 1,
+    "weight": 0
+  },
+  {
+    "name": "FIRE BALL - CINNAMON WHISKEY",
+    "price": 8,
+    "weight": 0
+  },
+  {
+    "name": "OLD FORESTER BOURBON - WHISKEY",
+    "price": 8,
+    "weight": 0
+  },
+  {
+    "name": "TOGO STRAWBERRY MARGARITA",
+    "price": 16,
+    "weight": 0
+  },
+  {
+    "name": "AVISSI - PROSECCO",
+    "price": 9,
+    "weight": 0
+  },
+  {
+    "name": "MANGO - PITCHER",
+    "price": 44,
+    "weight": 0
+  }
+]

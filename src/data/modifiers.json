@@ -1,0 +1,1832 @@
+[
+  {
+    "name": "Barbacoa",
+    "price": 2.5,
+    "weight": 0
+  },
+  {
+    "name": "CRISPY AVOCADO",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "No Coleslaw",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "TAMARINDO STICK",
+    "price": 2,
+    "weight": 0
+  },
+  {
+    "name": "PICKLED JALAPEÑOS",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "NO MAYO",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "Shrimp",
+    "price": 2.5,
+    "weight": 0
+  },
+  {
+    "name": "Pickled Red Onions",
+    "price": 0.63,
+    "weight": 0
+  },
+  {
+    "name": "ADD CHICKEN",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "Guac - No Jalapeno",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "SAUTEED PEPPER & ONIONS",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "ADD RADISH",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "ADD CARNITAS",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "PICO DE GALLO",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "ADD CHAYOTE SLAW",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "STRAWBERRY",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "3 PICANHA",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "NOTHING ON RIM",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "ADD BARBACOA",
+    "price": 5,
+    "weight": 0
+  },
+  {
+    "name": "ADD GUACAMOLE",
+    "price": 1.5,
+    "weight": 0
+  },
+  {
+    "name": "PLAIN",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "ADD FISH",
+    "price": 5,
+    "weight": 0
+  },
+  {
+    "name": "GRAND MARNIER",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "NO QUESO",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "Cabbage",
+    "price": 0.63,
+    "weight": 0
+  },
+  {
+    "name": "CHILLED",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "FISH",
+    "price": 2,
+    "weight": 0
+  },
+  {
+    "name": "Add Asada",
+    "price": 6.25,
+    "weight": 0
+  },
+  {
+    "name": "FRESH JALAPEÑOS",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "AL PASTOR",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "Sauted Pepper & Onions",
+    "price": 0.63,
+    "weight": 0
+  },
+  {
+    "name": "GRILLED FISH",
+    "price": 2,
+    "weight": 0
+  },
+  {
+    "name": "Coleslaw",
+    "price": 0.63,
+    "weight": 0
+  },
+  {
+    "name": "No Cheese",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "NO SLAW",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "French Fries",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "SANGRIA SWIRL",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "Sauted Peppers & Onions",
+    "price": 0.63,
+    "weight": 0
+  },
+  {
+    "name": "No Tajin",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "NO RADDISH",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "CARNITAS",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "ADD JALAPEÑOS",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "SUGAR",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "GRAND MARNIER - FLOAT",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "NO RIM",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "No Rice",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "No Jalapeno",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "ADD PICHANA",
+    "price": 5.5,
+    "weight": 0
+  },
+  {
+    "name": "MEXICAN RICE (Red)",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "NO MEAT",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "NO SOUR CREAM",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "TAJIN",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "Queso Fresco",
+    "price": 0.63,
+    "weight": 0
+  },
+  {
+    "name": "Add Tempura Fish",
+    "price": 11.25,
+    "weight": 0
+  },
+  {
+    "name": "ADD PORK BELLY",
+    "price": 5,
+    "weight": 0
+  },
+  {
+    "name": "Asada",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "ADD QUESO DIP",
+    "price": 1,
+    "weight": 0
+  },
+  {
+    "name": "EXTRA TOMATO",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "Add Mixed Veggies",
+    "price": 4.38,
+    "weight": 0
+  },
+  {
+    "name": "ADD SLICED AVOCADO",
+    "price": 3,
+    "weight": 0
+  },
+  {
+    "name": "3 ASADA",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "SPRITE",
+    "price": 2,
+    "weight": 0
+  },
+  {
+    "name": "NOTHING ON THE RIM",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "ADD FRESH JALAPEÑOS",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "SALT",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "Tempura Fish",
+    "price": 1.5,
+    "weight": 0
+  },
+  {
+    "name": "FLOUR TORTILLA",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "NO BEANS",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "ADD MIX VEGGIES",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "MANGO",
+    "price": 2,
+    "weight": 0
+  },
+  {
+    "name": "Tomato",
+    "price": 0.63,
+    "weight": 0
+  },
+  {
+    "name": "EXTRA CILANTRO & ONIONS",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "ADD SOUR CREAM",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "ADD ROSE SCENTED CONSOME",
+    "price": 3,
+    "weight": 0
+  },
+  {
+    "name": "MEXICAN RICE",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "3 COSTRA AL PASTOR",
+    "price": 5,
+    "weight": 0
+  },
+  {
+    "name": "Onion & Cilantro On The Side",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "ADD CRISPY AVOCADO",
+    "price": 2,
+    "weight": 0
+  },
+  {
+    "name": "NO ONIONS",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "NO GUACAMOLE",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "ADD PICO DE GALLO",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "AVOCADO",
+    "price": 1.5,
+    "weight": 0
+  },
+  {
+    "name": "LIME DROP",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "DO NOT MAKE",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "Tomatoes",
+    "price": 0.63,
+    "weight": 0
+  },
+  {
+    "name": "ADD PICO",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "CHICKEN",
+    "price": 2,
+    "weight": 0
+  },
+  {
+    "name": "3 Veggie",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "NO ONION",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "SUB CORN TORTILLA",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "CHIPOTLE MAYO ON THE SIDE",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "RADDISH",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "ADD TOMATO",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "SANGRIA SWRIL",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "Grilled Chicken",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "NO PICO DE GALLO",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "ADD ASADA STEAK",
+    "price": 5,
+    "weight": 0
+  },
+  {
+    "name": "CHIPS FOR TRIO",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "Chicken Birria",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "DOUBLE TORTILLA",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "COLESLAW ON THE SIDE",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "3",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "GINGER BEER",
+    "price": 2,
+    "weight": 0
+  },
+  {
+    "name": "SPICY",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "Salsa Habanera",
+    "price": 0.63,
+    "weight": 0
+  },
+  {
+    "name": "NUT ALLERGY",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "16 CORN TORTILLAS",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "Add Pickled Jalapeños",
+    "price": 1.25,
+    "weight": 0
+  },
+  {
+    "name": "PINEAPPLE JUICE",
+    "price": 2,
+    "weight": 0
+  },
+  {
+    "name": "EL HOT CHOCOLATE",
+    "price": 5,
+    "weight": 0
+  },
+  {
+    "name": "PICANHA",
+    "price": 3,
+    "weight": 0
+  },
+  {
+    "name": "ADD QUESO FRESCO",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "4",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "3 GLASSES",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "PORK BELLY",
+    "price": 1,
+    "weight": 0
+  },
+  {
+    "name": "SMOKEY TAMARIMNDO",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "GUACAMOLE",
+    "price": 1.5,
+    "weight": 0
+  },
+  {
+    "name": "NO CILANTRO",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "5",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "No Avocado",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "SUB - FRESH AVOCADO",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "PASSION FRUIT",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "3 COSTRA GRILLED CHICKEN",
+    "price": 5,
+    "weight": 0
+  },
+  {
+    "name": "FEAST PICO DE GALLO",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "Toreados",
+    "price": 0.63,
+    "weight": 0
+  },
+  {
+    "name": "SHREDDED CHEESE",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "SAUTEED PEPPERS & ONIONS",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "No Cabbage",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "CRANBERRY JUICE",
+    "price": 2,
+    "weight": 0
+  },
+  {
+    "name": "MEZCALITA",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "ADD CABBAGE",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "25oz",
+    "price": 9,
+    "weight": 0
+  },
+  {
+    "name": "NO CHIPOTLE MAYO",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "ADD SAUTED PEPPERS & ONIONS",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "COLD GLASS",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "No Pico",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "SPARKLING WATER",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "QUESO COTIJA",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "GRAND MARNIER FLOAT",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "WATERMELON MARGARITA",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "ADD SALMON",
+    "price": 5.5,
+    "weight": 0
+  },
+  {
+    "name": "CILANTRO RICE (Green)",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "NO-MEAT",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "NO GLASSES",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "GLUTEN ALLERGY",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "Cilantro Rice",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "3 Al Pastor",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "No Meat - Sub",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "GUAVA PINEAPPLE MARGARITA",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "TEXAS",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "2 GLASSES",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "3 GRILLED CHICKEN",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "ASADA STEAK",
+    "price": 1,
+    "weight": 0
+  },
+  {
+    "name": "Queso",
+    "price": 1.57,
+    "weight": 0
+  },
+  {
+    "name": "CHAYOTE SLAW",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "Add Mix Veggie",
+    "price": 8.75,
+    "weight": 0
+  },
+  {
+    "name": "JALAPEÑOS",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "VEGGIE",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "ESPRESSO MARTINI",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "NO TOMATO",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "NO SPRING MIX",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "MOJITO",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "3 PORK CARNITAS",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "1234",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "ADD COLESLAW",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "BLUE CORN",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "Whole Beans",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "ADD AVOCADO",
+    "price": 1.5,
+    "weight": 0
+  },
+  {
+    "name": "ADD PICKLED RED ONIONS",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "Add Al Pastor",
+    "price": 5,
+    "weight": 0
+  },
+  {
+    "name": "RED BULL",
+    "price": 3,
+    "weight": 0
+  },
+  {
+    "name": "RANCH WATER",
+    "price": 3,
+    "weight": 0
+  },
+  {
+    "name": "EXTRA CREMA",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "PASSIONFRUIT",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "3 Birria Barbacoa",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "PASTOR",
+    "price": 2,
+    "weight": 0
+  },
+  {
+    "name": "Sour Cream",
+    "price": 0.63,
+    "weight": 0
+  },
+  {
+    "name": "NO CHILLI POWDER",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "NO CHILI POWDER",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "PICHANA",
+    "price": 1.5,
+    "weight": 0
+  },
+  {
+    "name": "EXTRA QUESO COTIJA",
+    "price": 0.25,
+    "weight": 0
+  },
+  {
+    "name": "No Dressing",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "NO QUESO DIP",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "No Cucumber",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "NO QUESO COTIJA",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "FEAST GUACAMOLE",
+    "price": 1.5,
+    "weight": 0
+  },
+  {
+    "name": "PEACH",
+    "price": 2,
+    "weight": 0
+  },
+  {
+    "name": "EXTRA MAYO",
+    "price": 0.25,
+    "weight": 0
+  },
+  {
+    "name": "EXTRA QUESO",
+    "price": 1.5,
+    "weight": 0
+  },
+  {
+    "name": "Extra Aguacate",
+    "price": 1.88,
+    "weight": 0
+  },
+  {
+    "name": "Shellfish allergy",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "ADD CHORIZO",
+    "price": 1,
+    "weight": 0
+  },
+  {
+    "name": "NO QUESO FRESCO",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "ADD JALAPEÑOS FRESCOS",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "Pickle Red Onions",
+    "price": 0.63,
+    "weight": 0
+  },
+  {
+    "name": "4 GLASSES",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "NEAT",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "ADD CHICKEN BIRRIA",
+    "price": 5,
+    "weight": 0
+  },
+  {
+    "name": "FISH ALLERGY",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "WITCHES' BREW",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "SALMON",
+    "price": 2,
+    "weight": 0
+  },
+  {
+    "name": "Rose Scented Consomé",
+    "price": 3.75,
+    "weight": 0
+  },
+  {
+    "name": "EXTRA CILANTRO AND ONIONS",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "COKE ZERO",
+    "price": 1,
+    "weight": 0
+  },
+  {
+    "name": "No Frijol",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "ADD GRILLED FISH",
+    "price": 5,
+    "weight": 0
+  },
+  {
+    "name": "Crispy Avocados",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "Add Crispy Avocados",
+    "price": 4.38,
+    "weight": 0
+  },
+  {
+    "name": "GINGERALE",
+    "price": 2,
+    "weight": 0
+  },
+  {
+    "name": "16 FLOURTORTILLAS",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "QUESO DIP",
+    "price": 1.5,
+    "weight": 0
+  },
+  {
+    "name": "8 CORN TORTILLAS & 8 FLOUR TORTILLAS",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "ADD SHRIMP",
+    "price": 5,
+    "weight": 0
+  },
+  {
+    "name": "MAKE MICHELADA",
+    "price": 7,
+    "weight": 0
+  },
+  {
+    "name": "EXTRA CABBAGE",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "Guac",
+    "price": 1.88,
+    "weight": 0
+  },
+  {
+    "name": "16oz",
+    "price": 6,
+    "weight": 0
+  },
+  {
+    "name": "EXTRA CHILI POWDER",
+    "price": 0.25,
+    "weight": 0
+  },
+  {
+    "name": "3 Costra Shrimp",
+    "price": 6.25,
+    "weight": 0
+  },
+  {
+    "name": "REFRIED BEANS",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "Jalapeños Extra",
+    "price": 0.63,
+    "weight": 0
+  },
+  {
+    "name": "ROCKS",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "Mixed Veggies",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "Jalapeno Extra",
+    "price": 0.63,
+    "weight": 0
+  },
+  {
+    "name": "8 FLOUR TORTILLAS",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "3 MIXED VEGGIES",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "1",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "MULE",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "Jalapeno Toreado",
+    "price": 1.88,
+    "weight": 0
+  },
+  {
+    "name": "MAKE IT GRILLED",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "3 Grilled Shrimp",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "EXTRA CHIPS",
+    "price": 2,
+    "weight": 0
+  },
+  {
+    "name": "NO LECHERA",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "NO PINEAPPLE",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "GRAND MARNIER - FLOAT (1/2 OZ)",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "ON",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "DAIRY ALLERGY",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "12 CORN TORTILLAS",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "ORANGE JUICE",
+    "price": 2,
+    "weight": 0
+  },
+  {
+    "name": "NO PICKLED RED ONION",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "Cilantro",
+    "price": 0.63,
+    "weight": 0
+  },
+  {
+    "name": "NO SLAW MIX",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "ADD EXTRA ONIONS",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "Add Grilled Chicken",
+    "price": 8.75,
+    "weight": 0
+  },
+  {
+    "name": "Fried Avocado",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "NO CREMA",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "No Side",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "FRIES",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "No Chimichurri",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "BLOODY MARY",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "AGUA FRESCA PASSION FRUIT",
+    "price": 1,
+    "weight": 0
+  },
+  {
+    "name": "LARGE",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "Fresh Avocado",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "No Pickled Onions",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "ON THE SIDE",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "ADD SHREDDED CHEESE",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "NO PEPPER & ONIONS",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "SEPARATE BOX",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "ADD VINEGAR JALAPEÑOS",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "TEQUILA SUNRISE",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "OLD FASHIONED",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "6 CORN TORTILLAS",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "AGUA FRESCA MANGO",
+    "price": 1,
+    "weight": 0
+  },
+  {
+    "name": "2",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "EXTRA PICKLED JALAPEÑO",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "WATER",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "MAKE IT SPICY",
+    "price": 2,
+    "weight": 0
+  },
+  {
+    "name": "3 COSTRA BARBACOA",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "MALVERDE",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "6 FLOUR TORTILAS & 6 CORN TORTILLAS",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "Sauted Peppers & Onion",
+    "price": 0.63,
+    "weight": 0
+  },
+  {
+    "name": "3 GRILLED FISH",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "ADDITIONAL FLAVOR",
+    "price": 2,
+    "weight": 0
+  },
+  {
+    "name": "NO CREAMA",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "NO JALAPEÑ0S",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "ADD SAUTEED PEPPERS & ONIONS",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "PLAIN CORN",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "BEEF BARBACOA",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "DRAGON FRUIT MARGARITA",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "Mix Veggie",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "TONIC WATER",
+    "price": 2,
+    "weight": 0
+  },
+  {
+    "name": "60oz",
+    "price": 20,
+    "weight": 0
+  },
+  {
+    "name": "FEAST COLESLAW",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "ADD SAUTED PEPPER & ONIONS",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "3 NEW VEGGIE",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "MIX VIGGIE",
+    "price": 7,
+    "weight": 0
+  },
+  {
+    "name": "3 Costra De Asada",
+    "price": 6.25,
+    "weight": 0
+  },
+  {
+    "name": "SUAGR",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "NO SIDES",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "MIX VEGGIES",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "CHORIZO",
+    "price": 1,
+    "weight": 0
+  },
+  {
+    "name": "Add Onions",
+    "price": 1.25,
+    "weight": 0
+  },
+  {
+    "name": "EL GRINCH",
+    "price": 5,
+    "weight": 0
+  },
+  {
+    "name": "ADD PICKLED JALAPEÑO",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "GRAN GALA - FLOAT (1/2 OZ)",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "ADD QUESO FRESO",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "Add Porkbelly",
+    "price": 5,
+    "weight": 0
+  },
+  {
+    "name": "ADD QUESO COTIJA",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "ADD CILANTRO",
+    "price": 1,
+    "weight": 0
+  },
+  {
+    "name": "Radish",
+    "price": 0.63,
+    "weight": 0
+  },
+  {
+    "name": "MAKE IT PITCHER",
+    "price": 60,
+    "weight": 0
+  },
+  {
+    "name": "Toreado",
+    "price": 0.63,
+    "weight": 0
+  },
+  {
+    "name": "FRESCO CUCUMBER",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "Add Picanha",
+    "price": 12.5,
+    "weight": 0
+  },
+  {
+    "name": "LEMONADE",
+    "price": 1,
+    "weight": 0
+  },
+  {
+    "name": "COKE",
+    "price": 2,
+    "weight": 0
+  },
+  {
+    "name": "RED BULL SUGAR FREE",
+    "price": 3,
+    "weight": 0
+  },
+  {
+    "name": "TEMPUA FISH",
+    "price": 9,
+    "weight": 0
+  },
+  {
+    "name": "No Cheese Dip",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "3 COSTRA CARNITAS",
+    "price": 5,
+    "weight": 0
+  },
+  {
+    "name": "DR PEPPER",
+    "price": 1,
+    "weight": 0
+  },
+  {
+    "name": "GINGER ALE",
+    "price": 1,
+    "weight": 0
+  },
+  {
+    "name": "PORKBELLY",
+    "price": 1,
+    "weight": 0
+  },
+  {
+    "name": "6 FLOUR TORTIILAS",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "ADD CONSOME",
+    "price": 3,
+    "weight": 0
+  },
+  {
+    "name": "ADD PICKLED RED ONION",
+    "price": 1,
+    "weight": 0
+  },
+  {
+    "name": "No Pepper Onion",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "GRILL CHICKEN",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "Add Chopped Onions & Cilantro",
+    "price": 1.25,
+    "weight": 0
+  },
+  {
+    "name": "8 CORN & 8 FLOUR",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "3 Pork Belly",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "ADD CHICKENS",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "5 GLASSES",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "16 FLOUR TORTILLAS",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "3 COSTRA PICANHA",
+    "price": 5,
+    "weight": 0
+  },
+  {
+    "name": "3 COSTRA DE SHRIMP",
+    "price": 5,
+    "weight": 0
+  },
+  {
+    "name": "Sub Grilled",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "No Pickled Jalapeno",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "JALAPEÑO FRESCO",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "Add Grill Chicken",
+    "price": 5,
+    "weight": 0
+  },
+  {
+    "name": "LA CATRINA",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "MAKE IT A DOUBLE",
+    "price": 10,
+    "weight": 0
+  },
+  {
+    "name": "NO SUGAR",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "3 CHRISTMAS BIRRIA",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "MARGARITA",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "3 BEEF BARBACOA",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "CLUB SODA",
+    "price": 2,
+    "weight": 0
+  },
+  {
+    "name": "No Tomatoes",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "FEAST ONIONS & CILANTRO",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "ADD EXTRA CRISPY AVOCADO",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "ADD CORIZO",
+    "price": 1,
+    "weight": 0
+  },
+  {
+    "name": "Pico Gallo",
+    "price": 0.63,
+    "weight": 0
+  },
+  {
+    "name": "TEST",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "8 CORN TORTILLAS",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "CILATRO RICE",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "NONE",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "1 GLASS",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "No Guac",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "SUB TOSTADAS",
+    "price": 1,
+    "weight": 0
+  },
+  {
+    "name": "No Make",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "Onions",
+    "price": 0.63,
+    "weight": 0
+  },
+  {
+    "name": "NO TAJÍN ON WATERMELON",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "AGUA FRESCA PINEAPPLE",
+    "price": 1,
+    "weight": 0
+  },
+  {
+    "name": "PALOMA",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "3 COSTRA PORK BELLY",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "ZOMBIE PUNCH",
+    "price": 4,
+    "weight": 0
+  },
+  {
+    "name": "NO CHIPS SUB TOSTADAS",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "3 COSTRA ASADA",
+    "price": 5,
+    "weight": 0
+  },
+  {
+    "name": "No Pepper - No Onions",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "3 Tempura Fish",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "12 FLOUR TORTILLAS",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "ADD RADDISH",
+    "price": 0.5,
+    "weight": 0
+  },
+  {
+    "name": "ADD EXTRA CILANTRO",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "3 COSTRA GRILL CHICKEN",
+    "price": 5,
+    "weight": 0
+  },
+  {
+    "name": "ADD CHOPPED ONION & CILANTRO",
+    "price": 1,
+    "weight": 0
+  },
+  {
+    "name": "Chimichurri On The Side",
+    "price": 0,
+    "weight": 0
+  }
+]
