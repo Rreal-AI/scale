@@ -36,10 +36,16 @@ export function formatPrice(priceInCents: number): string {
 }
 
 export function formatWeight(weightInGrams: number): string {
-  if (weightInGrams >= 1000) {
-    return `${(weightInGrams / 1000).toFixed(1)} kg`;
+  const ounces = Math.round((weightInGrams / 28.3495) * 10) / 10;
+  if (ounces >= 16) {
+    const pounds = Math.floor(ounces / 16);
+    const remainingOz = ounces % 16;
+    if (remainingOz === 0) {
+      return `${pounds} lb`;
+    }
+    return `${pounds} lb ${remainingOz} oz`;
   }
-  return `${weightInGrams} g`;
+  return `${ounces} oz`;
 }
 
 export function formatDate(dateString: string): string {

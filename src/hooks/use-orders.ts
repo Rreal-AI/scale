@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@clerk/nextjs";
 
 // Tipos para las respuestas de la API
@@ -201,5 +201,50 @@ export const useRecentOrders = (limit: number = 10) => {
     limit,
     sort_by: "created_at",
     sort_order: "desc",
+  });
+};
+
+// Function to update order weight
+const updateOrderWeight = async ({
+  id,
+  actual_weight,
+}: {
+  id: string;
+  actual_weight: number;
+}): Promise<{ order: Order; message: string }> => {
+  const response = await fetch(`/api/orders/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ actual_weight }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Failed to update order weight");
+  }
+
+  return response.json();
+};
+
+// Hook to update order weight
+export const useUpdateOrderWeight = () => {
+  const { orgId } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateOrderWeight,
+    onSuccess: (data, variables) => {
+      // Invalidar la query del order específico
+      queryClient.invalidateQueries({
+        queryKey: ["orders", orgId, variables.id],
+      });
+      // Invalidar la lista de orders
+      queryClient.invalidateQueries({
+        queryKey: ["orders", orgId],
+        exact: false,
+      });
+    },
   });
 };

@@ -7,7 +7,7 @@ export const organizations = pgTable("organizations", {
   currency: text("currency").notNull().default("USD"),
   order_weight_delta_tolerance: integer("order_weight_delta_tolerance")
     .notNull()
-    .default(100),
+    .default(100), // in grams (~3.5 oz tolerance)
   created_at: timestamp("created_at").notNull().defaultNow(),
   updated_at: timestamp("updated_at").notNull().defaultNow(),
 });

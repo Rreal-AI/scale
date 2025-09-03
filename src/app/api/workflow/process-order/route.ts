@@ -62,7 +62,7 @@ export const { POST } = serve<ProcessOrderPayload>(
             ),
         });
 
-        // Calculate expected weight before creating the order
+        // Calculate expected weight before creating the order (in grams)
         let expectedWeight = 0;
 
         // Calculate weight from products
