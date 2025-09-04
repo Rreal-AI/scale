@@ -84,8 +84,8 @@ export function OrdersStats({ orders, className }: OrdersStatsProps) {
               <div className="absolute top-0 left-0 right-0 h-0.5 bg-red-400" />
             )}
             
-            <CardContent className="p-3">
-              <div className="space-y-1.5">
+            <CardContent className="p-2.5">
+              <div className="space-y-1">
                 <div className="flex items-center justify-between">
                   <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
                     {stat.label}

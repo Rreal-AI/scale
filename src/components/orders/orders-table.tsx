@@ -6,6 +6,9 @@ import { OrdersFilters } from "./orders-filters";
 import { OrdersTableContent } from "./orders-table-content";
 import { OrdersPagination } from "./orders-pagination";
 import { OrderDetailSheet } from "./order-detail-sheet";
+import { Button } from "@/components/ui/button";
+import { LayoutGrid, Table, RefreshCw } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface Order {
   id: string;
@@ -30,7 +33,12 @@ interface Order {
   updated_at: string;
 }
 
-export function OrdersTable() {
+interface OrdersTableProps {
+  viewMode?: "cards" | "table";
+  onViewModeChange?: (mode: "cards" | "table") => void;
+}
+
+export function OrdersTable({ viewMode, onViewModeChange }: OrdersTableProps = {}) {
   const [filters, setFilters] = useState<{
     search?: string;
     status?: "pending_weight" | "weighed" | "completed" | "cancelled";
@@ -91,14 +99,55 @@ export function OrdersTable() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold">Orders</h1>
           <p className="text-muted-foreground">
             View and manage customer orders
           </p>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          {/* View Toggle */}
+          {onViewModeChange && (
+            <div className="flex items-center rounded-lg border p-1 bg-muted/50">
+              <Button
+                variant={viewMode === "cards" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => onViewModeChange("cards")}
+                className={cn(
+                  "flex items-center gap-2 transition-all",
+                  viewMode === "cards" && "bg-background shadow-sm"
+                )}
+              >
+                <LayoutGrid className="h-4 w-4" />
+                Cards
+              </Button>
+              <Button
+                variant={viewMode === "table" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => onViewModeChange("table")}
+                className={cn(
+                  "flex items-center gap-2 transition-all",
+                  viewMode === "table" && "bg-background shadow-sm"
+                )}
+              >
+                <Table className="h-4 w-4" />
+                Table
+              </Button>
+            </div>
+          )}
+          
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2"
+          >
+            <RefreshCw className="h-4 w-4" />
+            Refresh
+          </Button>
         </div>
       </div>
 
