@@ -27,7 +27,7 @@ import { cn } from "@/lib/utils";
 interface Order {
   id: string;
   org_id: string;
-  status: "pending_weight" | "weighed" | "completed" | "cancelled";
+  status: "pending_weight" | "weighed" | "ready_for_lockers" | "completed" | "cancelled";
   type: "delivery" | "takeout";
   check_number: string;
   customer_name: string;
@@ -43,6 +43,7 @@ interface Order {
   input: string;
   structured_output?: Record<string, unknown>;
   weight_verified_at?: string;
+  ready_for_lockers_at?: string;
   created_at: string;
   updated_at: string;
 }
@@ -52,7 +53,7 @@ interface FilterOption {
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   value?: "delivery" | "takeout";
-  status?: "pending_weight" | "completed" | "cancelled";
+  status?: "pending_weight" | "ready_for_lockers" | "completed" | "cancelled";
   color: string;
   count?: number;
 }
@@ -65,7 +66,7 @@ interface OrdersDashboardProps {
 export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardProps = {}) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState<"delivery" | "takeout" | "all">("all");
-  const [selectedStatus, setSelectedStatus] = useState<"pending_weight" | "completed" | "cancelled" | "all">("all");
+  const [selectedStatus, setSelectedStatus] = useState<"pending_weight" | "ready_for_lockers" | "completed" | "cancelled" | "all">("all");
   
   // View states
   const [currentView, setCurrentView] = useState<"dashboard" | "weigh">("dashboard");
@@ -109,6 +110,7 @@ export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardP
       delivery: allOrders.filter(o => o.type === "delivery").length,
       takeout: allOrders.filter(o => o.type === "takeout").length,
       pending_weight: allOrders.filter(o => o.status === "pending_weight").length,
+      ready_for_lockers: allOrders.filter(o => o.status === "ready_for_lockers").length,
       completed: allOrders.filter(o => o.status === "completed").length,
       cancelled: allOrders.filter(o => o.status === "cancelled").length,
     };
@@ -150,6 +152,14 @@ export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardP
       status: "pending_weight",
       color: "text-gray-700 hover:bg-gray-100",
       count: counts.pending_weight
+    },
+    {
+      id: "ready_for_lockers",
+      label: "Ready for Lockers",
+      icon: Package,
+      status: "ready_for_lockers",
+      color: "text-gray-700 hover:bg-gray-100",
+      count: counts.ready_for_lockers
     },
     {
       id: "completed",

@@ -49,7 +49,7 @@ interface OrderItem {
 interface Order {
   id: string;
   org_id: string;
-  status: "pending_weight" | "weighed" | "completed" | "cancelled";
+  status: "pending_weight" | "weighed" | "ready_for_lockers" | "completed" | "cancelled";
   type: "delivery" | "takeout";
   check_number: string;
   customer_name: string;
@@ -65,6 +65,7 @@ interface Order {
   input: string;
   structured_output?: Record<string, unknown>;
   weight_verified_at?: string;
+  ready_for_lockers_at?: string;
   created_at: string;
   updated_at: string;
 }

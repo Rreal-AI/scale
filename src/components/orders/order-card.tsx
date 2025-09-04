@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils";
 interface Order {
   id: string;
   org_id: string;
-  status: "pending_weight" | "weighed" | "completed" | "cancelled";
+  status: "pending_weight" | "weighed" | "ready_for_lockers" | "completed" | "cancelled";
   type: "delivery" | "takeout";
   check_number: string;
   customer_name: string;
@@ -62,6 +62,12 @@ const getStatusConfig = (status: Order["status"]) => {
         label: "Weighed",
         variant: "outline" as const,
         color: "text-blue-600 bg-blue-50"
+      };
+    case "ready_for_lockers":
+      return {
+        label: "Ready for Lockers",
+        variant: "outline" as const,
+        color: "text-purple-600 bg-purple-50"
       };
     case "completed":
       return {

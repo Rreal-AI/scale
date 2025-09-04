@@ -634,7 +634,7 @@ export function WeighOrderView({
                             disabled={totalWeight === 0}
                             className="w-full h-16 text-xl font-semibold bg-green-600 hover:bg-green-700 disabled:bg-gray-300"
                           >
-                            Complete Weighing
+                            Ready for Lockers
                           </Button>
                         );
                       })()}

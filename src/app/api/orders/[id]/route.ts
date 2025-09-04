@@ -155,8 +155,9 @@ export async function PUT(
       .set({
         actual_weight,
         delta_weight,
-        status: "completed", // Mark as completed when weighed
+        status: "ready_for_lockers", // Mark as ready for lockers when weighed
         weight_verified_at: new Date(),
+        ready_for_lockers_at: new Date(), // Track when moved to lockers
         updated_at: new Date(),
       })
       .where(and(eq(orders.id, id), eq(orders.org_id, orgId)))
