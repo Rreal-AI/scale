@@ -412,31 +412,23 @@ export function WeighOrderView({
                     {(() => {
                       const structuredOutput = selectedOrder.structured_output as { items?: Array<{ name: string; quantity: number; price: number; modifiers?: Array<{ name: string; price: number }> }> } | null;
                       return structuredOutput?.items?.map((item, index) => (
-                      <div key={index} className="flex justify-between items-start">
+                      <div key={index} className="flex items-start gap-2">
+                        <span className="text-gray-400 mt-1">•</span>
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
                             <span className="font-medium">{item.quantity}x</span>
                             <span>{item.name}</span>
                           </div>
                           {item.modifiers && item.modifiers.length > 0 && (
-                            <div className="ml-6 mt-1 space-y-1">
+                            <div className="ml-4 mt-1 space-y-0.5">
                               {item.modifiers.map((modifier, modIndex) => (
-                                <div key={modIndex} className="text-sm text-gray-600">
-                                  + {modifier.name}
-                                  {modifier.price > 0 && (
-                                    <span className="ml-2 text-gray-500">
-                                      {formatPrice(modifier.price * 100)}
-                                    </span>
-                                  )}
+                                <div key={modIndex} className="text-sm text-gray-600 flex items-center gap-1">
+                                  <span className="text-gray-300">•</span>
+                                  <span>{modifier.name}</span>
                                 </div>
                               ))}
                             </div>
                           )}
-                        </div>
-                        <div className="text-right">
-                          <span className="font-medium">
-                            {formatPrice(item.price * item.quantity * 100)}
-                          </span>
                         </div>
                       </div>
                     ));
