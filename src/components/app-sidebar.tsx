@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Package, Settings, FileText } from "lucide-react";
+import { useSidebar } from "@/components/ui/sidebar";
 import {
   Sidebar,
   SidebarContent,
@@ -35,6 +36,7 @@ const navigationItems = [
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const { state } = useSidebar();
 
   return (
     <Sidebar>
@@ -43,9 +45,14 @@ export function AppSidebar() {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <span className="text-sm font-bold">S</span>
           </div>
-          <span className="text-lg font-semibold">Scale</span>
+          {state === "expanded" && (
+            <span className="text-lg font-semibold">Scale</span>
+          )}
         </div>
       </SidebarHeader>
+
+      {/* Divider line between header and content */}
+      <div className="h-px bg-gray-300 mx-2" />
 
       <SidebarContent>
         <SidebarGroup>

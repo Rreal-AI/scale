@@ -1,0 +1,71 @@
+/* Typography System - Operance Style */
+
+/* Base font family */
+* {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+}
+
+/* Headings */
+h1, .text-h1 {
+  @apply text-2xl font-semibold tracking-tight text-gray-900;
+}
+
+h2, .text-h2 {
+  @apply text-xl font-semibold tracking-tight text-gray-900;
+}
+
+h3, .text-h3 {
+  @apply text-lg font-medium text-gray-900;
+}
+
+h4, .text-h4 {
+  @apply text-base font-medium text-gray-900;
+}
+
+h5, .text-h5 {
+  @apply text-sm font-medium text-gray-900;
+}
+
+h6, .text-h6 {
+  @apply text-xs font-medium text-gray-700 uppercase tracking-wide;
+}
+
+/* Body text */
+.text-body {
+  @apply text-sm text-gray-700 leading-relaxed;
+}
+
+.text-body-large {
+  @apply text-base text-gray-700 leading-relaxed;
+}
+
+.text-body-small {
+  @apply text-xs text-gray-600;
+}
+
+/* Caption text */
+.text-caption {
+  @apply text-xs text-gray-500;
+}
+
+.text-caption-small {
+  @apply text-xs text-gray-400;
+}
+
+/* Labels */
+.text-label {
+  @apply text-sm font-medium text-gray-700;
+}
+
+.text-label-small {
+  @apply text-xs font-medium text-gray-600;
+}
+
+/* Muted text */
+.text-muted {
+  @apply text-gray-500;
+}
+
+.text-muted-light {
+  @apply text-gray-400;
+}

@@ -24,6 +24,7 @@ import { cn } from "@/lib/utils";
 
 interface Order {
   id: string;
+  org_id: string;
   status: "pending_weight" | "weighed" | "completed" | "cancelled";
   type: "delivery" | "takeout";
   check_number: string;
@@ -122,7 +123,7 @@ export function OrdersDashboard() {
       label: "Delivery",
       icon: Truck,
       value: "delivery",
-      color: "text-gray-700 hover:bg-gray-100",
+      color: "text-indigo-600 hover:bg-indigo-50",
       count: counts.delivery
     },
     {
@@ -130,7 +131,7 @@ export function OrdersDashboard() {
       label: "Pickup",
       icon: Package,
       value: "takeout",
-      color: "text-gray-700 hover:bg-gray-100",
+      color: "text-emerald-600 hover:bg-emerald-50",
       count: counts.takeout
     }
   ];
@@ -209,8 +210,10 @@ export function OrdersDashboard() {
     }
   };
 
-  // Get urgent orders count
+  // Get urgent orders count (only pending orders can be urgent)
   const urgentOrdersCount = orders.filter(order => {
+    if (order.status !== "pending_weight") return false; // Only pending orders can be urgent
+    
     const created = new Date(order.created_at);
     const now = new Date();
     const diffMinutes = Math.floor((now.getTime() - created.getTime()) / (1000 * 60));
@@ -235,7 +238,7 @@ export function OrdersDashboard() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold">Orders Dashboard</h1>
+            <h1 className="text-h1">Orders Dashboard</h1>
             {urgentOrdersCount > 0 && (
               <Badge variant="destructive" className="flex items-center gap-1">
                 <AlertTriangle className="h-3 w-3" />
@@ -243,7 +246,7 @@ export function OrdersDashboard() {
               </Badge>
             )}
           </div>
-          <p className="text-muted-foreground">
+          <p className="text-body">
             Real-time order management and weight verification
           </p>
         </div>
@@ -281,7 +284,7 @@ export function OrdersDashboard() {
 
         {/* Type Filters */}
         <div className="space-y-2">
-          <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+          <h3 className="text-h6">
             Order Type
           </h3>
           <div className="flex flex-wrap gap-2">
@@ -294,12 +297,27 @@ export function OrdersDashboard() {
                   key={filter.id}
                   variant="ghost"
                   size="sm"
-                  onClick={() => setSelectedType(filter.value || "all")}
+                  onClick={() => {
+                    // Toggle filter - if already selected, deselect it
+                    if (isSelected && filter.value) {
+                      setSelectedType("all");
+                    } else {
+                      setSelectedType(filter.value || "all");
+                    }
+                  }}
                   className={cn(
                     "flex items-center gap-2 transition-all border",
                     isSelected 
-                      ? "bg-gray-900 text-white border-gray-900" 
-                      : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                      ? (filter.id === "delivery" 
+                          ? "bg-indigo-600 text-white border-indigo-600"
+                          : filter.id === "takeout"
+                          ? "bg-emerald-600 text-white border-emerald-600"
+                          : "bg-gray-900 text-white border-gray-900")
+                      : (filter.id === "delivery"
+                          ? "text-indigo-600 border-indigo-200 hover:bg-indigo-50"
+                          : filter.id === "takeout"
+                          ? "text-emerald-600 border-emerald-200 hover:bg-emerald-50"
+                          : "border-gray-200 text-gray-600 hover:bg-gray-50")
                   )}
                 >
                   <Icon className="h-4 w-4" />
@@ -323,7 +341,7 @@ export function OrdersDashboard() {
 
         {/* Status Filters */}
         <div className="space-y-2">
-          <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+          <h3 className="text-h6">
             Order Status
           </h3>
           <div className="flex flex-wrap gap-2">
@@ -336,7 +354,14 @@ export function OrdersDashboard() {
                   key={filter.id}
                   variant="ghost"
                   size="sm"
-                  onClick={() => setSelectedStatus(filter.status || "all")}
+                  onClick={() => {
+                    // Toggle filter - if already selected, deselect it
+                    if (isSelected && filter.status) {
+                      setSelectedStatus("all");
+                    } else {
+                      setSelectedStatus(filter.status || "all");
+                    }
+                  }}
                   className={cn(
                     "flex items-center gap-2 transition-all border",
                     isSelected 
@@ -366,7 +391,7 @@ export function OrdersDashboard() {
 
       {/* Orders Grid */}
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3">
           {Array.from({ length: 8 }).map((_, i) => (
             <div key={i} className="h-64 bg-muted rounded-lg animate-pulse" />
           ))}
@@ -394,15 +419,94 @@ export function OrdersDashboard() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {orders.map((order) => (
-            <OrderCard
-              key={order.id}
-              order={order}
-              onWeigh={handleWeighOrder}
-              onViewDetails={handleViewDetails}
-            />
-          ))}
+        <div className="space-y-8">
+          {(() => {
+            // Separate orders by status when showing all
+            const pendingOrders = orders.filter(order => 
+              order.status === "pending_weight" || order.status === "weighed"
+            );
+            const completedOrders = orders.filter(order => 
+              order.status === "completed"
+            );
+            
+            // If filtering by status, show normal grid
+            if (selectedStatus !== "all") {
+              return (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3">
+                  {orders.map((order) => (
+                    <OrderCard
+                      key={order.id}
+                      order={order}
+                      variant="compact"
+                      onWeigh={handleWeighOrder}
+                      onViewDetails={handleViewDetails}
+                      onCardClick={order.status === "pending_weight" ? handleWeighOrder : handleViewDetails}
+                    />
+                  ))}
+                </div>
+              );
+            }
+            
+            return (
+              <div className="space-y-8">
+                {/* Pending Orders Section */}
+                {pendingOrders.length > 0 && (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3">
+                      {pendingOrders.map((order) => (
+                        <OrderCard
+                          key={order.id}
+                          order={order}
+                          variant="compact"
+                          onWeigh={handleWeighOrder}
+                          onViewDetails={handleViewDetails}
+                          onCardClick={handleWeighOrder}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Completed Orders Section */}
+                {completedOrders.length > 0 && (
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-4">
+                      <div className="h-px bg-gray-200 flex-1"></div>
+                      <span className="text-sm font-medium text-gray-500 uppercase tracking-wider px-3">
+                        Completed
+                      </span>
+                      <div className="h-px bg-gray-200 flex-1"></div>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3">
+                      {completedOrders.map((order) => (
+                        <OrderCard
+                          key={order.id}
+                          order={order}
+                          variant="compact"
+                          onWeigh={handleWeighOrder}
+                          onViewDetails={handleViewDetails}
+                          onCardClick={handleViewDetails}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Empty state when no orders in either section */}
+                {pendingOrders.length === 0 && completedOrders.length === 0 && (
+                  <div className="text-center py-12">
+                    <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">No orders found</h3>
+                    <p className="text-muted-foreground">
+                      {searchQuery || selectedType !== "all"
+                        ? "Try adjusting your filters or search query."
+                        : "No orders have been created yet."}
+                    </p>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
         </div>
       )}
 

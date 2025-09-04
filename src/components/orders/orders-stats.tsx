@@ -33,6 +33,8 @@ export function OrdersStats({ orders, className }: OrdersStatsProps) {
     weighed: orders.filter(o => o.status === "weighed").length,
     completed: orders.filter(o => o.status === "completed").length,
     urgent: orders.filter(order => {
+      if (order.status !== "pending_weight") return false; // Only pending orders can be urgent
+      
       const created = new Date(order.created_at);
       const now = new Date();
       const diffMinutes = Math.floor((now.getTime() - created.getTime()) / (1000 * 60));
@@ -82,8 +84,8 @@ export function OrdersStats({ orders, className }: OrdersStatsProps) {
               <div className="absolute top-0 left-0 right-0 h-0.5 bg-red-400" />
             )}
             
-            <CardContent className="p-4">
-              <div className="space-y-2">
+            <CardContent className="p-3">
+              <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
                     {stat.label}
@@ -94,7 +96,7 @@ export function OrdersStats({ orders, className }: OrdersStatsProps) {
                     </Badge>
                   )}
                 </div>
-                <p className="text-2xl font-bold text-gray-900">
+                <p className="text-xl font-bold text-gray-900">
                   {stat.value}
                 </p>
                 <p className="text-xs text-gray-500">

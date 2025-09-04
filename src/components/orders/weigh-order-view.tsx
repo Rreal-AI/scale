@@ -67,7 +67,7 @@ export function WeighOrderView({
 }: WeighOrderViewProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState<"all" | "delivery" | "takeout">("all");
-  const [selectedStatus, setSelectedStatus] = useState<"all" | "pending_weight">("all");
+  const [selectedStatus, setSelectedStatus] = useState<"all" | "pending_weight">("pending_weight");
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "customer">("newest");
   
   // Weighing state
@@ -89,6 +89,8 @@ export function WeighOrderView({
   // Fetch selected order details
   const { data: selectedOrderData } = useOrder(selectedOrderId || "");
   const selectedOrder = selectedOrderData?.order;
+
+
 
   const orders = ordersData?.orders || [];
 
@@ -140,16 +142,21 @@ export function WeighOrderView({
     if (!selectedOrderId || totalWeight === 0) return;
     
     const expectedWeightOz = selectedOrder?.expected_weight ? gramsToOunces(selectedOrder.expected_weight) : 0;
-    const toleranceOz = gramsToOunces(100);
-    const analysis = analyzeOrderWeight(totalWeight, expectedWeightOz, selectedOrder?.structured_output?.items || [], toleranceOz);
     
-    if (analysis.status === 'underweight') {
-      // Don't complete - just reset for re-weighing
-      resetWeighingState();
-      return;
+    // Only analyze if we have expected weight
+    if (expectedWeightOz > 0) {
+      const toleranceOz = gramsToOunces(100);
+      const structuredOutput = selectedOrder?.structured_output as { items?: Array<{ name: string; quantity: number; price: number; modifiers?: Array<{ name: string; price: number }> }> } | null;
+      const analysis = analyzeOrderWeight(totalWeight, expectedWeightOz, structuredOutput?.items || [], toleranceOz);
+      
+      if (analysis.status === 'underweight') {
+        // Don't complete - just reset for re-weighing
+        resetWeighingState();
+        return;
+      }
     }
     
-    // Complete weighing for perfect or overweight orders
+    // Complete weighing (for perfect/overweight orders or orders without expected weight)
     const weightInGrams = ouncesToGrams(totalWeight);
     onOrderWeighed(selectedOrderId, weightInGrams);
     
@@ -186,7 +193,12 @@ export function WeighOrderView({
       .join(", ") + (items.length > 2 ? "..." : "");
   };
 
-  const getDueTime = (createdAt: string): { time: string; isUrgent: boolean } => {
+  const getDueTime = (createdAt: string, status: string): { time: string; isUrgent: boolean } => {
+    // Completed orders are never urgent
+    if (status === "completed" || status === "weighed") {
+      return { time: "Completed", isUrgent: false };
+    }
+    
     const created = new Date(createdAt);
     const now = new Date();
     const diffMinutes = Math.floor((now.getTime() - created.getTime()) / (1000 * 60));
@@ -270,7 +282,12 @@ export function WeighOrderView({
                 variant={selectedType === "delivery" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setSelectedType("delivery")}
-                className="h-8 px-3 text-xs font-medium"
+                className={cn(
+                  "h-8 px-3 text-xs font-medium",
+                  selectedType === "delivery" 
+                    ? "bg-indigo-600 text-white border-indigo-600" 
+                    : "text-indigo-600 border-indigo-200 hover:bg-indigo-50"
+                )}
               >
                 <Truck className="h-3 w-3 mr-1" />
                 Delivery
@@ -279,7 +296,12 @@ export function WeighOrderView({
                 variant={selectedType === "takeout" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setSelectedType("takeout")}
-                className="h-8 px-3 text-xs font-medium"
+                className={cn(
+                  "h-8 px-3 text-xs font-medium",
+                  selectedType === "takeout" 
+                    ? "bg-emerald-600 text-white border-emerald-600" 
+                    : "text-emerald-600 border-emerald-200 hover:bg-emerald-50"
+                )}
               >
                 <Package className="h-3 w-3 mr-1" />
                 Pickup
@@ -291,7 +313,7 @@ export function WeighOrderView({
         {/* Orders List */}
         <div className="flex-1 overflow-y-auto">
           {orders.map((order) => {
-            const { time: dueTime, isUrgent } = getDueTime(order.created_at);
+            const { time: dueTime, isUrgent } = getDueTime(order.created_at, order.status);
             const isSelected = selectedOrderId === order.id;
             
             return (
@@ -381,28 +403,20 @@ export function WeighOrderView({
                   )}
                 </div>
                 <div className="text-right">
-                  <div className="text-2xl font-bold text-gray-900 mb-1">
+                  <div className="text-2xl font-bold text-gray-900">
                     {formatPrice(selectedOrder.total_amount)}
                   </div>
-                  {selectedOrder.expected_weight && (
-                    <div className="text-sm text-gray-500">
-                      Expected: {gramsToOunces(selectedOrder.expected_weight)} oz
-                    </div>
-                  )}
                 </div>
-              </div>
-            </div>
 
-            {/* Order Items */}
-            <div className="flex-1 overflow-y-auto bg-gray-50 p-6">
-              <div className="max-w-2xl mx-auto space-y-6">
-                {/* Items List */}
+                {/* Order Items - MOVED TO BOTTOM */}
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-lg">Order Items</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    {selectedOrder.structured_output?.items?.map((item, index) => (
+                    {(() => {
+                      const structuredOutput = selectedOrder.structured_output as { items?: Array<{ name: string; quantity: number; price: number; modifiers?: Array<{ name: string; price: number }> }> } | null;
+                      return structuredOutput?.items?.map((item, index) => (
                       <div key={index} className="flex justify-between items-start">
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
@@ -430,15 +444,21 @@ export function WeighOrderView({
                           </span>
                         </div>
                       </div>
-                    )) || (
+                    ));
+                  })() || (
                       <div className="text-center text-gray-500 py-4">
                         No items found
                       </div>
                     )}
                   </CardContent>
                 </Card>
+              </div>
+            </div>
 
-                {/* Weighing Section */}
+            {/* Main Content - Weighing First, Items Second */}
+            <div className="flex-1 overflow-y-auto bg-gray-50 p-6">
+              <div className="max-w-2xl mx-auto space-y-6">
+                {/* Weighing Section - MOVED TO TOP */}
                 {selectedOrder.status === "pending_weight" && (
                   <div className="space-y-6">
                     <Card>
@@ -472,6 +492,16 @@ export function WeighOrderView({
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-6">
+                      {/* Expected Weight Display */}
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div className="flex justify-between items-center">
+                          <span className="text-lg font-medium text-blue-900">Expected Weight:</span>
+                          <span className="text-xl font-bold text-blue-900">
+                            {selectedOrder.expected_weight ? `${gramsToOunces(selectedOrder.expected_weight)} oz` : "Not calculated"}
+                          </span>
+                        </div>
+                      </div>
+
                       {/* Bag Weight Inputs - Clean Layout */}
                       <div className="grid gap-4">
                         {bagWeights.map((bag, index) => (
@@ -510,8 +540,10 @@ export function WeighOrderView({
                       {(() => {
                         const expectedWeightOz = selectedOrder.expected_weight ? gramsToOunces(selectedOrder.expected_weight) : 0;
                         const toleranceOz = gramsToOunces(100); // 100g tolerance
+                        // Skip analysis if no expected weight - just allow completion
+                        const structuredOutput = selectedOrder.structured_output as { items?: Array<{ name: string; quantity: number; price: number; modifiers?: Array<{ name: string; price: number }> }> } | null;
                         const analysis = totalWeight > 0 && expectedWeightOz > 0 
-                          ? analyzeOrderWeight(totalWeight, expectedWeightOz, selectedOrder.structured_output?.items || [], toleranceOz)
+                          ? analyzeOrderWeight(totalWeight, expectedWeightOz, structuredOutput?.items || [], toleranceOz)
                           : null;
                         
                         const getStatusColor = () => {
@@ -529,48 +561,53 @@ export function WeighOrderView({
                               <span className="text-xl font-medium text-gray-700">Total Weight:</span>
                               <span className="text-3xl font-bold text-gray-900">{totalWeight} oz</span>
                             </div>
-                            {selectedOrder.expected_weight && (
-                              <div className="flex justify-between items-center mt-3 text-lg">
-                                <span className="text-gray-500">Expected:</span>
-                                <span className="text-gray-700 font-medium">{expectedWeightOz} oz</span>
-                              </div>
-                            )}
+                                                    {/* Expected weight is now shown before input */}
                             
                             {/* Immediate Analysis Feedback */}
-                            {analysis && (
+                            {totalWeight > 0 && (
                               <div className="mt-4 pt-4 border-t border-gray-200">
-                                {analysis.status === 'perfect' && (
-                                  <div className="flex items-center gap-2 text-green-700">
+                                {analysis ? (
+                                  <>
+                                    {analysis.status === 'perfect' && (
+                                      <div className="flex items-center gap-2 text-green-700">
+                                        <CheckCircle2 className="h-5 w-5" />
+                                        <span className="font-medium">✅ Ready for delivery</span>
+                                      </div>
+                                    )}
+                                    
+                                    {analysis.status === 'underweight' && (
+                                      <div className="space-y-2">
+                                        <div className="flex items-center gap-2 text-red-700">
+                                          <AlertTriangle className="h-5 w-5" />
+                                          <span className="font-bold">⚠️ MISSING ITEMS</span>
+                                        </div>
+                                        <div className="bg-red-100 border border-red-300 rounded-lg p-3">
+                                          <p className="text-red-800 font-medium text-sm">
+                                            {analysis.message}
+                                          </p>
+                                        </div>
+                                      </div>
+                                    )}
+                                    
+                                    {analysis.status === 'overweight' && (
+                                      <div className="space-y-2">
+                                        <div className="flex items-center gap-2 text-orange-700">
+                                          <AlertTriangle className="h-5 w-5" />
+                                          <span className="font-medium">Extra weight detected</span>
+                                        </div>
+                                        <div className="bg-orange-100 border border-orange-300 rounded-lg p-3">
+                                          <p className="text-orange-800 font-medium text-sm">
+                                            {analysis.message}
+                                          </p>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </>
+                                ) : (
+                                  // No expected weight - just show ready to complete
+                                  <div className="flex items-center gap-2 text-blue-700">
                                     <CheckCircle2 className="h-5 w-5" />
-                                    <span className="font-medium">✅ Ready for delivery</span>
-                                  </div>
-                                )}
-                                
-                                {analysis.status === 'underweight' && (
-                                  <div className="space-y-2">
-                                    <div className="flex items-center gap-2 text-red-700">
-                                      <AlertTriangle className="h-5 w-5" />
-                                      <span className="font-bold">⚠️ MISSING ITEMS</span>
-                                    </div>
-                                    <div className="bg-red-100 border border-red-300 rounded-lg p-3">
-                                      <p className="text-red-800 font-medium text-sm">
-                                        {analysis.message}
-                                      </p>
-                                    </div>
-                                  </div>
-                                )}
-                                
-                                {analysis.status === 'overweight' && (
-                                  <div className="space-y-2">
-                                    <div className="flex items-center gap-2 text-orange-700">
-                                      <AlertTriangle className="h-5 w-5" />
-                                      <span className="font-medium">Extra weight detected</span>
-                                    </div>
-                                    <div className="bg-orange-100 border border-orange-300 rounded-lg p-3">
-                                      <p className="text-orange-800 font-medium text-sm">
-                                        {analysis.message}
-                                      </p>
-                                    </div>
+                                    <span className="font-medium">Weight recorded - Ready to complete</span>
                                   </div>
                                 )}
                               </div>
@@ -583,10 +620,14 @@ export function WeighOrderView({
                       {(() => {
                         const expectedWeightOz = selectedOrder.expected_weight ? gramsToOunces(selectedOrder.expected_weight) : 0;
                         const toleranceOz = gramsToOunces(100);
+                        
+                        // Only analyze if we have expected weight
+                        const structuredOutput = selectedOrder.structured_output as { items?: Array<{ name: string; quantity: number; price: number; modifiers?: Array<{ name: string; price: number }> }> } | null;
                         const analysis = totalWeight > 0 && expectedWeightOz > 0 
-                          ? analyzeOrderWeight(totalWeight, expectedWeightOz, selectedOrder.structured_output?.items || [], toleranceOz)
+                          ? analyzeOrderWeight(totalWeight, expectedWeightOz, structuredOutput?.items || [], toleranceOz)
                           : null;
                         
+                        // If underweight, show re-weigh button
                         if (analysis?.status === 'underweight') {
                           return (
                             <Button
@@ -599,6 +640,7 @@ export function WeighOrderView({
                           );
                         }
                         
+                        // Default: Complete weighing (works for no expected weight too)
                         return (
                           <Button
                             onClick={handleWeighAction}
