@@ -226,16 +226,16 @@ export function WeighOrderView({
       <div className="w-96 bg-white border-r border-gray-200 flex flex-col">
         {/* Header */}
         <div className="p-4 border-b border-gray-200">
-          <div className="flex items-center gap-3 mb-4">
+          <div className="mb-4">
             <Button
               variant="ghost"
               size="sm"
               onClick={onBack}
-              className="p-1 hover:bg-gray-100"
+              className="flex items-center gap-3 p-2 hover:bg-blue-50 text-blue-600 border border-blue-200 bg-blue-50 rounded-md w-full justify-start"
             >
               <ArrowLeft className="h-4 w-4" />
+              <span className="font-semibold">Orders</span>
             </Button>
-            <h2 className="font-semibold text-gray-900">Orders</h2>
           </div>
 
           {/* Search */}
@@ -401,11 +401,6 @@ export function WeighOrderView({
                       {selectedOrder.customer_address}
                     </p>
                   )}
-                </div>
-                <div className="text-right">
-                  <div className="text-2xl font-bold text-gray-900">
-                    {formatPrice(selectedOrder.total_amount)}
-                  </div>
                 </div>
 
                 {/* Order Items - MOVED TO BOTTOM */}

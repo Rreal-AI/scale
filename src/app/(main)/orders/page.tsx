@@ -13,39 +13,19 @@ export default function OrdersPage() {
   const [viewMode, setViewMode] = useState<ViewMode>("cards");
 
   return (
-    <div className="space-y-6">
-      {/* View Toggle */}
-      <div className="flex justify-end">
-        <div className="flex items-center rounded-lg border p-1 bg-muted/50">
-          <Button
-            variant={viewMode === "cards" ? "default" : "ghost"}
-            size="sm"
-            onClick={() => setViewMode("cards")}
-            className={cn(
-              "flex items-center gap-2 transition-all",
-              viewMode === "cards" && "bg-background shadow-sm"
-            )}
-          >
-            <LayoutGrid className="h-4 w-4" />
-            Cards
-          </Button>
-          <Button
-            variant={viewMode === "table" ? "default" : "ghost"}
-            size="sm"
-            onClick={() => setViewMode("table")}
-            className={cn(
-              "flex items-center gap-2 transition-all",
-              viewMode === "table" && "bg-background shadow-sm"
-            )}
-          >
-            <Table className="h-4 w-4" />
-            Table
-          </Button>
-        </div>
-      </div>
-
-      {/* Content */}
-      {viewMode === "cards" ? <OrdersDashboard /> : <OrdersTable />}
+    <div className="space-y-4">
+      {/* Content with integrated toggle */}
+      {viewMode === "cards" ? (
+        <OrdersDashboard 
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+        />
+      ) : (
+        <OrdersTable 
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+        />
+      )}
     </div>
   );
 }

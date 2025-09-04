@@ -18,7 +18,9 @@ import {
   AlertTriangle,
   Timer,
   Scale,
-  CheckCircle2
+  CheckCircle2,
+  LayoutGrid,
+  Table
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -55,7 +57,12 @@ interface FilterOption {
   count?: number;
 }
 
-export function OrdersDashboard() {
+interface OrdersDashboardProps {
+  viewMode?: "cards" | "table";
+  onViewModeChange?: (mode: "cards" | "table") => void;
+}
+
+export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardProps = {}) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState<"delivery" | "takeout" | "all">("all");
   const [selectedStatus, setSelectedStatus] = useState<"pending_weight" | "weighed" | "completed" | "cancelled" | "all">("all");
@@ -233,9 +240,9 @@ export function OrdersDashboard() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-h1">Orders Dashboard</h1>
@@ -252,6 +259,36 @@ export function OrdersDashboard() {
         </div>
         
         <div className="flex items-center gap-2">
+          {/* View Toggle */}
+          {onViewModeChange && (
+            <div className="flex items-center rounded-lg border p-1 bg-muted/50">
+              <Button
+                variant={viewMode === "cards" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => onViewModeChange("cards")}
+                className={cn(
+                  "flex items-center gap-2 transition-all",
+                  viewMode === "cards" && "bg-background shadow-sm"
+                )}
+              >
+                <LayoutGrid className="h-4 w-4" />
+                Cards
+              </Button>
+              <Button
+                variant={viewMode === "table" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => onViewModeChange("table")}
+                className={cn(
+                  "flex items-center gap-2 transition-all",
+                  viewMode === "table" && "bg-background shadow-sm"
+                )}
+              >
+                <Table className="h-4 w-4" />
+                Table
+              </Button>
+            </div>
+          )}
+          
           <Button
             variant="outline"
             size="sm"
@@ -270,7 +307,7 @@ export function OrdersDashboard() {
       )}
 
       {/* Search and Filters */}
-      <div className="space-y-4">
+      <div className="space-y-3">
         {/* Search */}
         <div className="relative max-w-md">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
