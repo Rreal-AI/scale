@@ -52,7 +52,7 @@ interface FilterOption {
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   value?: "delivery" | "takeout";
-  status?: "pending_weight" | "weighed" | "completed" | "cancelled";
+  status?: "pending_weight" | "completed" | "cancelled";
   color: string;
   count?: number;
 }
@@ -65,7 +65,7 @@ interface OrdersDashboardProps {
 export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardProps = {}) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState<"delivery" | "takeout" | "all">("all");
-  const [selectedStatus, setSelectedStatus] = useState<"pending_weight" | "weighed" | "completed" | "cancelled" | "all">("all");
+  const [selectedStatus, setSelectedStatus] = useState<"pending_weight" | "completed" | "cancelled" | "all">("all");
   
   // View states
   const [currentView, setCurrentView] = useState<"dashboard" | "weigh">("dashboard");
@@ -109,7 +109,6 @@ export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardP
       delivery: allOrders.filter(o => o.type === "delivery").length,
       takeout: allOrders.filter(o => o.type === "takeout").length,
       pending_weight: allOrders.filter(o => o.status === "pending_weight").length,
-      weighed: allOrders.filter(o => o.status === "weighed").length,
       completed: allOrders.filter(o => o.status === "completed").length,
       cancelled: allOrders.filter(o => o.status === "cancelled").length,
     };
@@ -151,14 +150,6 @@ export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardP
       status: "pending_weight",
       color: "text-gray-700 hover:bg-gray-100",
       count: counts.pending_weight
-    },
-    {
-      id: "weighed",
-      label: "Weighed",
-      icon: Scale,
-      status: "weighed",
-      color: "text-gray-700 hover:bg-gray-100",
-      count: counts.weighed
     },
     {
       id: "completed",
@@ -301,9 +292,9 @@ export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardP
         </div>
       </div>
 
-      {/* Stats Overview */}
-      {orders.length > 0 && (
-        <OrdersStats orders={orders} />
+      {/* Stats Overview - Always shows all orders */}
+      {allOrdersData?.orders && allOrdersData.orders.length > 0 && (
+        <OrdersStats orders={allOrdersData.orders} />
       )}
 
       {/* Search and Filters */}
