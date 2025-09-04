@@ -51,7 +51,11 @@ interface WeighOrderViewProps {
   selectedOrderId: string | null;
   onBack: () => void;
   onOrderSelect: (orderId: string) => void;
-  onOrderWeighed: (orderId: string, totalWeight: number) => void;
+  onOrderWeighed: (
+    orderId: string,
+    totalWeight: number,
+    status?: "weighed" | "completed"
+  ) => void;
 }
 
 interface BagWeight {
@@ -67,12 +71,14 @@ export function WeighOrderView({
 }: WeighOrderViewProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState<"all" | "delivery" | "takeout">("all");
-  const [selectedStatus, setSelectedStatus] = useState<"all" | "pending_weight">("pending_weight");
+  const [selectedStatus, setSelectedStatus] = useState<"all" | "pending_weight" | "weighed">("pending_weight");
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "customer">("newest");
+  const [selectedReadyIds, setSelectedReadyIds] = useState<Set<string>>(new Set());
   
   // Weighing state
   const [bagCount, setBagCount] = useState<number>(1);
   const [bagWeights, setBagWeights] = useState<BagWeight[]>([{ id: "bag-1", weight: 0 }]);
+  const [bagPackaging, setBagPackaging] = useState<Record<string, "none" | "paper" | "plastic" | "box">>({ "bag-1": "none" });
   const [weightModalOpen, setWeightModalOpen] = useState(false);
   const [selectedBagForWeighing, setSelectedBagForWeighing] = useState<{ id: string; number: number } | null>(null);
 
@@ -82,8 +88,21 @@ export function WeighOrderView({
     search: searchQuery || undefined,
     type: selectedType !== "all" ? selectedType : undefined,
     status: selectedStatus !== "all" ? selectedStatus : undefined,
-    sort_by: sortBy === "customer" ? "customer_name" : "created_at",
+    sort_by:
+      selectedStatus === "weighed"
+        ? "updated_at"
+        : sortBy === "customer"
+        ? "customer_name"
+        : "created_at",
     sort_order: sortBy === "oldest" ? "asc" : "desc",
+  });
+
+  // Separate fetch to always know how many are ready for lockers
+  const { data: readyOrdersData } = useRealTimeOrders({
+    limit: 100,
+    status: "weighed",
+    sort_by: "updated_at",
+    sort_order: "desc",
   });
 
   // Fetch selected order details
@@ -93,13 +112,50 @@ export function WeighOrderView({
 
 
   const orders = ordersData?.orders || [];
+  const displayOrders = (() => {
+    if (selectedStatus === "weighed") {
+      return [...orders].sort(
+        (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+      );
+    }
+    if (selectedStatus === "all") {
+      const weighedFirst = orders
+        .filter(o => o.status === "weighed")
+        .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
+      const pending = orders
+        .filter(o => o.status === "pending_weight")
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      const others = orders
+        .filter(o => o.status !== "weighed" && o.status !== "pending_weight")
+        .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
+      return [...weighedFirst, ...pending, ...others];
+    }
+    return orders;
+  })();
+
+  const toggleSelectReady = (orderId: string) => {
+    setSelectedReadyIds(prev => {
+      const next = new Set(prev);
+      if (next.has(orderId)) next.delete(orderId);
+      else next.add(orderId);
+      return next;
+    });
+  };
+
+  const selectAllReady = () => {
+    setSelectedReadyIds(new Set(displayOrders.filter(o => o.status === "weighed").map(o => o.id)));
+  };
+
+  const clearReadySelection = () => setSelectedReadyIds(new Set());
 
   // Add bag
   const addBag = () => {
     if (bagCount < 10) {
       const newBagCount = bagCount + 1;
       setBagCount(newBagCount);
-      setBagWeights(prev => [...prev, { id: `bag-${newBagCount}`, weight: 0 }]);
+      const id = `bag-${newBagCount}`;
+      setBagWeights(prev => [...prev, { id, weight: 0 }]);
+      setBagPackaging(prev => ({ ...prev, [id]: "none" }));
     }
   };
 
@@ -268,6 +324,14 @@ export function WeighOrderView({
               >
                 Pending
               </Button>
+              <Button
+                variant={selectedStatus === "weighed" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedStatus("weighed")}
+                className="h-8 px-3 text-xs font-medium"
+              >
+                Ready for Lockers
+              </Button>
             </div>
             <div className="flex gap-1">
               <Button
@@ -312,7 +376,54 @@ export function WeighOrderView({
 
         {/* Orders List */}
         <div className="flex-1 overflow-y-auto">
-          {orders.map((order) => {
+          {/* Priority banner when there are Ready for Lockers */}
+          {readyOrdersData?.orders && readyOrdersData.orders.length > 0 && selectedStatus !== "weighed" && (
+            <div className="mb-2 p-3 bg-yellow-50 border border-yellow-200 rounded flex items-center justify-between">
+              <div className="text-sm text-yellow-800 font-medium">
+                {readyOrdersData.orders.length} order{readyOrdersData.orders.length > 1 ? 's' : ''} ready for lockers
+              </div>
+              <Button size="sm" variant="outline" onClick={() => setSelectedStatus("weighed")}>
+                View
+              </Button>
+            </div>
+          )}
+          {/* Ready for Lockers batch bar */}
+          {selectedStatus === "weighed" && (
+            <div className="flex items-center justify-between p-2 mb-2 bg-blue-50 border border-blue-200 rounded">
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4"
+                  onChange={(e) => (e.target.checked ? selectAllReady() : clearReadySelection())}
+                />
+                <span className="text-sm text-blue-900 font-medium">Select All</span>
+                <span className="text-sm text-blue-700">{selectedReadyIds.size} selected</span>
+              </div>
+              <Button
+                size="sm"
+                disabled={selectedReadyIds.size === 0}
+                onClick={async () => {
+                  try {
+                    const ids = Array.from(selectedReadyIds);
+                    const res = await fetch(`/api/orders`, {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ ids }),
+                    });
+                    if (!res.ok) throw new Error("Batch complete failed");
+                    clearReadySelection();
+                  } catch (e) {
+                    console.error(e);
+                  }
+                }}
+                className="bg-green-600 hover:bg-green-700 text-white"
+              >
+                Complete Selected
+              </Button>
+            </div>
+          )}
+
+          {displayOrders.map((order) => {
             const { time: dueTime, isUrgent } = getDueTime(order.created_at, order.status);
             const isSelected = selectedOrderId === order.id;
             
@@ -329,6 +440,18 @@ export function WeighOrderView({
               >
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex items-center gap-2">
+                    {selectedStatus === "weighed" && (
+                      <input
+                        type="checkbox"
+                        className="h-4 w-4 mr-1"
+                        checked={selectedReadyIds.has(order.id)}
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          toggleSelectReady(order.id);
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    )}
                     <span className="font-medium text-sm">#{order.check_number}</span>
                     {order.type === "delivery" && (
                       <Truck className="h-3 w-3 text-gray-400" />
@@ -496,6 +619,17 @@ export function WeighOrderView({
                             <div className="text-lg font-medium text-gray-700 w-20">
                               Bag {index + 1}
                             </div>
+                            {/* Packaging selector */}
+                            <select
+                              className="h-10 border rounded px-2 text-sm text-gray-700"
+                              value={bagPackaging[bag.id] || "none"}
+                              onChange={(e) => setBagPackaging(prev => ({ ...prev, [bag.id]: e.target.value as any }))}
+                            >
+                              <option value="none">No packaging</option>
+                              <option value="paper">Paper bag</option>
+                              <option value="plastic">Plastic bag</option>
+                              <option value="box">Box</option>
+                            </select>
                             <Button
                               variant="outline"
                               className={cn(
@@ -627,10 +761,17 @@ export function WeighOrderView({
                           );
                         }
                         
-                        // Default: Complete weighing (works for no expected weight too)
+                        // Default: Ready for lockers (works for no expected weight too)
                         return (
                           <Button
-                            onClick={handleWeighAction}
+                            onClick={async () => {
+                              try {
+                                await onOrderWeighed(selectedOrder.id, ouncesToGrams(totalWeight), "weighed");
+                                resetWeighingState();
+                              } catch (e) {
+                                console.error(e);
+                              }
+                            }}
                             disabled={totalWeight === 0}
                             className="w-full h-16 text-xl font-semibold bg-green-600 hover:bg-green-700 disabled:bg-gray-300"
                           >

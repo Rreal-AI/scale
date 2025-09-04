@@ -58,12 +58,12 @@ export function OrdersStats({ orders, className }: OrdersStatsProps) {
       urgent: true
     },
     {
-      label: "Weighed",
+      label: "Ready for Lockers",
       value: stats.weighed,
-      description: "Ready for delivery"
+      description: "Awaiting dispatch"
     },
     {
-      label: "Completed",
+      label: "Dispatched",
       value: stats.completed,
       description: "Successfully delivered"
     }

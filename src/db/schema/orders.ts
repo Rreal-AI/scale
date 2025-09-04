@@ -15,7 +15,6 @@ export const orderType = pgEnum("order_type", ["delivery", "takeout"]);
 export const orderStatus = pgEnum("order_status", [
   "pending_weight", // Esperando a ser pesado
   "weighed", // Pesado y verificado
-  "ready_for_lockers", // Listo para lockers, esperando confirmación batch
   "completed", // Proceso completado
   "cancelled", // Cancelado
 ]);
@@ -46,7 +45,6 @@ export const orders = pgTable("orders", {
   structured_output: jsonb("structured_output"),
 
   weight_verified_at: timestamp("weight_verified_at"),
-  ready_for_lockers_at: timestamp("ready_for_lockers_at"),
   created_at: timestamp("created_at").notNull().defaultNow(),
   updated_at: timestamp("updated_at").notNull().defaultNow(),
 });

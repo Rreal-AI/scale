@@ -81,7 +81,7 @@ interface OrdersTableContentProps {
 const statusLabels = {
   pending_weight: "Pending Weight",
   weighed: "Weighed",
-  completed: "Completed",
+  completed: "Dispatched",
   cancelled: "Cancelled",
 };
 

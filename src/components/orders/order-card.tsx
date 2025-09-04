@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils";
 interface Order {
   id: string;
   org_id: string;
-  status: "pending_weight" | "weighed" | "ready_for_lockers" | "completed" | "cancelled";
+  status: "pending_weight" | "weighed" | "completed" | "cancelled";
   type: "delivery" | "takeout";
   check_number: string;
   customer_name: string;
@@ -59,19 +59,13 @@ const getStatusConfig = (status: Order["status"]) => {
       };
     case "weighed":
       return {
-        label: "Weighed",
+        label: "Ready for Lockers",
         variant: "outline" as const,
         color: "text-blue-600 bg-blue-50"
       };
-    case "ready_for_lockers":
-      return {
-        label: "Ready for Lockers",
-        variant: "outline" as const,
-        color: "text-purple-600 bg-purple-50"
-      };
     case "completed":
       return {
-        label: "Completed",
+        label: "Dispatched",
         variant: "outline" as const,
         color: "text-green-600 bg-green-50"
       };
@@ -256,6 +250,14 @@ export function OrderCard({ order, onWeigh, onViewDetails, onCardClick, variant 
               >
                 {typeConfig.label}
               </Badge>
+              {order.status === "weighed" && (
+                <Badge
+                  variant="outline"
+                  className="h-5 px-2 text-[10px] font-medium text-blue-700 border-blue-200 bg-blue-50"
+                >
+                  Ready for Lockers
+                </Badge>
+              )}
               {isUrgent && (
                 <Badge 
                   variant="outline"
@@ -308,6 +310,22 @@ export function OrderCard({ order, onWeigh, onViewDetails, onCardClick, variant 
                 className="h-7 px-3 text-xs bg-gray-900 hover:bg-gray-800 text-white"
               >
                 Weigh
+              </Button>
+            )}
+            {order.status === "weighed" && (
+              <Button
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  fetch(`/api/orders`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ ids: [order.id] }),
+                  }).catch(console.error);
+                }}
+                className="h-7 px-3 text-xs bg-green-600 hover:bg-green-700 text-white"
+              >
+                Confirm Dispatch
               </Button>
             )}
             

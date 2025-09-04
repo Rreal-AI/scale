@@ -49,7 +49,7 @@ interface OrderItem {
 interface Order {
   id: string;
   org_id: string;
-  status: "pending_weight" | "weighed" | "ready_for_lockers" | "completed" | "cancelled";
+  status: "pending_weight" | "weighed" | "completed" | "cancelled";
   type: "delivery" | "takeout";
   check_number: string;
   customer_name: string;
@@ -65,7 +65,6 @@ interface Order {
   input: string;
   structured_output?: Record<string, unknown>;
   weight_verified_at?: string;
-  ready_for_lockers_at?: string;
   created_at: string;
   updated_at: string;
 }
@@ -209,16 +208,18 @@ export const useRecentOrders = (limit: number = 10) => {
 const updateOrderWeight = async ({
   id,
   actual_weight,
+  status,
 }: {
   id: string;
   actual_weight: number;
+  status?: "weighed" | "completed";
 }): Promise<{ order: Order; message: string }> => {
   const response = await fetch(`/api/orders/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ actual_weight }),
+    body: JSON.stringify({ actual_weight, status }),
   });
 
   if (!response.ok) {
@@ -246,6 +247,31 @@ export const useUpdateOrderWeight = () => {
         queryKey: ["orders", orgId],
         exact: false,
       });
+    },
+  });
+};
+
+// Batch complete weighed orders
+const batchCompleteOrders = async (ids: string[]) => {
+  const response = await fetch(`/api/orders`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ids }),
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Failed to batch complete orders");
+  }
+  return response.json() as Promise<{ updated: Order[]; count: number }>;
+};
+
+export const useBatchCompleteOrders = () => {
+  const { orgId } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: batchCompleteOrders,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["orders", orgId], exact: false });
     },
   });
 };

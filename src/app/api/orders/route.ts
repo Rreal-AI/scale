@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/db";
 import { orders } from "@/db/schema";
-import { and, eq, ilike, or, asc, desc, count } from "drizzle-orm";
+import { and, eq, ilike, or, asc, desc, count, inArray } from "drizzle-orm";
+import { z } from "zod";
 
 // GET /api/orders - Listar orders con paginación y filtros
 export async function GET(request: NextRequest) {
@@ -172,5 +173,34 @@ export async function GET(request: NextRequest) {
       { error: "Internal server error" },
       { status: 500 }
     );
+  }
+}
+
+// POST /api/orders - batch complete weighed orders
+export async function POST(request: NextRequest) {
+  try {
+    const { userId, orgId } = await auth();
+    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!orgId) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+    const schema = z.object({ ids: z.array(z.string().uuid()).min(1) });
+    const body = await request.json();
+    const parsed = schema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Invalid body" }, { status: 400 });
+    }
+
+    const { ids } = parsed.data;
+    const now = new Date();
+    const updated = await db
+      .update(orders)
+      .set({ status: "completed", updated_at: now })
+      .where(and(eq(orders.org_id, orgId), inArray(orders.id, ids)))
+      .returning();
+
+    return NextResponse.json({ updated, count: updated.length });
+  } catch (error) {
+    console.error("Error in batch complete:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

@@ -77,6 +77,7 @@ export async function GET(
 // Schema for weight update
 const updateWeightSchema = z.object({
   actual_weight: z.number().positive("Actual weight must be positive"),
+  status: z.enum(["weighed", "completed"]).optional(),
 });
 
 // PUT /api/orders/[id] - Update order weight and status
@@ -134,7 +135,7 @@ export async function PUT(
       );
     }
 
-    const { actual_weight } = parseResult.data;
+    const { actual_weight, status } = parseResult.data;
 
     // Buscar la orden
     const existingOrder = await db.query.orders.findFirst({
@@ -155,9 +156,9 @@ export async function PUT(
       .set({
         actual_weight,
         delta_weight,
-        status: "ready_for_lockers", // Mark as ready for lockers when weighed
+        // If status provided use it, otherwise default to completed
+        status: (status as any) ?? "completed",
         weight_verified_at: new Date(),
-        ready_for_lockers_at: new Date(), // Track when moved to lockers
         updated_at: new Date(),
       })
       .where(and(eq(orders.id, id), eq(orders.org_id, orgId)))
@@ -172,7 +173,10 @@ export async function PUT(
 
     return NextResponse.json({
       order: updatedOrder,
-      message: "Order weight updated and marked as completed",
+      message:
+        ((status as any) ?? "completed") === "weighed"
+          ? "Order weight updated and marked as ready for lockers"
+          : "Order weight updated and marked as completed",
     });
   } catch (error) {
     console.error("Error updating order weight:", error);

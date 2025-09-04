@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRealTimeOrders, useUpdateOrderWeight } from "@/hooks/use-orders";
 import { OrderCard } from "./order-card";
 import { OrderDetailSheet } from "./order-detail-sheet";
@@ -9,6 +9,7 @@ import { WeighOrderView } from "./weigh-order-view";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import { 
   Search, 
   Filter, 
@@ -27,7 +28,7 @@ import { cn } from "@/lib/utils";
 interface Order {
   id: string;
   org_id: string;
-  status: "pending_weight" | "weighed" | "ready_for_lockers" | "completed" | "cancelled";
+  status: "pending_weight" | "weighed" | "completed" | "cancelled";
   type: "delivery" | "takeout";
   check_number: string;
   customer_name: string;
@@ -43,7 +44,6 @@ interface Order {
   input: string;
   structured_output?: Record<string, unknown>;
   weight_verified_at?: string;
-  ready_for_lockers_at?: string;
   created_at: string;
   updated_at: string;
 }
@@ -53,7 +53,7 @@ interface FilterOption {
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   value?: "delivery" | "takeout";
-  status?: "pending_weight" | "ready_for_lockers" | "completed" | "cancelled";
+  status?: "pending_weight" | "completed" | "cancelled";
   color: string;
   count?: number;
 }
@@ -66,7 +66,21 @@ interface OrdersDashboardProps {
 export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardProps = {}) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState<"delivery" | "takeout" | "all">("all");
-  const [selectedStatus, setSelectedStatus] = useState<"pending_weight" | "ready_for_lockers" | "completed" | "cancelled" | "all">("all");
+  const [selectedStatus, setSelectedStatus] = useState<"pending_weight" | "completed" | "cancelled" | "all">("all");
+  const [showDispatched, setShowDispatched] = useState<boolean>(() => {
+    if (typeof window === "undefined") return true;
+    try {
+      const v = localStorage.getItem("orders_show_dispatched");
+      return v ? JSON.parse(v) : true;
+    } catch {
+      return true;
+    }
+  });
+  useEffect(() => {
+    try {
+      localStorage.setItem("orders_show_dispatched", JSON.stringify(showDispatched));
+    } catch {}
+  }, [showDispatched]);
   
   // View states
   const [currentView, setCurrentView] = useState<"dashboard" | "weigh">("dashboard");
@@ -110,7 +124,6 @@ export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardP
       delivery: allOrders.filter(o => o.type === "delivery").length,
       takeout: allOrders.filter(o => o.type === "takeout").length,
       pending_weight: allOrders.filter(o => o.status === "pending_weight").length,
-      ready_for_lockers: allOrders.filter(o => o.status === "ready_for_lockers").length,
       completed: allOrders.filter(o => o.status === "completed").length,
       cancelled: allOrders.filter(o => o.status === "cancelled").length,
     };
@@ -154,16 +167,8 @@ export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardP
       count: counts.pending_weight
     },
     {
-      id: "ready_for_lockers",
-      label: "Ready for Lockers",
-      icon: Package,
-      status: "ready_for_lockers",
-      color: "text-gray-700 hover:bg-gray-100",
-      count: counts.ready_for_lockers
-    },
-    {
       id: "completed",
-      label: "Completed",
+      label: "Dispatched",
       icon: CheckCircle2,
       status: "completed",
       color: "text-gray-700 hover:bg-gray-100",
@@ -205,11 +210,16 @@ export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardP
 
   const updateOrderWeightMutation = useUpdateOrderWeight();
 
-  const handleOrderWeighed = async (orderId: string, totalWeightInGrams: number) => {
+  const handleOrderWeighed = async (
+    orderId: string,
+    totalWeightInGrams: number,
+    status: "weighed" | "completed" = "completed"
+  ) => {
     try {
       await updateOrderWeightMutation.mutateAsync({
         id: orderId,
         actual_weight: totalWeightInGrams,
+        status,
       });
       // Orders will auto-refresh due to query invalidation
     } catch (error) {
@@ -260,6 +270,11 @@ export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardP
         </div>
         
         <div className="flex items-center gap-2">
+          {/* Personalization toggle */}
+          <div className="hidden lg:flex items-center gap-2 mr-2">
+            <span className="text-sm text-muted-foreground">Show Dispatched</span>
+            <Switch checked={showDispatched} onCheckedChange={(v) => setShowDispatched(Boolean(v))} />
+          </div>
           {/* View Toggle */}
           {onViewModeChange && (
             <div className="flex items-center rounded-lg border p-1 bg-muted/50">
@@ -308,7 +323,7 @@ export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardP
       )}
 
       {/* Search and Filters */}
-      <div className="space-y-3">
+      <div className="space-y-4">
         {/* Search */}
         <div className="relative max-w-md">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -320,12 +335,11 @@ export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardP
           />
         </div>
 
-        {/* Type Filters */}
-        <div className="space-y-2">
-          <h3 className="text-h6">
-            Order Type
-          </h3>
-          <div className="flex flex-wrap gap-2">
+        {/* Type + Status Filters on one row */}
+        <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex items-center gap-3 flex-wrap">
+            <span className="text-h6">Order Type</span>
+            <div className="flex flex-wrap gap-2">
             {typeFilters.map((filter) => {
               const Icon = filter.icon;
               const isSelected = selectedType === (filter.value || "all");
@@ -374,15 +388,12 @@ export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardP
                 </Button>
               );
             })}
+            </div>
           </div>
-        </div>
 
-        {/* Status Filters */}
-        <div className="space-y-2">
-          <h3 className="text-h6">
-            Order Status
-          </h3>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex items-center gap-3 flex-wrap">
+            <span className="text-h6">Order Status</span>
+            <div className="flex flex-wrap gap-2">
             {statusFilters.map((filter) => {
               const Icon = filter.icon;
               const isSelected = selectedStatus === filter.status;
@@ -423,6 +434,7 @@ export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardP
                 </Button>
               );
             })}
+            </div>
           </div>
         </div>
       </div>
@@ -505,13 +517,13 @@ export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardP
                   </div>
                 )}
                 
-                {/* Completed Orders Section */}
-                {completedOrders.length > 0 && (
+                {/* Dispatched Orders Section */}
+                {completedOrders.length > 0 && (selectedStatus !== "all" || showDispatched) && (
                   <div className="space-y-4">
                     <div className="flex items-center gap-4">
                       <div className="h-px bg-gray-200 flex-1"></div>
                       <span className="text-sm font-medium text-gray-500 uppercase tracking-wider px-3">
-                        Completed
+                        Dispatched
                       </span>
                       <div className="h-px bg-gray-200 flex-1"></div>
                     </div>

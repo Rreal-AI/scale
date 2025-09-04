@@ -52,8 +52,8 @@ interface OrdersFiltersProps {
 
 const statusLabels = {
   pending_weight: "Pending Weight",
-  weighed: "Weighed",
-  completed: "Completed",
+  weighed: "Ready for Lockers",
+  completed: "Dispatched",
   cancelled: "Cancelled",
 };
 
@@ -215,8 +215,8 @@ export function OrdersFilters({
                       <SelectItem value="pending_weight">
                         Pending Weight
                       </SelectItem>
-                      <SelectItem value="weighed">Weighed</SelectItem>
-                      <SelectItem value="completed">Completed</SelectItem>
+                      <SelectItem value="weighed">Ready for Lockers</SelectItem>
+                      <SelectItem value="completed">Dispatched</SelectItem>
                       <SelectItem value="cancelled">Cancelled</SelectItem>
                     </SelectContent>
                   </Select>
