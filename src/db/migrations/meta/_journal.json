@@ -15,6 +15,13 @@
       "when": 1757362235494,
       "tag": "0001_parched_ink",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1757367183642,
+      "tag": "0002_jittery_wildside",
+      "breakpoints": true
     }
   ]
 }

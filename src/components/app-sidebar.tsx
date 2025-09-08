@@ -2,7 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Package, Settings, FileText, Box, ShoppingBag } from "lucide-react";
+import {
+  Package,
+  Settings,
+  FileText,
+  Box,
+  ShoppingBag,
+  Tag,
+} from "lucide-react";
 import { useSidebar } from "@/components/ui/sidebar";
 import {
   Sidebar,
@@ -22,6 +29,11 @@ const navigationItems = [
     title: "Products",
     href: "/products",
     icon: ShoppingBag,
+  },
+  {
+    title: "Categories",
+    href: "/categories",
+    icon: Tag,
   },
   {
     title: "Packaging",

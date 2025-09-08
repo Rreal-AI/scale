@@ -1,5 +1,8 @@
 import { ProductsTable } from "@/components/products/products-table";
+import { auth } from "@clerk/nextjs/server";
 
-export default function ProductsPage() {
+export default async function ProductsPage() {
+  await auth.protect();
+
   return <ProductsTable />;
 }
