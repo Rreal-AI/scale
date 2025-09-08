@@ -157,7 +157,7 @@ export async function PUT(
         actual_weight,
         delta_weight,
         // If status provided use it, otherwise default to completed
-        status: (status as any) ?? "completed",
+        status: status ?? "completed",
         weight_verified_at: new Date(),
         updated_at: new Date(),
       })
@@ -174,7 +174,7 @@ export async function PUT(
     return NextResponse.json({
       order: updatedOrder,
       message:
-        ((status as any) ?? "completed") === "weighed"
+        (status ?? "completed") === "weighed"
           ? "Order weight updated and marked as ready for lockers"
           : "Order weight updated and marked as completed",
     });

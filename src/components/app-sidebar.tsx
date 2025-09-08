@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Package, Settings, FileText } from "lucide-react";
+import { Package, Settings, FileText, Box, ShoppingBag } from "lucide-react";
 import { useSidebar } from "@/components/ui/sidebar";
 import {
   Sidebar,
@@ -15,12 +15,18 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
 
 const navigationItems = [
   {
     title: "Products",
     href: "/products",
-    icon: Package,
+    icon: ShoppingBag,
+  },
+  {
+    title: "Packaging",
+    href: "/packaging",
+    icon: Box,
   },
   {
     title: "Modifiers",
@@ -41,14 +47,7 @@ export function AppSidebar() {
   return (
     <Sidebar>
       <SidebarHeader>
-        <div className="flex items-center gap-2 px-2 py-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <span className="text-sm font-bold">S</span>
-          </div>
-          {state === "expanded" && (
-            <span className="text-lg font-semibold">Scale</span>
-          )}
-        </div>
+        <OrganizationSwitcher />
       </SidebarHeader>
 
       {/* Divider line between header and content */}
@@ -79,9 +78,7 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter>
-        <div className="px-2 py-2">
-          <div className="text-xs text-muted-foreground">v1.0.0</div>
-        </div>
+        <UserButton showName />
       </SidebarFooter>
     </Sidebar>
   );

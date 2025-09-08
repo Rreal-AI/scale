@@ -8,6 +8,13 @@
       "when": 1757009775978,
       "tag": "0000_adorable_rawhide_kid",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1757362235494,
+      "tag": "0001_parched_ink",
+      "breakpoints": true
     }
   ]
 }

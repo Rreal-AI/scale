@@ -399,7 +399,7 @@ export function OrderDetailSheet({
                         <Button
                           variant="ghost"
                           className="w-full justify-between p-4 h-auto"
-                          onClick={() => toggleItem(item.id)}
+                          // onClick={() => toggleItem(item.id)}
                         >
                           <div className="flex items-center gap-3">
                             <Package className="h-4 w-4" />
