@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/db";
 import { products } from "@/db/schema";
-import { createProductSchema, getProductsSchema } from "@/schemas/products";
+import { createProductSchema } from "@/schemas/products";
 import { and, eq, ilike, or, asc, desc, count } from "drizzle-orm";
 
 // GET /api/products - Listar productos con paginación y filtros

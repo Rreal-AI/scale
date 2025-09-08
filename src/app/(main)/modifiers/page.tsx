@@ -1,5 +1,8 @@
 import { ModifiersTable } from "@/components/modifiers/modifiers-table";
+import { auth } from "@clerk/nextjs/server";
 
-export default function ModifiersPage() {
+export default async function ModifiersPage() {
+  await auth.protect();
+
   return <ModifiersTable />;
 }

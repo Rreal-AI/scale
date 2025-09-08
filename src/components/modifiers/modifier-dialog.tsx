@@ -7,10 +7,8 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useCreateModifier, useUpdateModifier } from "@/hooks/use-modifiers";
 import {
-  createModifierFormSchema,
-  updateModifierFormSchema,
-  type CreateModifierFormInput,
-  type UpdateModifierFormInput,
+  createModifierSchema,
+  updateModifierSchema,
   type CreateModifierInput,
   type UpdateModifierInput,
 } from "@/schemas/modifiers";
@@ -62,9 +60,9 @@ export function ModifierDialog({
   const createModifier = useCreateModifier();
   const updateModifier = useUpdateModifier();
 
-  const form = useForm<CreateModifierFormInput | UpdateModifierFormInput>({
+  const form = useForm<CreateModifierInput | UpdateModifierInput>({
     resolver: zodResolver(
-      mode === "create" ? createModifierFormSchema : updateModifierFormSchema
+      mode === "create" ? createModifierSchema : updateModifierSchema
     ),
     defaultValues: {
       name: "",
@@ -93,7 +91,7 @@ export function ModifierDialog({
   }, [open, mode, modifier, form]);
 
   const onSubmit = async (
-    values: CreateModifierFormInput | UpdateModifierFormInput
+    values: CreateModifierInput | UpdateModifierInput
   ) => {
     setIsSubmitting(true);
 

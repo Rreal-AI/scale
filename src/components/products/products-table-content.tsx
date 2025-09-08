@@ -153,7 +153,10 @@ export function ProductsTableContent({
               <TableCell colSpan={5} className="text-center py-8">
                 <div className="text-muted-foreground">
                   {currentFilters.search ? (
-                    <>No products found matching &ldquo;{currentFilters.search}&rdquo;</>
+                    <>
+                      No products found matching &ldquo;{currentFilters.search}
+                      &rdquo;
+                    </>
                   ) : (
                     <>No products registered yet</>
                   )}

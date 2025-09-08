@@ -151,7 +151,10 @@ export function ModifiersTableContent({
               <TableCell colSpan={5} className="text-center py-8">
                 <div className="text-muted-foreground">
                   {currentFilters.search ? (
-                    <>No modifiers found matching &ldquo;{currentFilters.search}&rdquo;</>
+                    <>
+                      No modifiers found matching &ldquo;{currentFilters.search}
+                      &rdquo;
+                    </>
                   ) : (
                     <>No modifiers registered yet</>
                   )}

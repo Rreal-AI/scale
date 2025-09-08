@@ -6,7 +6,6 @@ import {
   MapPin,
   Phone,
   Mail,
-  DollarSign,
   Weight,
   Calendar,
   Clock,
@@ -78,7 +77,7 @@ export function OrderDetailSheet({
   orderId,
 }: OrderDetailSheetProps) {
   const [copiedField, setCopiedField] = useState<string | null>(null);
-  const [openItems, setOpenItems] = useState<string[]>([]);
+  // openItems state removed - collapsible items not implemented yet
 
   const { data: orderData, isLoading, error } = useOrder(orderId || "");
 
@@ -93,13 +92,7 @@ export function OrderDetailSheet({
     }
   };
 
-  const toggleItem = (itemId: string) => {
-    setOpenItems((prev) =>
-      prev.includes(itemId)
-        ? prev.filter((id) => id !== itemId)
-        : [...prev, itemId]
-    );
-  };
+  // toggleItem function removed - collapsible items not implemented yet
 
   const order = orderData?.order;
 

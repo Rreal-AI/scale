@@ -1,61 +1,39 @@
 import { z } from "zod";
 
-// Schema para crear un modifier (API - expects cents)
+// Schema para crear un modifier
 export const createModifierSchema = z.object({
   name: z
     .string()
-    .min(1, "Name is required")
-    .max(255, "Name cannot exceed 255 characters"),
-  price: z.number().int().nonnegative("Price must be a non-negative integer"),
+    .min(1, "El nombre es requerido")
+    .max(255, "El nombre no puede exceder 255 caracteres"),
+  price: z
+    .number()
+    .int()
+    .nonnegative("El precio debe ser un número entero no negativo"),
   weight: z
     .number()
-    .int("Weight must be an integer (can be negative to remove ingredients)"),
+    .int(
+      "El peso debe ser un número entero (puede ser negativo para remover ingredientes)"
+    ),
 });
 
-// Schema para crear un modifier (Frontend - accepts float)
-export const createModifierFormSchema = z.object({
-  name: z
-    .string()
-    .min(1, "Name is required")
-    .max(255, "Name cannot exceed 255 characters"),
-  price: z.number().nonnegative("Price must be a non-negative number"),
-  weight: z
-    .number()
-    .int("Weight must be an integer (can be negative to remove ingredients)"),
-});
-
-// Schema para actualizar un modifier (API - expects cents)
+// Schema para actualizar un modifier
 export const updateModifierSchema = z.object({
   name: z
     .string()
-    .min(1, "Name is required")
-    .max(255, "Name cannot exceed 255 characters")
+    .min(1, "El nombre es requerido")
+    .max(255, "El nombre no puede exceder 255 caracteres")
     .optional(),
   price: z
     .number()
     .int()
-    .nonnegative("Price must be a non-negative integer")
+    .nonnegative("El precio debe ser un número entero no negativo")
     .optional(),
   weight: z
     .number()
-    .int("Weight must be an integer (can be negative to remove ingredients)")
-    .optional(),
-});
-
-// Schema para actualizar un modifier (Frontend - accepts float)
-export const updateModifierFormSchema = z.object({
-  name: z
-    .string()
-    .min(1, "Name is required")
-    .max(255, "Name cannot exceed 255 characters")
-    .optional(),
-  price: z
-    .number()
-    .nonnegative("Price must be a non-negative number")
-    .optional(),
-  weight: z
-    .number()
-    .int("Weight must be an integer (can be negative to remove ingredients)")
+    .int(
+      "El peso debe ser un número entero (puede ser negativo para remover ingredientes)"
+    )
     .optional(),
 });
 
@@ -78,7 +56,5 @@ export const modifierIdSchema = z.object({
 // Tipos TypeScript derivados de los schemas
 export type CreateModifierInput = z.infer<typeof createModifierSchema>;
 export type UpdateModifierInput = z.infer<typeof updateModifierSchema>;
-export type CreateModifierFormInput = z.infer<typeof createModifierFormSchema>;
-export type UpdateModifierFormInput = z.infer<typeof updateModifierFormSchema>;
 export type GetModifiersInput = z.infer<typeof getModifiersSchema>;
 export type ModifierIdInput = z.infer<typeof modifierIdSchema>;

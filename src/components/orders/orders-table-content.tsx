@@ -190,7 +190,10 @@ export function OrdersTableContent({
               <TableCell colSpan={6} className="text-center py-8">
                 <div className="text-muted-foreground">
                   {currentFilters.search ? (
-                                         <>No orders found matching &ldquo;{currentFilters.search}&rdquo;</>
+                    <>
+                      No orders found matching &ldquo;{currentFilters.search}
+                      &rdquo;
+                    </>
                   ) : (
                     <>No orders found</>
                   )}
