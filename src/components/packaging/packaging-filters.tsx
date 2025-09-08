@@ -27,6 +27,7 @@ interface PackagingFiltersProps {
   currentFilters: {
     search?: string;
     sort_by?: "name" | "weight" | "created_at";
+
     sort_order?: "asc" | "desc";
   };
 }
