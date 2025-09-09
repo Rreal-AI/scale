@@ -45,8 +45,14 @@ interface Product {
   name: string;
   price: number;
   weight: number;
+  category_id: string | null;
   created_at: string;
   updated_at: string;
+  category: {
+    id: string;
+    name: string;
+    description: string | null;
+  } | null;
 }
 
 interface ProductDetailSheetProps {
@@ -220,6 +226,32 @@ export function ProductDetailSheet({
                     description="Product weight"
                     copyable
                     copyValue={formatWeight(product.weight)}
+                  />
+
+                  <InfoCard
+                    icon={Package}
+                    title="Category"
+                    value={
+                      product.category ? (
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline" className="text-sm">
+                            {product.category.name}
+                          </Badge>
+                          {product.category.description && (
+                            <span className="text-xs text-muted-foreground">
+                              {product.category.description}
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <Badge variant="secondary" className="text-sm">
+                          No category assigned
+                        </Badge>
+                      )
+                    }
+                    description="Product category"
+                    copyable={!!product.category}
+                    copyValue={product.category?.name}
                   />
                 </div>
 

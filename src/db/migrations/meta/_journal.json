@@ -22,6 +22,13 @@
       "when": 1757367183642,
       "tag": "0002_jittery_wildside",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1757425629187,
+      "tag": "0003_legal_lightspeed",
+      "breakpoints": true
     }
   ]
 }

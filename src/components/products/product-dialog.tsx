@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useCreateProduct, useUpdateProduct } from "@/hooks/use-products";
+import { useCategories } from "@/hooks/use-categories";
 import {
   createProductFormSchema,
   updateProductFormSchema,
@@ -34,6 +35,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { NumberInput } from "@/components/ui/number-input";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Product {
   id: string;
@@ -41,8 +49,14 @@ interface Product {
   name: string;
   price: number;
   weight: number;
+  category_id: string | null;
   created_at: string;
   updated_at: string;
+  category: {
+    id: string;
+    name: string;
+    description: string | null;
+  } | null;
 }
 
 interface ProductDialogProps {
@@ -62,6 +76,9 @@ export function ProductDialog({
 
   const createProduct = useCreateProduct();
   const updateProduct = useUpdateProduct();
+  const { data: categoriesData, isLoading: categoriesLoading } = useCategories({
+    limit: 100, // Get all categories for selection
+  });
 
   const form = useForm<CreateProductFormInput | UpdateProductFormInput>({
     resolver: zodResolver(
@@ -71,6 +88,7 @@ export function ProductDialog({
       name: "",
       price: 0,
       weight: 0,
+      category_id: undefined,
     },
   });
 
@@ -82,12 +100,14 @@ export function ProductDialog({
           name: product.name,
           price: product.price / 100, // Convert cents to float
           weight: product.weight,
+          category_id: product.category_id || undefined,
         });
       } else {
         form.reset({
           name: "",
           price: 0,
           weight: 0,
+          category_id: undefined,
         });
       }
     }
@@ -222,6 +242,39 @@ export function ProductDialog({
                     />
                   </FormControl>
                   <FormDescription>Product weight in grams</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="category_id"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Category (Optional)</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    value={field.value || ""}
+                    disabled={isLoading || categoriesLoading}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a category" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="">No category</SelectItem>
+                      {categoriesData?.categories.map((category) => (
+                        <SelectItem key={category.id} value={category.id}>
+                          {category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormDescription>
+                    Optional category to organize your products
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

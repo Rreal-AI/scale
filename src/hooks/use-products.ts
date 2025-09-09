@@ -9,8 +9,14 @@ interface Product {
   name: string;
   price: number;
   weight: number;
+  category_id: string | null;
   created_at: string;
   updated_at: string;
+  category: {
+    id: string;
+    name: string;
+    description: string | null;
+  } | null;
 }
 
 interface ProductsResponse {

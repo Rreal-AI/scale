@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/db";
-import { products } from "@/db/schema";
+import { products, categories } from "@/db/schema";
 import { updateProductSchema } from "@/schemas/products";
 import { and, eq } from "drizzle-orm";
 
@@ -45,8 +45,23 @@ export async function GET(
 
     // Buscar el producto
     const product = await db
-      .select()
+      .select({
+        id: products.id,
+        org_id: products.org_id,
+        name: products.name,
+        price: products.price,
+        weight: products.weight,
+        category_id: products.category_id,
+        created_at: products.created_at,
+        updated_at: products.updated_at,
+        category: {
+          id: categories.id,
+          name: categories.name,
+          description: categories.description,
+        },
+      })
       .from(products)
+      .leftJoin(categories, eq(products.category_id, categories.id))
       .where(and(eq(products.id, id), eq(products.org_id, orgId)))
       .limit(1);
 

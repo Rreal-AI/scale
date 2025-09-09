@@ -23,8 +23,14 @@ interface Product {
   name: string;
   price: number;
   weight: number;
+  category_id: string | null;
   created_at: string;
   updated_at: string;
+  category: {
+    id: string;
+    name: string;
+    description: string | null;
+  } | null;
 }
 
 interface DeleteProductDialogProps {
@@ -92,6 +98,15 @@ export function DeleteProductDialog({
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Badge variant="secondary">{formatPrice(product.price)}</Badge>
               <Badge variant="outline">{formatWeight(product.weight)}</Badge>
+              {product.category ? (
+                <Badge variant="outline" className="text-xs">
+                  {product.category.name}
+                </Badge>
+              ) : (
+                <Badge variant="secondary" className="text-xs">
+                  No category
+                </Badge>
+              )}
             </div>
             <div className="text-xs text-muted-foreground">
               ID: {product.id}

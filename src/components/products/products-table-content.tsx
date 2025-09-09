@@ -29,8 +29,14 @@ interface Product {
   name: string;
   price: number;
   weight: number;
+  category_id: string | null;
   created_at: string;
   updated_at: string;
+  category: {
+    id: string;
+    name: string;
+    description: string | null;
+  } | null;
 }
 
 interface ProductsResponse {
@@ -78,6 +84,9 @@ function LoadingSkeleton() {
             </div>
           </TableCell>
           <TableCell>
+            <Skeleton className="h-6 w-[100px] rounded-full" />
+          </TableCell>
+          <TableCell>
             <Skeleton className="h-6 w-[80px] rounded-full" />
           </TableCell>
           <TableCell>
@@ -121,6 +130,7 @@ export function ProductsTableContent({
           <TableHeader>
             <TableRow>
               <TableHead>Name</TableHead>
+              <TableHead>Category</TableHead>
               <TableHead>Price</TableHead>
               <TableHead>Weight</TableHead>
               <TableHead>Created</TableHead>
@@ -142,6 +152,7 @@ export function ProductsTableContent({
           <TableHeader>
             <TableRow>
               <TableHead>Name</TableHead>
+              <TableHead>Category</TableHead>
               <TableHead>Price</TableHead>
               <TableHead>Weight</TableHead>
               <TableHead>Created</TableHead>
@@ -150,7 +161,7 @@ export function ProductsTableContent({
           </TableHeader>
           <TableBody>
             <TableRow>
-              <TableCell colSpan={5} className="text-center py-8">
+              <TableCell colSpan={6} className="text-center py-8">
                 <div className="text-muted-foreground">
                   {currentFilters.search ? (
                     <>
@@ -191,6 +202,17 @@ export function ProductsTableContent({
                     ID: {product.id.slice(0, 8)}...
                   </div>
                 </div>
+              </TableCell>
+              <TableCell>
+                {product.category ? (
+                  <Badge variant="outline" className="text-xs">
+                    {product.category.name}
+                  </Badge>
+                ) : (
+                  <Badge variant="secondary" className="text-xs">
+                    No category
+                  </Badge>
+                )}
               </TableCell>
               <TableCell>
                 <Badge variant="secondary">{formatPrice(product.price)}</Badge>
