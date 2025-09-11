@@ -40,12 +40,13 @@ export async function GET(request: NextRequest) {
         | "name"
         | "price"
         | "weight"
-        | "created_at") || "created_at";
+        | "created_at"
+        | "category") || "created_at";
     const sort_order =
       (searchParams.get("sort_order") as "asc" | "desc") || "desc";
 
     // Validar que sort_by y sort_order sean valores válidos
-    const validSortBy = ["name", "price", "weight", "created_at"];
+    const validSortBy = ["name", "price", "weight", "created_at", "category"];
     const validSortOrder = ["asc", "desc"];
 
     const finalSortBy = validSortBy.includes(sort_by) ? sort_by : "created_at";
@@ -74,6 +75,9 @@ export async function GET(request: NextRequest) {
         break;
       case "weight":
         orderColumn = products.weight;
+        break;
+      case "category":
+        orderColumn = categories.name;
         break;
       case "created_at":
       default:

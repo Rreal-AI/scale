@@ -1,51 +1,91 @@
-/* Typography System - Operance Style */
+/* Typography System - Modern Sans-Serif */
 
-/* Base font family */
+/* Base font family - Inter for modern, clean UI */
 * {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  font-variant-numeric: lining-nums;
 }
 
-/* Headings */
+/* Headings - Modern Inter Typography */
 h1, .text-h1 {
   @apply text-2xl font-semibold tracking-tight text-gray-900;
+  font-weight: 600;
+  letter-spacing: -0.025em;
 }
 
 h2, .text-h2 {
   @apply text-xl font-semibold tracking-tight text-gray-900;
+  font-weight: 600;
+  letter-spacing: -0.025em;
 }
 
 h3, .text-h3 {
   @apply text-lg font-medium text-gray-900;
+  font-weight: 500;
+  letter-spacing: -0.025em;
 }
 
 h4, .text-h4 {
   @apply text-base font-medium text-gray-900;
+  font-weight: 500;
+  letter-spacing: -0.025em;
 }
 
 h5, .text-h5 {
   @apply text-sm font-medium text-gray-900;
+  font-weight: 500;
+  letter-spacing: -0.025em;
 }
 
 h6, .text-h6 {
   @apply text-xs font-medium text-gray-700 uppercase tracking-wide;
+  font-weight: 500;
+  letter-spacing: 0.05em;
 }
 
-/* Body text */
+/* Body text - Inter with optimized spacing */
 .text-body {
   @apply text-sm text-gray-700 leading-relaxed;
+  font-weight: 400;
+  letter-spacing: -0.01em;
 }
 
 .text-body-large {
   @apply text-base text-gray-700 leading-relaxed;
+  font-weight: 400;
+  letter-spacing: -0.01em;
 }
 
 .text-body-small {
   @apply text-xs text-gray-600;
+  font-weight: 400;
+  letter-spacing: 0;
 }
 
 /* Caption text */
 .text-caption {
   @apply text-xs text-gray-500;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+/* Button text - Medium weight for better readability */
+button, .btn {
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+/* Input text - Regular weight for form fields */
+input, textarea, select {
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+/* Label text - Medium weight for form labels */
+label {
+  font-weight: 500;
+  letter-spacing: -0.01em;
 }
 
 .text-caption-small {

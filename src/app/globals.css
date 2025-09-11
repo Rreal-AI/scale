@@ -1,8 +1,73 @@
+/* Import Inter font from Google Fonts - Must be first */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "../styles/typography.css";
 
 @custom-variant dark (&:is(.dark *));
+
+/* Global Typography - Inter Font Family */
+html, body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  font-variant-numeric: lining-nums;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Color Tokens */
+:root {
+  --color-primary: #0078D4;
+  --color-primary-tint: #EAF4FD;
+  --color-secondary: #9B59B6;
+  --color-secondary-tint: #F3EAF7;
+  --color-success: #2ECC71;
+  --color-success-tint: #EAF8F1;
+  --color-warning: #F39C12;
+  --color-warning-tint: #FFF8E6;
+  --color-danger: #E74C3C;
+  --color-danger-tint: #FDECEC;
+  --color-info: #5DA5F5;
+  --color-info-tint: #EEF5FE;
+  --color-neutral: #F8F9FA;
+  --color-neutral-border: #E5E8E9;
+  --color-neutral-dark: #95A5A6;
+}
+
+/* Utility Classes for Custom Colors */
+.bg-primary { background-color: var(--color-primary); }
+.bg-primary-tint { background-color: var(--color-primary-tint); }
+.bg-secondary { background-color: var(--color-secondary); }
+.bg-secondary-tint { background-color: var(--color-secondary-tint); }
+.bg-success { background-color: var(--color-success); }
+.bg-success-tint { background-color: var(--color-success-tint); }
+.bg-warning { background-color: var(--color-warning); }
+.bg-warning-tint { background-color: var(--color-warning-tint); }
+.bg-danger { background-color: var(--color-danger); }
+.bg-danger-tint { background-color: var(--color-danger-tint); }
+.bg-info { background-color: var(--color-info); }
+.bg-info-tint { background-color: var(--color-info-tint); }
+.bg-neutral { background-color: var(--color-neutral); }
+
+.text-primary { color: var(--color-primary); }
+.text-secondary { color: var(--color-secondary); }
+.text-success { color: var(--color-success); }
+.text-warning { color: var(--color-warning); }
+.text-danger { color: var(--color-danger); }
+.text-info { color: var(--color-info); }
+.text-neutral-dark { color: var(--color-neutral-dark); }
+
+.border-primary { border-color: var(--color-primary); }
+.border-secondary { border-color: var(--color-secondary); }
+.border-success { border-color: var(--color-success); }
+.border-warning { border-color: var(--color-warning); }
+.border-danger { border-color: var(--color-danger); }
+.border-info { border-color: var(--color-info); }
+.border-neutral { border-color: var(--color-neutral-border); }
+
+.hover\:bg-primary:hover { background-color: var(--color-primary); }
+.hover\:bg-secondary:hover { background-color: var(--color-secondary); }
 
 @theme inline {
   --color-background: var(--background);

@@ -200,7 +200,7 @@ export function PackagingDialog({
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isLoading}>
+              <Button type="submit" variant="outline" disabled={isLoading}>
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {mode === "create" ? "Create Packaging" : "Save Changes"}
               </Button>

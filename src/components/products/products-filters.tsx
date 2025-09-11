@@ -21,12 +21,12 @@ import { Label } from "@/components/ui/label";
 interface ProductsFiltersProps {
   onFiltersChange: (filters: {
     search?: string;
-    sort_by?: "name" | "price" | "weight" | "created_at";
+    sort_by?: "name" | "price" | "weight" | "created_at" | "category";
     sort_order?: "asc" | "desc";
   }) => void;
   currentFilters: {
     search?: string;
-    sort_by?: "name" | "price" | "weight" | "created_at";
+    sort_by?: "name" | "price" | "weight" | "created_at" | "category";
     sort_order?: "asc" | "desc";
   };
 }
@@ -43,7 +43,7 @@ export function ProductsFilters({
   };
 
   const handleSortChange = (
-    sort_by: "name" | "price" | "weight" | "created_at"
+    sort_by: "name" | "price" | "weight" | "created_at" | "category"
   ) => {
     onFiltersChange({ ...currentFilters, sort_by });
   };
@@ -78,7 +78,7 @@ export function ProductsFilters({
             className="pl-10"
           />
         </div>
-        <Button type="submit" variant="secondary">
+        <Button type="submit" variant="outline">
           Search
         </Button>
       </form>
@@ -95,9 +95,10 @@ export function ProductsFilters({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="name">Name</SelectItem>
+            <SelectItem value="category">Category</SelectItem>
             <SelectItem value="price">Price</SelectItem>
             <SelectItem value="weight">Weight</SelectItem>
-            <SelectItem value="created_at">Created Date</SelectItem>
+            <SelectItem value="created_at">Updated Date</SelectItem>
           </SelectContent>
         </Select>
 
@@ -144,9 +145,10 @@ export function ProductsFilters({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="name">Name</SelectItem>
+                    <SelectItem value="category">Category</SelectItem>
                     <SelectItem value="price">Price</SelectItem>
                     <SelectItem value="weight">Weight</SelectItem>
-                    <SelectItem value="created_at">Created Date</SelectItem>
+                    <SelectItem value="created_at">Updated Date</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

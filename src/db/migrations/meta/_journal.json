@@ -29,6 +29,34 @@
       "when": 1757425629187,
       "tag": "0003_legal_lightspeed",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1757432451090,
+      "tag": "0004_fuzzy_nightmare",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1757439073308,
+      "tag": "0005_free_sally_floyd",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1757441510028,
+      "tag": "0006_glorious_xorn",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1757443021190,
+      "tag": "0007_colossal_bloodstorm",
+      "breakpoints": true
     }
   ]
 }

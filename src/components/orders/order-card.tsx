@@ -55,25 +55,41 @@ const getStatusConfig = (status: Order["status"]) => {
       return {
         label: "Awaiting Weight",
         variant: "secondary" as const,
-        color: "text-amber-600 bg-amber-50"
+        style: {
+          color: "var(--color-warning)",
+          backgroundColor: "var(--color-warning-tint)",
+          borderColor: "var(--color-warning)"
+        }
       };
     case "weighed":
       return {
         label: "Ready for Lockers",
         variant: "outline" as const,
-        color: "text-blue-600 bg-blue-50"
+        style: {
+          color: "var(--color-success)",
+          backgroundColor: "var(--color-success-tint)",
+          borderColor: "var(--color-success)"
+        }
       };
     case "completed":
       return {
         label: "Dispatched",
         variant: "outline" as const,
-        color: "text-green-600 bg-green-50"
+        style: {
+          color: "var(--color-success)",
+          backgroundColor: "var(--color-success-tint)",
+          borderColor: "var(--color-success)"
+        }
       };
     case "cancelled":
       return {
         label: "Cancelled",
         variant: "outline" as const,
-        color: "text-red-600 bg-red-50"
+        style: {
+          color: "var(--color-neutral-dark)",
+          backgroundColor: "var(--color-neutral)",
+          borderColor: "var(--color-neutral-border)"
+        }
       };
   }
 };
@@ -210,27 +226,30 @@ export function OrderCard({ order, onWeigh, onViewDetails, onCardClick, variant 
       <Card 
         className={cn(
           "group relative overflow-hidden transition-all duration-200 hover:shadow-md bg-white cursor-pointer",
-          // Status-based styling
-          order.status === "completed" 
-            ? "border-green-200 bg-green-50/30" 
-            : order.status === "weighed"
-            ? "border-blue-200 bg-blue-50/30"
-            : "border-gray-200",
           // Urgent indicator only for pending orders
-          isUrgent && order.status === "pending_weight" && "ring-1 ring-red-200",
+          isUrgent && order.status === "pending_weight" && "ring-1 ring-[var(--color-danger)]",
           className
         )}
+        style={{
+          // Status-based styling
+          backgroundColor: (order.status === "completed" || order.status === "weighed") 
+            ? "var(--color-success-tint)" 
+            : "white",
+          borderColor: (order.status === "completed" || order.status === "weighed")
+            ? "var(--color-success)"
+            : "var(--color-neutral-border)"
+        }}
         onClick={handleCardClick}
       >
         {/* Status indicator bar */}
         {order.status === "completed" && (
-          <div className="absolute top-0 left-0 right-0 h-1 bg-green-500" />
+          <div className="absolute top-0 left-0 right-0 h-1" style={{ backgroundColor: "var(--color-success)" }} />
         )}
         {order.status === "weighed" && (
-          <div className="absolute top-0 left-0 right-0 h-1 bg-blue-500" />
+          <div className="absolute top-0 left-0 right-0 h-1" style={{ backgroundColor: "var(--color-success)" }} />
         )}
         {isUrgent && order.status === "pending_weight" && (
-          <div className="absolute top-0 left-0 right-0 h-0.5 bg-red-400" />
+          <div className="absolute top-0 left-0 right-0 h-0.5" style={{ backgroundColor: "var(--color-danger)" }} />
         )}
 
         <CardContent className="p-4 flex flex-col min-h-[140px]">
@@ -241,19 +260,24 @@ export function OrderCard({ order, onWeigh, onViewDetails, onCardClick, variant 
               <h3 className="text-sm font-semibold">#{order.check_number}</h3>
               <Badge 
                 variant="outline"
-                className={cn(
-                  "h-5 px-2 text-[10px] font-medium",
-                  order.type === "delivery" 
-                    ? "text-indigo-600 border-indigo-200 bg-indigo-50" 
-                    : "text-emerald-600 border-emerald-200 bg-emerald-50"
-                )}
+                className="h-5 px-2 text-[10px] font-medium"
+                style={{
+                  color: order.type === "delivery" ? "var(--color-primary)" : "var(--color-secondary)",
+                  backgroundColor: order.type === "delivery" ? "var(--color-primary-tint)" : "var(--color-secondary-tint)",
+                  borderColor: order.type === "delivery" ? "var(--color-primary)" : "var(--color-secondary)"
+                }}
               >
                 {typeConfig.label}
               </Badge>
               {order.status === "weighed" && (
                 <Badge
                   variant="outline"
-                  className="h-5 px-2 text-[10px] font-medium text-blue-700 border-blue-200 bg-blue-50"
+                  className="h-5 px-2 text-[10px] font-medium"
+                  style={{
+                    color: "var(--color-success)",
+                    backgroundColor: "var(--color-success-tint)",
+                    borderColor: "var(--color-success)"
+                  }}
                 >
                   Ready for Lockers
                 </Badge>
@@ -261,7 +285,12 @@ export function OrderCard({ order, onWeigh, onViewDetails, onCardClick, variant 
               {isUrgent && (
                 <Badge 
                   variant="outline"
-                  className="h-5 px-2 text-[10px] font-medium text-red-600 border-red-200 bg-red-50"
+                  className="h-5 px-2 text-[10px] font-medium"
+                  style={{
+                    color: "var(--color-danger)",
+                    backgroundColor: "var(--color-danger-tint)",
+                    borderColor: "var(--color-danger)"
+                  }}
                 >
                   Overdue
                 </Badge>
@@ -307,7 +336,10 @@ export function OrderCard({ order, onWeigh, onViewDetails, onCardClick, variant 
                   onWeigh(order);
                 }}
                 size="sm"
-                className="h-7 px-3 text-xs bg-gray-900 hover:bg-gray-800 text-white"
+                className="h-7 px-3 text-xs text-white"
+                style={{
+                  backgroundColor: "var(--color-primary)"
+                }}
               >
                 Weigh
               </Button>
@@ -323,13 +355,16 @@ export function OrderCard({ order, onWeigh, onViewDetails, onCardClick, variant 
                     body: JSON.stringify({ ids: [order.id] }),
                   }).catch(console.error);
                 }}
-                className="h-7 px-3 text-xs bg-green-600 hover:bg-green-700 text-white"
+                className="h-7 px-3 text-xs text-white"
+                style={{
+                  backgroundColor: "var(--color-success)"
+                }}
               >
                 Confirm Dispatch
               </Button>
             )}
             
-            {onViewDetails && (
+            {onViewDetails && order.status === "completed" && (
               <Button 
                 variant="outline" 
                 size="sm" 
@@ -337,11 +372,16 @@ export function OrderCard({ order, onWeigh, onViewDetails, onCardClick, variant 
                   e.stopPropagation();
                   onViewDetails(order);
                 }}
-                className="h-7 px-3 text-xs"
+                className="h-7 px-3 text-xs border-gray-200 text-gray-700 hover:bg-gray-50"
               >
                 Details
               </Button>
             )}
+          </div>
+          
+          {/* Updated at */}
+          <div className="mt-2 text-xs text-gray-500 text-center">
+            Updated {formatRelativeTime(order.updated_at)}
           </div>
         </CardContent>
       </Card>
@@ -352,27 +392,30 @@ export function OrderCard({ order, onWeigh, onViewDetails, onCardClick, variant 
     <Card 
       className={cn(
         "group relative overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 bg-white cursor-pointer",
-        // Status-based styling
-        order.status === "completed" 
-          ? "border-green-200 bg-green-50/30" 
-          : order.status === "weighed"
-          ? "border-blue-200 bg-blue-50/30"
-          : "border-gray-200",
         // Urgent indicator only for pending orders
-        isUrgent && order.status === "pending_weight" && "ring-1 ring-red-200",
+        isUrgent && order.status === "pending_weight" && "ring-1 ring-[var(--color-danger)]",
         className
       )}
+      style={{
+        // Status-based styling
+        backgroundColor: (order.status === "completed" || order.status === "weighed") 
+          ? "var(--color-success-tint)" 
+          : "white",
+        borderColor: (order.status === "completed" || order.status === "weighed")
+          ? "var(--color-success)"
+          : "var(--color-neutral-border)"
+      }}
       onClick={handleCardClick}
     >
       {/* Status indicator bar */}
       {order.status === "completed" && (
-        <div className="absolute top-0 left-0 right-0 h-1 bg-green-500" />
+        <div className="absolute top-0 left-0 right-0 h-1" style={{ backgroundColor: "var(--color-success)" }} />
       )}
       {order.status === "weighed" && (
-        <div className="absolute top-0 left-0 right-0 h-1 bg-blue-500" />
+        <div className="absolute top-0 left-0 right-0 h-1" style={{ backgroundColor: "var(--color-success)" }} />
       )}
       {isUrgent && order.status === "pending_weight" && (
-        <div className="absolute top-0 left-0 right-0 h-0.5 bg-red-400" />
+        <div className="absolute top-0 left-0 right-0 h-0.5" style={{ backgroundColor: "var(--color-danger)" }} />
       )}
 
       <CardHeader className="pb-3">
@@ -381,7 +424,7 @@ export function OrderCard({ order, onWeigh, onViewDetails, onCardClick, variant 
             <div className="flex items-center gap-2">
               <h3 className="text-h3">#{order.check_number}</h3>
               {isUrgent && (
-                <AlertTriangle className="h-4 w-4 text-red-500" />
+                <AlertTriangle className="h-4 w-4" style={{ color: "var(--color-danger)" }} />
               )}
             </div>
             <p className="text-body">
@@ -392,12 +435,12 @@ export function OrderCard({ order, onWeigh, onViewDetails, onCardClick, variant 
           <div className="flex flex-col items-end gap-2">
             <Badge 
               variant="outline"
-              className={cn(
-                "flex items-center gap-1.5 px-2 py-1",
-                order.type === "delivery" 
-                  ? "text-indigo-600 border-indigo-200 bg-indigo-50" 
-                  : "text-emerald-600 border-emerald-200 bg-emerald-50"
-              )}
+              className="flex items-center gap-1.5 px-2 py-1"
+              style={{
+                color: order.type === "delivery" ? "var(--color-primary)" : "var(--color-secondary)",
+                backgroundColor: order.type === "delivery" ? "var(--color-primary-tint)" : "var(--color-secondary-tint)",
+                borderColor: order.type === "delivery" ? "var(--color-primary)" : "var(--color-secondary)"
+              }}
             >
               <TypeIcon className="h-3 w-3" />
               {typeConfig.label}
@@ -405,7 +448,7 @@ export function OrderCard({ order, onWeigh, onViewDetails, onCardClick, variant 
             
             {/* Due time - only show if overdue */}
             {isUrgent && (
-              <div className="flex items-center gap-1 text-red-500 text-xs font-medium">
+              <div className="flex items-center gap-1 text-xs font-medium" style={{ color: "var(--color-danger)" }}>
                 <Clock className="h-3 w-3" />
                 Overdue
               </div>
@@ -441,10 +484,8 @@ export function OrderCard({ order, onWeigh, onViewDetails, onCardClick, variant 
         <div className="flex items-center justify-between pt-2">
           <Badge 
             variant="outline"
-            className={cn(
-              "px-2 py-1 text-xs font-medium border",
-              statusConfig.color
-            )}
+            className="px-2 py-1 text-xs font-medium border"
+            style={statusConfig.style}
           >
             {statusConfig.label}
           </Badge>
@@ -463,13 +504,16 @@ export function OrderCard({ order, onWeigh, onViewDetails, onCardClick, variant 
                 onWeigh(order);
               }}
               size="sm"
-              className="flex-1 bg-gray-900 hover:bg-gray-800 text-white"
+              className="flex-1 text-white"
+              style={{
+                backgroundColor: "var(--color-primary)"
+              }}
             >
               Weigh Order
             </Button>
           )}
           
-          {onViewDetails && (
+          {onViewDetails && order.status === "completed" && (
             <Button 
               variant="outline" 
               size="sm" 
@@ -477,14 +521,16 @@ export function OrderCard({ order, onWeigh, onViewDetails, onCardClick, variant 
                 e.stopPropagation();
                 onViewDetails(order);
               }}
-              className={cn(
-                "border-gray-200 text-gray-700 hover:bg-gray-50",
-                order.status === "pending_weight" && onWeigh ? "flex-none px-3" : "flex-1"
-              )}
+              className="flex-1 border-gray-200 text-gray-700 hover:bg-gray-50"
             >
               View Details
             </Button>
           )}
+        </div>
+        
+        {/* Updated at */}
+        <div className="mt-3 text-xs text-gray-500 text-center">
+          Updated {formatRelativeTime(order.updated_at)}
         </div>
       </CardContent>
     </Card>

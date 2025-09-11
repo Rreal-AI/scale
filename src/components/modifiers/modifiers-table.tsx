@@ -137,7 +137,7 @@ export function ModifiersTable() {
           <h1 className="text-2xl font-bold">Modifiers</h1>
           <p className="text-muted-foreground">Manage your product modifiers</p>
         </div>
-        <Button onClick={handleCreateModifier}>
+        <Button variant="outline" onClick={handleCreateModifier}>
           <Plus className="h-4 w-4 mr-2" />
           New Modifier
         </Button>

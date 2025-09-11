@@ -59,7 +59,7 @@ interface GetProductsParams {
   page?: number;
   limit?: number;
   search?: string;
-  sort_by?: "name" | "price" | "weight" | "created_at";
+  sort_by?: "name" | "price" | "weight" | "created_at" | "category";
   sort_order?: "asc" | "desc";
 }
 
@@ -136,6 +136,29 @@ const updateProduct = async ({
   return response.json();
 };
 
+const updateProductWeight = async ({
+  id,
+  weight,
+}: {
+  id: string;
+  weight: number;
+}): Promise<UpdateProductResponse> => {
+  const response = await fetch(`/api/products/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ weight }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Failed to update product weight");
+  }
+
+  return response.json();
+};
+
 const deleteProduct = async (id: string): Promise<DeleteProductResponse> => {
   const response = await fetch(`/api/products/${id}`, {
     method: "DELETE",
@@ -205,6 +228,51 @@ export const useUpdateProduct = () => {
   });
 };
 
+export const useUpdateProductWeight = () => {
+  const { orgId } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateProductWeight,
+    onSuccess: async (data, variables) => {
+      // Invalidar la query del producto específico
+      queryClient.invalidateQueries({
+        queryKey: ["products", orgId, variables.id],
+      });
+      // Invalidar la lista de productos
+      queryClient.invalidateQueries({
+        queryKey: ["products", orgId],
+        exact: false,
+      });
+
+      // Disparar recálculo de expected_weight en background
+      try {
+        const response = await fetch(`/api/products/${variables.id}/recalculate-orders`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          console.log(`Recalculated expected weights for ${result.affected_orders} orders`);
+        } else {
+          console.warn("Failed to trigger expected weight recalculation");
+        }
+      } catch (error) {
+        console.error("Error triggering expected weight recalculation:", error);
+      }
+
+      // Invalidar queries de orders después del recálculo
+      queryClient.invalidateQueries({
+        queryKey: ["orders", orgId],
+        exact: false,
+      });
+    },
+  });
+};
+
 export const useDeleteProduct = () => {
   const { orgId } = useAuth();
   const queryClient = useQueryClient();
@@ -219,6 +287,44 @@ export const useDeleteProduct = () => {
       // Invalidar la lista de productos
       queryClient.invalidateQueries({
         queryKey: ["products", orgId],
+        exact: false,
+      });
+    },
+  });
+};
+
+// Hook para recálculo manual de todas las órdenes
+export const useRecalculateAllOrders = () => {
+  const { orgId } = useAuth();
+  const queryClient = useQueryClient();
+
+  const recalculateAllOrders = async (): Promise<{
+    affected_orders: number;
+    total_orders: number;
+  }> => {
+    const response = await fetch("/api/orders/recalculate-simple", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || "Failed to recalculate orders");
+    }
+
+    return response.json();
+  };
+
+  return useMutation({
+    mutationFn: recalculateAllOrders,
+    onSuccess: (data) => {
+      console.log(`Recalculated expected weights for ${data.affected_orders} orders`);
+      
+      // Invalidar todas las queries de órdenes
+      queryClient.invalidateQueries({
+        queryKey: ["orders", orgId],
         exact: false,
       });
     },

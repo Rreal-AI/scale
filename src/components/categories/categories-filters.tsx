@@ -76,7 +76,7 @@ export function CategoriesFilters({
             className="pl-10"
           />
         </div>
-        <Button type="submit" variant="secondary">
+        <Button type="submit" variant="outline">
           Search
         </Button>
       </form>
@@ -170,6 +170,7 @@ export function CategoriesFilters({
                   Clear
                 </Button>
                 <Button
+                  variant="outline"
                   onClick={() =>
                     onFiltersChange({
                       ...currentFilters,

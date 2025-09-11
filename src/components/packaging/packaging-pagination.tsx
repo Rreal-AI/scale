@@ -120,7 +120,7 @@ export function PackagingPagination({
                 <span className="px-2 text-muted-foreground">...</span>
               ) : (
                 <Button
-                  variant={pageNum === currentPage ? "default" : "outline"}
+                  variant={pageNum === currentPage ? "secondary" : "outline"}
                   size="sm"
                   onClick={() => onPageChange(pageNum as number)}
                   className="h-8 w-8"

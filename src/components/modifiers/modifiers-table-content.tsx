@@ -191,7 +191,7 @@ export function ModifiersTableContent({
                 </div>
               </TableCell>
               <TableCell>
-                <Badge variant="secondary">{formatPrice(modifier.price)}</Badge>
+                <Badge variant="outline">{formatPrice(modifier.price)}</Badge>
               </TableCell>
               <TableCell>
                 <Badge

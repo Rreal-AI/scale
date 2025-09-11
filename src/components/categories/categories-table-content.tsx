@@ -188,7 +188,7 @@ export function CategoriesTableContent({
                   {category.description ? (
                     <span className="text-sm">{category.description}</span>
                   ) : (
-                    <Badge variant="secondary" className="text-xs">
+                    <Badge variant="outline" className="text-xs">
                       No description
                     </Badge>
                   )}

@@ -10,6 +10,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { 
   Search, 
   Filter, 
@@ -21,7 +27,8 @@ import {
   Scale,
   CheckCircle2,
   LayoutGrid,
-  Table
+  Table,
+  Settings2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -76,11 +83,28 @@ export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardP
       return true;
     }
   });
+  
+  const [showDashboard, setShowDashboard] = useState<boolean>(() => {
+    if (typeof window === "undefined") return true;
+    try {
+      const v = localStorage.getItem("orders_show_dashboard");
+      return v ? JSON.parse(v) : true;
+    } catch {
+      return true;
+    }
+  });
+  
   useEffect(() => {
     try {
       localStorage.setItem("orders_show_dispatched", JSON.stringify(showDispatched));
     } catch {}
   }, [showDispatched]);
+  
+  useEffect(() => {
+    try {
+      localStorage.setItem("orders_show_dashboard", JSON.stringify(showDashboard));
+    } catch {}
+  }, [showDashboard]);
   
   // View states
   const [currentView, setCurrentView] = useState<"dashboard" | "weigh">("dashboard");
@@ -254,49 +278,81 @@ export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardP
     <div className="space-y-2">
       {/* Header */}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-h1">Orders Dashboard</h1>
-            {urgentOrdersCount > 0 && (
-              <Badge variant="destructive" className="flex items-center gap-1">
-                <AlertTriangle className="h-3 w-3" />
-                {urgentOrdersCount} Urgent
-              </Badge>
-            )}
-          </div>
-          <p className="text-body">
-            Real-time order management and weight verification
-          </p>
-        </div>
         
         <div className="flex items-center gap-2">
-          {/* Personalization toggle */}
-          <div className="hidden lg:flex items-center gap-2 mr-2">
-            <span className="text-sm text-muted-foreground">Show Dispatched</span>
-            <Switch checked={showDispatched} onCheckedChange={(v) => setShowDispatched(Boolean(v))} />
-          </div>
+          {/* Components Selector */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className="flex items-center gap-2">
+                <Settings2 className="h-4 w-4" />
+                Components
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-56" align="end">
+              <div className="space-y-3">
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium leading-none">Toggle Components</h4>
+                  <p className="text-xs text-muted-foreground">
+                    Show or hide dashboard components
+                  </p>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="show-dashboard"
+                      checked={showDashboard}
+                      onCheckedChange={(checked) => setShowDashboard(Boolean(checked))}
+                    />
+                    <label
+                      htmlFor="show-dashboard"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      Dashboard Stats
+                    </label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="show-dispatched"
+                      checked={showDispatched}
+                      onCheckedChange={(checked) => setShowDispatched(Boolean(checked))}
+                    />
+                    <label
+                      htmlFor="show-dispatched"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      Dispatched Orders
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
           {/* View Toggle */}
           {onViewModeChange && (
             <div className="flex items-center rounded-lg border p-1 bg-muted/50">
               <Button
-                variant={viewMode === "cards" ? "default" : "ghost"}
+                variant="ghost"
                 size="sm"
                 onClick={() => onViewModeChange("cards")}
                 className={cn(
-                  "flex items-center gap-2 transition-all",
-                  viewMode === "cards" && "bg-background shadow-sm"
+                  "flex items-center gap-2 transition-all border",
+                  viewMode === "cards" 
+                    ? "border-black bg-gray-100 font-semibold text-black" 
+                    : "border-transparent hover:bg-gray-50"
                 )}
               >
                 <LayoutGrid className="h-4 w-4" />
                 Cards
               </Button>
               <Button
-                variant={viewMode === "table" ? "default" : "ghost"}
+                variant="ghost"
                 size="sm"
                 onClick={() => onViewModeChange("table")}
                 className={cn(
-                  "flex items-center gap-2 transition-all",
-                  viewMode === "table" && "bg-background shadow-sm"
+                  "flex items-center gap-2 transition-all border",
+                  viewMode === "table" 
+                    ? "border-black bg-gray-100 font-semibold text-black" 
+                    : "border-transparent hover:bg-gray-50"
                 )}
               >
                 <Table className="h-4 w-4" />
@@ -304,21 +360,11 @@ export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardP
               </Button>
             </div>
           )}
-          
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => refetch()}
-            className="flex items-center gap-2"
-          >
-            <RefreshCw className="h-4 w-4" />
-            Refresh
-          </Button>
         </div>
       </div>
 
-      {/* Stats Overview - Always shows all orders */}
-      {allOrdersData?.orders && allOrdersData.orders.length > 0 && (
+      {/* Stats Overview - Conditionally show based on toggle */}
+      {showDashboard && allOrdersData?.orders && allOrdersData.orders.length > 0 && (
         <OrdersStats orders={allOrdersData.orders} />
       )}
 
@@ -335,11 +381,10 @@ export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardP
           />
         </div>
 
-        {/* Type + Status Filters on one row */}
-        <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex items-center gap-3 flex-wrap">
-            <span className="text-h6">Order Type</span>
-            <div className="flex flex-wrap gap-2">
+        {/* Type + Status Filters in one row with divider */}
+        <div className="flex items-center gap-4 flex-wrap">
+          {/* Type Filters */}
+          <div className="flex flex-wrap gap-2">
             {typeFilters.map((filter) => {
               const Icon = filter.icon;
               const isSelected = selectedType === (filter.value || "all");
@@ -360,17 +405,19 @@ export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardP
                   className={cn(
                     "flex items-center gap-2 transition-all border",
                     isSelected 
-                      ? (filter.id === "delivery" 
-                          ? "bg-indigo-600 text-white border-indigo-600"
-                          : filter.id === "takeout"
-                          ? "bg-emerald-600 text-white border-emerald-600"
-                          : "bg-gray-900 text-white border-gray-900")
-                      : (filter.id === "delivery"
-                          ? "text-indigo-600 border-indigo-200 hover:bg-indigo-50"
-                          : filter.id === "takeout"
-                          ? "text-emerald-600 border-emerald-200 hover:bg-emerald-50"
-                          : "border-gray-200 text-gray-600 hover:bg-gray-50")
+                      ? (filter.id === "delivery" || filter.id === "takeout")
+                          ? "text-white"
+                          : "bg-gray-900 text-white border-gray-900"
+                      : "border-gray-200 text-gray-600 hover:bg-gray-50"
                   )}
+                  style={isSelected && (filter.id === "delivery" || filter.id === "takeout") ? {
+                    backgroundColor: filter.id === "delivery" ? "var(--color-primary)" : "var(--color-secondary)",
+                    borderColor: filter.id === "delivery" ? "var(--color-primary)" : "var(--color-secondary)"
+                  } : !isSelected && (filter.id === "delivery" || filter.id === "takeout") ? {
+                    color: filter.id === "delivery" ? "var(--color-primary)" : "var(--color-secondary)",
+                    borderColor: filter.id === "delivery" ? "var(--color-primary)" : "var(--color-secondary)",
+                    backgroundColor: "transparent"
+                  } : undefined}
                 >
                   <Icon className="h-4 w-4" />
                   {filter.label}
@@ -388,12 +435,13 @@ export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardP
                 </Button>
               );
             })}
-            </div>
           </div>
 
-          <div className="flex items-center gap-3 flex-wrap">
-            <span className="text-h6">Order Status</span>
-            <div className="flex flex-wrap gap-2">
+          {/* Divider */}
+          <div className="h-6 w-px bg-gray-300" />
+
+          {/* Status Filters */}
+          <div className="flex flex-wrap gap-2">
             {statusFilters.map((filter) => {
               const Icon = filter.icon;
               const isSelected = selectedStatus === filter.status;
@@ -414,9 +462,19 @@ export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardP
                   className={cn(
                     "flex items-center gap-2 transition-all border",
                     isSelected 
-                      ? "bg-gray-900 text-white border-gray-900" 
+                      ? (filter.status === "completed" || filter.status === "cancelled")
+                          ? "text-white"
+                          : "bg-gray-900 text-white border-gray-900"
                       : "border-gray-200 text-gray-600 hover:bg-gray-50"
                   )}
+                  style={isSelected && (filter.status === "completed" || filter.status === "cancelled") ? {
+                    backgroundColor: filter.status === "completed" ? "var(--color-success)" : "var(--color-warning)",
+                    borderColor: filter.status === "completed" ? "var(--color-success)" : "var(--color-warning)"
+                  } : !isSelected && (filter.status === "completed" || filter.status === "cancelled") ? {
+                    color: filter.status === "completed" ? "var(--color-success)" : "var(--color-warning)",
+                    borderColor: filter.status === "completed" ? "var(--color-success)" : "var(--color-warning)",
+                    backgroundColor: "transparent"
+                  } : undefined}
                 >
                   <Icon className="h-4 w-4" />
                   {filter.label}
@@ -434,7 +492,6 @@ export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardP
                 </Button>
               );
             })}
-            </div>
           </div>
         </div>
       </div>

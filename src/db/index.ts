@@ -3,7 +3,7 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: process.env.DATABASE_URL || "postgres://fedesilbert@localhost:5432/fs-scale",
 });
 
 export const db = drizzle(pool, { schema });

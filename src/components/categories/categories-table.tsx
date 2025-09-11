@@ -138,7 +138,7 @@ export function CategoriesTable() {
             Manage your product categories
           </p>
         </div>
-        <Button onClick={handleCreateCategory}>
+        <Button variant="outline" onClick={handleCreateCategory}>
           <Plus className="h-4 w-4 mr-2" />
           New Category
         </Button>

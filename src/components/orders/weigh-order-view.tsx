@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRealTimeOrders, useOrder } from "@/hooks/use-orders";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -90,12 +90,62 @@ export function WeighOrderView({
   ]);
   const [bagPackaging, setBagPackaging] = useState<
     Record<string, "none" | "paper" | "plastic" | "box">
-  >({ "bag-1": "none" });
+  >({ "bag-1": "paper" });
   const [weightModalOpen, setWeightModalOpen] = useState(false);
   const [selectedBagForWeighing, setSelectedBagForWeighing] = useState<{
     id: string;
     number: number;
   } | null>(null);
+
+  // Auto-save weighing progress
+  const saveWeighingProgress = (orderId: string, bagWeights: BagWeight[], bagPackaging: Record<string, string>, bagCount: number) => {
+    const progress = {
+      orderId,
+      bagWeights,
+      bagPackaging,
+      bagCount,
+      timestamp: Date.now()
+    };
+    localStorage.setItem(`weighing-progress-${orderId}`, JSON.stringify(progress));
+  };
+
+  const loadWeighingProgress = (orderId: string) => {
+    try {
+      const saved = localStorage.getItem(`weighing-progress-${orderId}`);
+      if (saved) {
+        const progress = JSON.parse(saved);
+        // Only load if it's from the last 24 hours
+        if (Date.now() - progress.timestamp < 24 * 60 * 60 * 1000) {
+          return progress;
+        }
+      }
+    } catch (error) {
+      console.error("Error loading weighing progress:", error);
+    }
+    return null;
+  };
+
+  const clearWeighingProgress = (orderId: string) => {
+    localStorage.removeItem(`weighing-progress-${orderId}`);
+  };
+
+  // Load weighing progress when order changes
+  useEffect(() => {
+    if (selectedOrderId) {
+      const savedProgress = loadWeighingProgress(selectedOrderId);
+      if (savedProgress) {
+        setBagWeights(savedProgress.bagWeights);
+        setBagPackaging(savedProgress.bagPackaging);
+        setBagCount(savedProgress.bagCount);
+        console.log("Restored weighing progress for order", selectedOrderId);
+      } else {
+        // Reset to default if no saved progress
+        setBagWeights([{ id: "bag-1", weight: 0 }]);
+        setBagPackaging({ "bag-1": "paper" });
+        setBagCount(1);
+      }
+    }
+  }, [selectedOrderId]);
 
   // Fetch orders for sidebar
   const { data: ordersData } = useRealTimeOrders({
@@ -123,6 +173,14 @@ export function WeighOrderView({
   // Fetch selected order details
   const { data: selectedOrderData } = useOrder(selectedOrderId || "");
   const selectedOrder = selectedOrderData?.order;
+
+  // Debug expected weight
+  useEffect(() => {
+    if (selectedOrder) {
+      console.log("Selected order expected_weight:", selectedOrder.expected_weight);
+      console.log("Selected order structured_output:", selectedOrder.structured_output);
+    }
+  }, [selectedOrder]);
 
   const orders = ordersData?.orders || [];
   const displayOrders = (() => {
@@ -181,8 +239,22 @@ export function WeighOrderView({
       const newBagCount = bagCount + 1;
       setBagCount(newBagCount);
       const id = `bag-${newBagCount}`;
-      setBagWeights((prev) => [...prev, { id, weight: 0 }]);
-      setBagPackaging((prev) => ({ ...prev, [id]: "none" }));
+      setBagWeights((prev) => {
+        const updated = [...prev, { id, weight: 0 }];
+        // Auto-save progress
+        if (selectedOrderId) {
+          saveWeighingProgress(selectedOrderId, updated, bagPackaging, newBagCount);
+        }
+        return updated;
+      });
+      setBagPackaging((prev) => {
+        const updated = { ...prev, [id]: "paper" as "none" | "paper" | "plastic" | "box" };
+        // Auto-save progress
+        if (selectedOrderId) {
+          saveWeighingProgress(selectedOrderId, bagWeights, updated, newBagCount);
+        }
+        return updated;
+      });
     }
   };
 
@@ -191,7 +263,14 @@ export function WeighOrderView({
     if (bagCount > 1) {
       const newBagCount = bagCount - 1;
       setBagCount(newBagCount);
-      setBagWeights((prev) => prev.slice(0, newBagCount));
+      setBagWeights((prev) => {
+        const updated = prev.slice(0, newBagCount);
+        // Auto-save progress
+        if (selectedOrderId) {
+          saveWeighingProgress(selectedOrderId, updated, bagPackaging, newBagCount);
+        }
+        return updated;
+      });
     }
   };
 
@@ -205,18 +284,51 @@ export function WeighOrderView({
   const handleWeightConfirm = (weight: number) => {
     if (selectedBagForWeighing) {
       updateBagWeight(selectedBagForWeighing.id, weight);
+      
+      // Auto-advance to next bag if available
+      const currentBagIndex = bagWeights.findIndex(bag => bag.id === selectedBagForWeighing.id);
+      const nextBagIndex = currentBagIndex + 1;
+      
+      if (nextBagIndex < bagWeights.length) {
+        // Move to next bag
+        const nextBag = bagWeights[nextBagIndex];
+        setSelectedBagForWeighing({ 
+          id: nextBag.id, 
+          number: nextBagIndex + 1 
+        });
+        // Keep modal open for next bag
+      } else {
+        // No more bags, close modal
+        setWeightModalOpen(false);
+        setSelectedBagForWeighing(null);
+      }
     }
   };
 
   // Update individual bag weight
   const updateBagWeight = (bagId: string, weight: number) => {
-    setBagWeights((prev) =>
-      prev.map((bag) => (bag.id === bagId ? { ...bag, weight } : bag))
-    );
+    setBagWeights((prev) => {
+      const updated = prev.map((bag) => (bag.id === bagId ? { ...bag, weight } : bag));
+      // Auto-save progress
+      if (selectedOrderId) {
+        saveWeighingProgress(selectedOrderId, updated, bagPackaging, bagCount);
+      }
+      return updated;
+    });
   };
 
-  // Calculate total weight
-  const totalWeight = bagWeights.reduce((sum, bag) => sum + bag.weight, 0);
+  // Calculate total weight including packaging
+  const totalWeight = Math.round(
+    bagWeights.reduce((sum, bag) => {
+      const bagWeight = bag.weight;
+      const packaging = bagPackaging[bag.id] || "paper"; // Default to paper bag
+      const packagingWeight = packaging === "none" ? 0 : 
+                             packaging === "paper" ? 0.1 : // Paper bag weight in oz
+                             packaging === "plastic" ? 0.05 : // Plastic bag weight in oz
+                             packaging === "box" ? 0.2 : 0; // Box weight in oz
+      return sum + bagWeight + packagingWeight;
+    }, 0) * 100
+  ) / 100; // Round to 2 decimal places to fix floating point precision
 
   // Handle complete weighing or re-weigh
   const handleWeighAction = () => {
@@ -272,6 +384,11 @@ export function WeighOrderView({
   const resetWeighingState = () => {
     setBagCount(1);
     setBagWeights([{ id: "bag-1", weight: 0 }]);
+    setBagPackaging({ "bag-1": "paper" });
+    // Clear saved progress when resetting
+    if (selectedOrderId) {
+      clearWeighingProgress(selectedOrderId);
+    }
   };
 
   const getOrderItems = (order: Order) => {
@@ -357,20 +474,28 @@ export function WeighOrderView({
           <div className="space-y-2">
             <div className="flex gap-1">
               <Button
-                variant={selectedStatus === "all" ? "default" : "outline"}
+                variant="outline"
                 size="sm"
                 onClick={() => setSelectedStatus("all")}
-                className="h-8 px-3 text-xs font-medium"
+                className={cn(
+                  "h-8 px-3 text-xs font-medium",
+                  selectedStatus === "all" 
+                    ? "bg-gray-900 text-white border-gray-900" 
+                    : "text-gray-600 border-gray-300 hover:bg-gray-50"
+                )}
               >
                 All
               </Button>
               <Button
-                variant={
-                  selectedStatus === "pending_weight" ? "default" : "outline"
-                }
+                variant="outline"
                 size="sm"
                 onClick={() => setSelectedStatus("pending_weight")}
-                className="h-8 px-3 text-xs font-medium"
+                className={cn(
+                  "h-8 px-3 text-xs font-medium",
+                  selectedStatus === "pending_weight" 
+                    ? "bg-gray-900 text-white border-gray-900" 
+                    : "text-gray-600 border-gray-300 hover:bg-gray-50"
+                )}
               >
                 Pending
               </Button>
@@ -378,17 +503,33 @@ export function WeighOrderView({
                 variant={selectedStatus === "weighed" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setSelectedStatus("weighed")}
-                className="h-8 px-3 text-xs font-medium"
+                className={cn(
+                  "h-8 px-3 text-xs font-medium",
+                  selectedStatus === "weighed" ? "text-white" : ""
+                )}
+                style={selectedStatus === "weighed" ? {
+                  backgroundColor: "#10b981", // emerald-500
+                  borderColor: "#10b981"
+                } : {
+                  color: "#10b981",
+                  borderColor: "#10b981",
+                  backgroundColor: "transparent"
+                }}
               >
                 Ready for Lockers
               </Button>
             </div>
             <div className="flex gap-1">
               <Button
-                variant={selectedType === "all" ? "default" : "outline"}
+                variant="outline"
                 size="sm"
                 onClick={() => setSelectedType("all")}
-                className="h-8 px-3 text-xs font-medium"
+                className={cn(
+                  "h-8 px-3 text-xs font-medium",
+                  selectedType === "all" 
+                    ? "bg-gray-900 text-white border-gray-900" 
+                    : "text-gray-600 border-gray-300 hover:bg-gray-50"
+                )}
               >
                 All Types
               </Button>
@@ -398,10 +539,16 @@ export function WeighOrderView({
                 onClick={() => setSelectedType("delivery")}
                 className={cn(
                   "h-8 px-3 text-xs font-medium",
-                  selectedType === "delivery"
-                    ? "bg-indigo-600 text-white border-indigo-600"
-                    : "text-indigo-600 border-indigo-200 hover:bg-indigo-50"
+                  selectedType === "delivery" ? "text-white" : ""
                 )}
+                style={selectedType === "delivery" ? {
+                  backgroundColor: "var(--color-primary)",
+                  borderColor: "var(--color-primary)"
+                } : {
+                  color: "var(--color-primary)",
+                  borderColor: "var(--color-primary)",
+                  backgroundColor: "transparent"
+                }}
               >
                 <Truck className="h-3 w-3 mr-1" />
                 Delivery
@@ -412,10 +559,16 @@ export function WeighOrderView({
                 onClick={() => setSelectedType("takeout")}
                 className={cn(
                   "h-8 px-3 text-xs font-medium",
-                  selectedType === "takeout"
-                    ? "bg-emerald-600 text-white border-emerald-600"
-                    : "text-emerald-600 border-emerald-200 hover:bg-emerald-50"
+                  selectedType === "takeout" ? "text-white" : ""
                 )}
+                style={selectedType === "takeout" ? {
+                  backgroundColor: "var(--color-secondary)",
+                  borderColor: "var(--color-secondary)"
+                } : {
+                  color: "var(--color-secondary)",
+                  borderColor: "var(--color-secondary)",
+                  backgroundColor: "transparent"
+                }}
               >
                 <Package className="h-3 w-3 mr-1" />
                 Pickup
@@ -533,6 +686,13 @@ export function WeighOrderView({
                     )}
                   </div>
                   <div className="flex items-center gap-1">
+                    {/* In Progress Indicator */}
+                    {isSelected && order.status === "pending_weight" && (
+                      <div 
+                        className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"
+                        title="Weighing in progress"
+                      />
+                    )}
                     {isUrgent && order.status === "pending_weight" && (
                       <Badge
                         variant="destructive"
@@ -542,7 +702,10 @@ export function WeighOrderView({
                       </Badge>
                     )}
                     {order.status === "pending_weight" && (
-                      <Badge variant="secondary" className="text-xs px-1 py-0">
+                      <Badge 
+                        variant="outline" 
+                        className="text-xs px-1 py-0 text-gray-600 border-gray-300 bg-gray-50"
+                      >
                         Awaiting
                       </Badge>
                     )}
@@ -595,7 +758,7 @@ export function WeighOrderView({
             {/* Order Header */}
             <div className="bg-white border-b border-gray-200 p-6">
               <div className="flex items-start justify-between mb-4">
-                <div>
+                <div className="flex-1">
                   <h1 className="text-2xl font-bold text-gray-900 mb-2">
                     Order #{selectedOrder.check_number}
                   </h1>
@@ -605,67 +768,95 @@ export function WeighOrderView({
                       {selectedOrder.customer_address}
                     </p>
                   )}
+                  
+                  {/* Order Items - MOVED HERE, SMALLER */}
+                  <div className="mt-4">
+                    <h3 className="text-sm font-medium text-gray-700 mb-2">Order Items</h3>
+                    <div className="space-y-1">
+                      {(() => {
+                        const structuredOutput =
+                          selectedOrder.structured_output as {
+                            items?: Array<{
+                              name: string;
+                              quantity: number;
+                              price: number;
+                              modifiers?: Array<{ name: string; price: number }>;
+                            }>;
+                          } | null;
+                        return structuredOutput?.items?.map((item, index) => (
+                          <div key={index} className="flex items-start gap-2 text-sm">
+                            <span className="text-gray-400 mt-0.5">•</span>
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium">
+                                  {item.quantity}x
+                                </span>
+                                <span>{item.name}</span>
+                              </div>
+                              {item.modifiers && item.modifiers.length > 0 && (
+                                <div className="ml-4 mt-0.5 space-y-0.5">
+                                  {item.modifiers.map((modifier, modIndex) => (
+                                    <div
+                                      key={modIndex}
+                                      className="text-xs text-gray-600 flex items-center gap-1"
+                                    >
+                                      <span className="text-gray-300">•</span>
+                                      <span>{modifier.name}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ));
+                      })() || (
+                        <div className="text-sm text-gray-500">
+                          No items found
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
 
-                {/* Order Items - MOVED TO BOTTOM */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Order Items</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {(() => {
-                      const structuredOutput =
-                        selectedOrder.structured_output as {
-                          items?: Array<{
-                            name: string;
-                            quantity: number;
-                            price: number;
-                            modifiers?: Array<{ name: string; price: number }>;
-                          }>;
-                        } | null;
-                      return structuredOutput?.items?.map((item, index) => (
-                        <div key={index} className="flex items-start gap-2">
-                          <span className="text-gray-400 mt-1">•</span>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium">
-                                {item.quantity}x
-                              </span>
-                              <span>{item.name}</span>
-                            </div>
-                            {item.modifiers && item.modifiers.length > 0 && (
-                              <div className="ml-4 mt-1 space-y-0.5">
-                                {item.modifiers.map((modifier, modIndex) => (
-                                  <div
-                                    key={modIndex}
-                                    className="text-sm text-gray-600 flex items-center gap-1"
-                                  >
-                                    <span className="text-gray-300">•</span>
-                                    <span>{modifier.name}</span>
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      ));
-                    })() || (
-                      <div className="text-center text-gray-500 py-4">
-                        No items found
+                {/* Expected Weight and Total Weight - MOVED HERE */}
+                <div className="ml-6 space-y-4">
+                  {/* Expected Weight */}
+                  <Card className="w-64">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm">Expected Weight</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold text-blue-900">
+                        {selectedOrder.expected_weight && selectedOrder.expected_weight > 0
+                          ? `${gramsToOunces(selectedOrder.expected_weight).toFixed(2)} oz`
+                          : "Not calculated"}
                       </div>
-                    )}
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+
+                  {/* Total Weight */}
+                  <Card className="w-64">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm">Total Weight</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold text-gray-900">
+                        {totalWeight.toFixed(2)} oz
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
               </div>
             </div>
 
-            {/* Main Content - Weighing First, Items Second */}
-            <div className="flex-1 overflow-y-auto bg-gray-50 p-6">
-              <div className="max-w-2xl mx-auto space-y-6">
-                {/* Weighing Section - MOVED TO TOP */}
-                {selectedOrder.status === "pending_weight" && (
-                  <div className="space-y-6">
-                    <Card>
+            {/* Main Content - Fixed Height Weight Verification */}
+            <div className="flex-1 flex flex-col bg-gray-50">
+              {/* Weight Verification - Fixed Height with Conditional Scroll */}
+              {selectedOrder.status === "pending_weight" && (
+                <div className="flex-1 flex flex-col min-h-0">
+                  <div className="p-6">
+                    <div className="max-w-2xl mx-auto">
+                      <Card className="h-full flex flex-col">
                       <CardHeader>
                         <div className="flex items-center justify-between">
                           <CardTitle className="flex items-center gap-2 text-xl">
@@ -695,22 +886,7 @@ export function WeighOrderView({
                           </div>
                         </div>
                       </CardHeader>
-                      <CardContent className="space-y-6">
-                        {/* Expected Weight Display */}
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                          <div className="flex justify-between items-center">
-                            <span className="text-lg font-medium text-blue-900">
-                              Expected Weight:
-                            </span>
-                            <span className="text-xl font-bold text-blue-900">
-                              {selectedOrder.expected_weight
-                                ? `${gramsToOunces(
-                                    selectedOrder.expected_weight
-                                  )} oz`
-                                : "Not calculated"}
-                            </span>
-                          </div>
-                        </div>
+                      <CardContent className="flex-1 overflow-y-auto space-y-6">
 
                         {/* Bag Weight Inputs - Clean Layout */}
                         <div className="grid gap-4">
@@ -722,25 +898,32 @@ export function WeighOrderView({
                               <div className="text-lg font-medium text-gray-700 w-20">
                                 Bag {index + 1}
                               </div>
-                              {/* Packaging selector */}
+                              {/* Type of bag selector */}
                               <select
                                 className="h-10 border rounded px-2 text-sm text-gray-700"
-                                value={bagPackaging[bag.id] || "none"}
+                                value={bagPackaging[bag.id] || "paper"}
                                 onChange={(e) =>
-                                  setBagPackaging((prev) => ({
-                                    ...prev,
-                                    [bag.id]: e.target.value as
-                                      | "none"
-                                      | "paper"
-                                      | "plastic"
-                                      | "box",
-                                  }))
+                                  setBagPackaging((prev) => {
+                                    const updated = {
+                                      ...prev,
+                                      [bag.id]: e.target.value as
+                                        | "none"
+                                        | "paper"
+                                        | "plastic"
+                                        | "box",
+                                    };
+                                    // Auto-save progress
+                                    if (selectedOrderId) {
+                                      saveWeighingProgress(selectedOrderId, bagWeights, updated, bagCount);
+                                    }
+                                    return updated;
+                                  })
                                 }
                               >
-                                <option value="none">No packaging</option>
-                                <option value="paper">Paper bag</option>
+                                <option value="paper">Type</option>
                                 <option value="plastic">Plastic bag</option>
                                 <option value="box">Box</option>
+                                <option value="none">No packaging</option>
                               </select>
                               <Button
                                 variant="outline"
@@ -958,10 +1141,26 @@ export function WeighOrderView({
                           );
                         })()}
                       </CardContent>
-                    </Card>
+                      </Card>
+                    </div>
                   </div>
-                )}
-              </div>
+                </div>
+              )}
+
+              {/* No weighing needed - Order already weighed or completed */}
+              {selectedOrder.status !== "pending_weight" && (
+                <div className="flex-1 flex items-center justify-center">
+                  <div className="text-center">
+                    <Scale className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      Order Already Processed
+                    </h3>
+                    <p className="text-gray-500">
+                      This order has already been weighed or completed
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </>
         ) : (
@@ -991,6 +1190,7 @@ export function WeighOrderView({
             : 0
         }
         onWeightConfirm={handleWeightConfirm}
+        totalBags={bagCount}
       />
     </div>
   );

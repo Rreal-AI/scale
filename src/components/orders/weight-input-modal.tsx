@@ -12,6 +12,7 @@ interface WeightInputModalProps {
   bagNumber: number;
   currentWeight: number;
   onWeightConfirm: (weight: number) => void;
+  totalBags?: number;
 }
 
 export function WeightInputModal({ 
@@ -19,19 +20,20 @@ export function WeightInputModal({
   onOpenChange, 
   bagNumber, 
   currentWeight, 
-  onWeightConfirm 
+  onWeightConfirm,
+  totalBags
 }: WeightInputModalProps) {
   const [value, setValue] = useState("");
 
   // Keypad numbers
   const keypadNumbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', '⌫'];
 
-  // Reset value when modal opens
+  // Reset value when modal opens or bag changes
   useEffect(() => {
     if (open) {
       setValue(currentWeight > 0 ? currentWeight.toString() : "");
     }
-  }, [open, currentWeight]);
+  }, [open, currentWeight, bagNumber]);
 
   // Handle keypad press
   const handleKeypadPress = (key: string) => {
@@ -71,7 +73,7 @@ export function WeightInputModal({
     const weight = parseFloat(value) || 0;
     if (weight > 0) {
       onWeightConfirm(weight);
-      onOpenChange(false);
+      // Don't close modal automatically - let parent component decide
     }
   };
 
@@ -86,6 +88,11 @@ export function WeightInputModal({
         <DialogHeader>
           <DialogTitle className="text-center text-2xl">
             Weigh Bag {bagNumber}
+            {totalBags && totalBags > 1 && (
+              <span className="text-lg text-gray-500 font-normal ml-2">
+                ({bagNumber} of {totalBags})
+              </span>
+            )}
           </DialogTitle>
         </DialogHeader>
 

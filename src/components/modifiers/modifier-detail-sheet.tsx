@@ -310,6 +310,7 @@ export function ModifierDetailSheet({
 
         <SheetFooter className="flex-col gap-2">
           <Button
+            variant="outline"
             onClick={() => modifier && onEdit?.(modifier)}
             className="w-full"
             disabled={isLoading || !modifier}

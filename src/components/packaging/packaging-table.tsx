@@ -136,7 +136,7 @@ export function PackagingTable() {
           <h1 className="text-2xl font-bold">Packaging</h1>
           <p className="text-muted-foreground">Manage your packaging catalog</p>
         </div>
-        <Button onClick={handleCreatePackaging}>
+        <Button variant="outline" onClick={handleCreatePackaging}>
           <Plus className="h-4 w-4 mr-2" />
           New Packaging
         </Button>

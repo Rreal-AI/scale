@@ -9,6 +9,7 @@ import {
   Box,
   ShoppingBag,
   Tag,
+  Scale,
 } from "lucide-react";
 import { useSidebar } from "@/components/ui/sidebar";
 import {
@@ -34,6 +35,11 @@ const navigationItems = [
     title: "Categories",
     href: "/categories",
     icon: Tag,
+  },
+  {
+    title: "Rules",
+    href: "/rules",
+    icon: Scale,
   },
   {
     title: "Packaging",
