@@ -8,6 +8,7 @@ import { orders } from "@/db/schema/orders";
 import { orderItemModifiers, orderItems } from "@/db/schema";
 import { Workflow } from "@/lib/workflow";
 import { eq, or } from "drizzle-orm";
+import { logger } from "@/lib/logger";
 
 interface ProcessOrderPayload {
   input: string;
@@ -20,13 +21,13 @@ export const { POST } = serve<ProcessOrderPayload>(
 
     const structuredOrder = await context.run("Structure order", async () => {
       try {
+        logger.info("Structuring order", { input, org_id });
+
         const { object } = await generateObject({
           model: "openai/o3",
           schema: structuredOrderSchema,
           prompt: PROMPT.replace("{order}", input),
         });
-
-        console.log("Structured order", JSON.stringify(object, null, 2));
 
         return object;
       } catch (error) {
@@ -35,6 +36,8 @@ export const { POST } = serve<ProcessOrderPayload>(
     });
 
     const orderId = await context.run("Create order", async () => {
+      logger.info("Creating order", { structuredOrder, org_id });
+
       return db.transaction(async (tx) => {
         const products = await tx.query.products.findMany({
           where: (table, { eq, and, or, ilike }) =>
@@ -194,6 +197,10 @@ export const { POST } = serve<ProcessOrderPayload>(
         return newOrder.id;
       });
     });
+
+    logger.info("Order created", { orderId, org_id });
+
+    return orderId;
   },
   {
     url: Workflow.ProcessOrder,
