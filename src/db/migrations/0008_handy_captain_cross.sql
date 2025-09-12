@@ -1,0 +1,1 @@
+ALTER TABLE "organizations" ADD COLUMN "inbound_order_email_inbox_id" uuid DEFAULT gen_random_uuid() NOT NULL;

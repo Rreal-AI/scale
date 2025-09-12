@@ -57,6 +57,13 @@
       "when": 1757443021190,
       "tag": "0007_colossal_bloodstorm",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1757713401967,
+      "tag": "0008_handy_captain_cross",
+      "breakpoints": true
     }
   ]
 }
