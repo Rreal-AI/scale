@@ -13,9 +13,11 @@ export async function POST(request: NextRequest) {
   const recipient = body.get("recipient")?.toString() ?? "";
   const text = body.get("body-plain")?.toString() ?? "";
 
+  const orgId = recipient.split("@")[0];
+
   await workflow.dispatch("ProcessOrder", {
     input: text,
-    org_id: "org_2yopRjqKgwchgLNHKPlT2zI48Mk",
+    org_id: orgId,
   });
 
   return new Response("OK");
