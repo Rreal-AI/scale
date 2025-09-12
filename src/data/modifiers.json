@@ -35,6 +35,11 @@
     "weight": 0
   },
   {
+    "name": "GRILLED FISH",
+    "price": 2,
+    "weight": 0
+  },
+  {
     "name": "Pickled Red Onions",
     "price": 0.63,
     "weight": 0
@@ -155,8 +160,8 @@
     "weight": 0
   },
   {
-    "name": "GRILLED FISH",
-    "price": 2,
+    "name": "CARNITAS",
+    "price": 0,
     "weight": 0
   },
   {
@@ -196,11 +201,6 @@
   },
   {
     "name": "NO RADDISH",
-    "price": 0,
-    "weight": 0
-  },
-  {
-    "name": "CARNITAS",
     "price": 0,
     "weight": 0
   },
@@ -292,6 +292,11 @@
   {
     "name": "Add Mixed Veggies",
     "price": 4.38,
+    "weight": 0
+  },
+  {
+    "name": "CHICKEN",
+    "price": 2,
     "weight": 0
   },
   {
@@ -430,11 +435,6 @@
     "weight": 0
   },
   {
-    "name": "CHICKEN",
-    "price": 2,
-    "weight": 0
-  },
-  {
     "name": "3 Veggie",
     "price": 0,
     "weight": 0
@@ -470,6 +470,11 @@
     "weight": 0
   },
   {
+    "name": "4 GLASSES",
+    "price": 0,
+    "weight": 0
+  },
+  {
     "name": "Grilled Chicken",
     "price": 0,
     "weight": 0
@@ -501,6 +506,11 @@
   },
   {
     "name": "COLESLAW ON THE SIDE",
+    "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "2 GLASSES",
     "price": 0,
     "weight": 0
   },
@@ -750,11 +760,6 @@
     "weight": 0
   },
   {
-    "name": "2 GLASSES",
-    "price": 0,
-    "weight": 0
-  },
-  {
     "name": "3 GRILLED CHICKEN",
     "price": 0,
     "weight": 0
@@ -895,6 +900,16 @@
     "weight": 0
   },
   {
+    "name": "EXTRA QUESO",
+    "price": 2,
+    "weight": 0
+  },
+  {
+    "name": "WATER",
+    "price": 0,
+    "weight": 0
+  },
+  {
     "name": "PICHANA",
     "price": 1.5,
     "weight": 0
@@ -940,11 +955,6 @@
     "weight": 0
   },
   {
-    "name": "EXTRA QUESO",
-    "price": 1.5,
-    "weight": 0
-  },
-  {
     "name": "Extra Aguacate",
     "price": 1.88,
     "weight": 0
@@ -972,11 +982,6 @@
   {
     "name": "Pickle Red Onions",
     "price": 0.63,
-    "weight": 0
-  },
-  {
-    "name": "4 GLASSES",
-    "price": 0,
     "weight": 0
   },
   {
@@ -1200,6 +1205,11 @@
     "weight": 0
   },
   {
+    "name": "TOGO MICHELADA",
+    "price": 7,
+    "weight": 0
+  },
+  {
     "name": "Cilantro",
     "price": 0.63,
     "weight": 0
@@ -1207,6 +1217,11 @@
   {
     "name": "NO SLAW MIX",
     "price": 0,
+    "weight": 0
+  },
+  {
+    "name": "COKE",
+    "price": 1,
     "weight": 0
   },
   {
@@ -1325,11 +1340,6 @@
     "weight": 0
   },
   {
-    "name": "WATER",
-    "price": 0,
-    "weight": 0
-  },
-  {
     "name": "MAKE IT SPICY",
     "price": 2,
     "weight": 0
@@ -1362,6 +1372,11 @@
   {
     "name": "ADDITIONAL FLAVOR",
     "price": 2,
+    "weight": 0
+  },
+  {
+    "name": "AGUA FRESCA PINEAPPLE",
+    "price": 1,
     "weight": 0
   },
   {
@@ -1450,6 +1465,11 @@
     "weight": 0
   },
   {
+    "name": "GINGER ALE",
+    "price": 1,
+    "weight": 0
+  },
+  {
     "name": "CHORIZO",
     "price": 1,
     "weight": 0
@@ -1525,11 +1545,6 @@
     "weight": 0
   },
   {
-    "name": "COKE",
-    "price": 2,
-    "weight": 0
-  },
-  {
     "name": "RED BULL SUGAR FREE",
     "price": 3,
     "weight": 0
@@ -1551,11 +1566,6 @@
   },
   {
     "name": "DR PEPPER",
-    "price": 1,
-    "weight": 0
-  },
-  {
-    "name": "GINGER ALE",
     "price": 1,
     "weight": 0
   },
@@ -1757,11 +1767,6 @@
   {
     "name": "NO TAJÍN ON WATERMELON",
     "price": 0,
-    "weight": 0
-  },
-  {
-    "name": "AGUA FRESCA PINEAPPLE",
-    "price": 1,
     "weight": 0
   },
   {

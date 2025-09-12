@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import * as workflow from "@/lib/workflow";
-import { eq } from "drizzle-orm";
+import { eq, ilike } from "drizzle-orm";
 import { db } from "@/db";
 import { organizations } from "@/db/schema";
 import { logger } from "@/lib/logger";
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
   const orgId = recipient.split("@")[0];
 
   const org = await db.query.organizations.findFirst({
-    where: eq(organizations.id, orgId),
+    where: ilike(organizations.id, orgId),
   });
 
   if (!org) {
