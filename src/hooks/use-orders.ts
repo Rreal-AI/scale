@@ -49,7 +49,7 @@ interface OrderItem {
 interface Order {
   id: string;
   org_id: string;
-  status: "pending_weight" | "weighed" | "completed" | "cancelled";
+  status: "pending_weight" | "weighed" | "completed" | "cancelled" | "archived";
   type: "delivery" | "takeout";
   check_number: string;
   customer_name: string;
@@ -65,6 +65,8 @@ interface Order {
   input: string;
   structured_output?: Record<string, unknown>;
   weight_verified_at?: string;
+  archived_at?: string;
+  archived_reason?: string;
   created_at: string;
   updated_at: string;
 }
@@ -85,10 +87,12 @@ interface OrdersResponse {
   };
   filters: {
     search?: string;
-    status?: "pending_weight" | "weighed" | "completed" | "cancelled";
+    status?: "pending_weight" | "weighed" | "completed" | "cancelled" | "archived";
     type?: "delivery" | "takeout";
     sort_by: string;
     sort_order: string;
+    archived_from?: string;
+    archived_to?: string;
   };
 }
 
@@ -101,8 +105,10 @@ interface GetOrdersParams {
   page?: number;
   limit?: number;
   search?: string;
-  status?: "pending_weight" | "weighed" | "completed" | "cancelled";
+  status?: "pending_weight" | "weighed" | "completed" | "cancelled" | "archived";
   type?: "delivery" | "takeout";
+  archived_from?: string;
+  archived_to?: string;
   sort_by?:
     | "created_at"
     | "updated_at"
@@ -125,6 +131,8 @@ const fetchOrders = async (
   if (params.search) searchParams.set("search", params.search);
   if (params.status) searchParams.set("status", params.status);
   if (params.type) searchParams.set("type", params.type);
+  if (params.archived_from) searchParams.set("archived_from", params.archived_from);
+  if (params.archived_to) searchParams.set("archived_to", params.archived_to);
   if (params.sort_by) searchParams.set("sort_by", params.sort_by);
   if (params.sort_order) searchParams.set("sort_order", params.sort_order);
 
@@ -181,7 +189,7 @@ export const useOrder = (id: string) => {
 
 // Hook para obtener orders por status (helper útil)
 export const useOrdersByStatus = (
-  status: "pending_weight" | "weighed" | "completed" | "cancelled",
+  status: "pending_weight" | "weighed" | "completed" | "cancelled" | "archived",
   params: Omit<GetOrdersParams, "status"> = {}
 ) => {
   return useOrders({ ...params, status });

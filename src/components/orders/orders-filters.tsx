@@ -22,8 +22,10 @@ import { Badge } from "@/components/ui/badge";
 interface OrdersFiltersProps {
   onFiltersChange: (filters: {
     search?: string;
-    status?: "pending_weight" | "weighed" | "completed" | "cancelled";
+    status?: "pending_weight" | "weighed" | "completed" | "cancelled" | "archived";
     type?: "delivery" | "takeout";
+    archived_from?: string;
+    archived_to?: string;
     sort_by?:
       | "created_at"
       | "updated_at"
@@ -36,8 +38,10 @@ interface OrdersFiltersProps {
   }) => void;
   currentFilters: {
     search?: string;
-    status?: "pending_weight" | "weighed" | "completed" | "cancelled";
+    status?: "pending_weight" | "weighed" | "completed" | "cancelled" | "archived";
     type?: "delivery" | "takeout";
+    archived_from?: string;
+    archived_to?: string;
     sort_by?:
       | "created_at"
       | "updated_at"
@@ -55,6 +59,7 @@ const statusLabels = {
   weighed: "Ready for Lockers",
   completed: "Dispatched",
   cancelled: "Cancelled",
+  archived: "Archived",
 };
 
 const statusColors = {
@@ -62,6 +67,7 @@ const statusColors = {
   weighed: "secondary" as const,
   completed: "outline" as const,
   cancelled: "destructive" as const,
+  archived: "outline" as const,
 };
 
 const typeLabels = {
@@ -81,11 +87,14 @@ export function OrdersFilters({
   };
 
   const handleStatusChange = (
-    status: "pending_weight" | "weighed" | "completed" | "cancelled" | "all"
+    status: "pending_weight" | "weighed" | "completed" | "cancelled" | "archived" | "all"
   ) => {
     onFiltersChange({
       ...currentFilters,
       status: status === "all" ? undefined : status,
+      // Clear archived date filters if not archived status
+      archived_from: status === "archived" ? currentFilters.archived_from : undefined,
+      archived_to: status === "archived" ? currentFilters.archived_to : undefined,
     });
   };
 
@@ -218,9 +227,44 @@ export function OrdersFilters({
                       <SelectItem value="weighed">Ready for Lockers</SelectItem>
                       <SelectItem value="completed">Dispatched</SelectItem>
                       <SelectItem value="cancelled">Cancelled</SelectItem>
+                      <SelectItem value="archived">Archived</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
+
+                {/* Archived Date Range Filters */}
+                {currentFilters.status === "archived" && (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="archived-from">Archived From</Label>
+                      <Input
+                        id="archived-from"
+                        type="date"
+                        value={currentFilters.archived_from || ""}
+                        onChange={(e) =>
+                          onFiltersChange({
+                            ...currentFilters,
+                            archived_from: e.target.value || undefined,
+                          })
+                        }
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="archived-to">Archived To</Label>
+                      <Input
+                        id="archived-to"
+                        type="date"
+                        value={currentFilters.archived_to || ""}
+                        onChange={(e) =>
+                          onFiltersChange({
+                            ...currentFilters,
+                            archived_to: e.target.value || undefined,
+                          })
+                        }
+                      />
+                    </div>
+                  </>
+                )}
 
                 <div className="space-y-2">
                   <Label>Type</Label>

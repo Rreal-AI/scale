@@ -254,8 +254,11 @@ export function ProductDialog({
                 <FormItem>
                   <FormLabel>Category (Optional)</FormLabel>
                   <Select
-                    onValueChange={field.onChange}
-                    value={field.value || ""}
+                    onValueChange={(value) => {
+                      // Convert "__none__" back to undefined
+                      field.onChange(value === "__none__" ? undefined : value);
+                    }}
+                    value={field.value || "__none__"}
                     disabled={isLoading || categoriesLoading}
                   >
                     <FormControl>
@@ -264,7 +267,7 @@ export function ProductDialog({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="">No category</SelectItem>
+                      <SelectItem value="__none__">No category</SelectItem>
                       {categoriesData?.categories.map((category) => (
                         <SelectItem key={category.id} value={category.id}>
                           {category.name}

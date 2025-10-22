@@ -10,7 +10,7 @@ const GRAMS_PER_OUNCE = 28.3495;
  * Convert grams to ounces for frontend display
  */
 export function gramsToOunces(grams: number): number {
-  return Math.round((grams / GRAMS_PER_OUNCE) * 10) / 10; // Round to 1 decimal
+  return Math.round((grams / GRAMS_PER_OUNCE) * 100) / 100; // Round to 2 decimals
 }
 
 /**

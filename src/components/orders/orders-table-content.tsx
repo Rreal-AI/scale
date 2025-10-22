@@ -18,7 +18,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 interface Order {
   id: string;
   org_id: string;
-  status: "pending_weight" | "weighed" | "completed" | "cancelled";
+  status: "pending_weight" | "weighed" | "completed" | "cancelled" | "archived";
   type: "delivery" | "takeout";
   check_number: string;
   customer_name: string;
@@ -34,6 +34,8 @@ interface Order {
   input: string;
   structured_output?: Record<string, unknown>;
   weight_verified_at?: string;
+  archived_at?: string;
+  archived_reason?: string;
   created_at: string;
   updated_at: string;
 }
@@ -63,7 +65,7 @@ interface OrdersTableContentProps {
   error: Error | null;
   currentFilters: {
     search?: string;
-    status?: "pending_weight" | "weighed" | "completed" | "cancelled";
+    status?: "pending_weight" | "weighed" | "completed" | "cancelled" | "archived";
     type?: "delivery" | "takeout";
     sort_by?:
       | "created_at"
@@ -83,6 +85,7 @@ const statusLabels = {
   weighed: "Weighed",
   completed: "Dispatched",
   cancelled: "Cancelled",
+  archived: "Archived",
 };
 
 const statusColors = {
@@ -90,6 +93,7 @@ const statusColors = {
   weighed: "secondary" as const,
   completed: "outline" as const,
   cancelled: "destructive" as const,
+  archived: "outline" as const,
 };
 
 const typeLabels = {
@@ -234,9 +238,16 @@ export function OrdersTableContent({
               <TableCell>
                 <div className="space-y-1">
                   <div className="font-mono text-sm">#{order.check_number}</div>
-                  <Badge variant={statusColors[order.status]}>
-                    {statusLabels[order.status]}
-                  </Badge>
+                  <div className="flex flex-col gap-1">
+                    <Badge variant={statusColors[order.status]}>
+                      {statusLabels[order.status]}
+                    </Badge>
+                    {order.status === "archived" && order.archived_at && (
+                      <div className="text-xs text-muted-foreground" title={order.archived_reason || ""}>
+                        📦 {new Date(order.archived_at).toLocaleDateString()}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </TableCell>
               <TableCell>

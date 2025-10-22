@@ -3,7 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 import { db } from "@/db";
 import { products, categories } from "@/db/schema";
 import { createProductSchema } from "@/schemas/products";
-import { and, eq, ilike, or, asc, desc, count } from "drizzle-orm";
+import { and, eq, ilike, or, asc, desc, count, isNull } from "drizzle-orm";
 
 // GET /api/products - Listar productos con paginación y filtros
 export async function GET(request: NextRequest) {
@@ -35,6 +35,7 @@ export async function GET(request: NextRequest) {
       Math.max(1, parseInt(searchParams.get("limit") || "10", 10))
     );
     const search = searchParams.get("search") || undefined;
+    const category_id = searchParams.get("category_id") || undefined;
     const sort_by =
       (searchParams.get("sort_by") as
         | "name"
@@ -62,6 +63,17 @@ export async function GET(request: NextRequest) {
 
     if (search) {
       conditions.push(or(ilike(products.name, `%${search}%`))!);
+    }
+
+    // Filter by category
+    if (category_id) {
+      if (category_id === "__none__") {
+        // Filter products without category
+        conditions.push(isNull(products.category_id));
+      } else {
+        // Filter by specific category
+        conditions.push(eq(products.category_id, category_id));
+      }
     }
 
     // Construir orden

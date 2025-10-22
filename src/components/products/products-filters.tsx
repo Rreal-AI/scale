@@ -17,23 +17,33 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+
+interface Category {
+  id: string;
+  name: string;
+}
 
 interface ProductsFiltersProps {
   onFiltersChange: (filters: {
     search?: string;
+    category_id?: string;
     sort_by?: "name" | "price" | "weight" | "created_at" | "category";
     sort_order?: "asc" | "desc";
   }) => void;
   currentFilters: {
     search?: string;
+    category_id?: string;
     sort_by?: "name" | "price" | "weight" | "created_at" | "category";
     sort_order?: "asc" | "desc";
   };
+  categories?: Category[];
 }
 
 export function ProductsFilters({
   onFiltersChange,
   currentFilters,
+  categories = [],
 }: ProductsFiltersProps) {
   const [localSearch, setLocalSearch] = useState(currentFilters.search || "");
 
@@ -52,6 +62,13 @@ export function ProductsFilters({
     onFiltersChange({ ...currentFilters, sort_order });
   };
 
+  const handleCategoryChange = (category_id: string) => {
+    onFiltersChange({
+      ...currentFilters,
+      category_id: category_id === "__all__" ? undefined : category_id,
+    });
+  };
+
   const clearFilters = () => {
     setLocalSearch("");
     onFiltersChange({});
@@ -59,6 +76,7 @@ export function ProductsFilters({
 
   const hasActiveFilters =
     currentFilters.search ||
+    currentFilters.category_id ||
     (currentFilters.sort_by && currentFilters.sort_by !== "created_at") ||
     (currentFilters.sort_order && currentFilters.sort_order !== "desc");
 
@@ -85,6 +103,25 @@ export function ProductsFilters({
 
       {/* Sort and Filters */}
       <div className="flex items-center gap-2">
+        {/* Category Filter */}
+        <Select
+          value={currentFilters.category_id || "__all__"}
+          onValueChange={handleCategoryChange}
+        >
+          <SelectTrigger className="w-44">
+            <SelectValue placeholder="All Categories" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="__all__">All Categories</SelectItem>
+            <SelectItem value="__none__">No Category</SelectItem>
+            {categories.map((category) => (
+              <SelectItem key={category.id} value={category.id}>
+                {category.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
         {/* Quick Sort */}
         <Select
           value={currentFilters.sort_by || "created_at"}
@@ -132,6 +169,27 @@ export function ProductsFilters({
                   value={localSearch}
                   onChange={(e) => setLocalSearch(e.target.value)}
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Category</Label>
+                <Select
+                  value={currentFilters.category_id || "__all__"}
+                  onValueChange={handleCategoryChange}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__all__">All Categories</SelectItem>
+                    <SelectItem value="__none__">No Category</SelectItem>
+                    {categories.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-2">
@@ -198,6 +256,23 @@ export function ProductsFilters({
           </Button>
         )}
       </div>
+
+      {/* Active Category Filter Badge */}
+      {currentFilters.category_id && (
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">Filtered by:</span>
+          <Badge
+            variant="secondary"
+            className="cursor-pointer gap-1"
+            onClick={() => handleCategoryChange("__all__")}
+          >
+            {currentFilters.category_id === "__none__"
+              ? "No Category"
+              : categories.find(c => c.id === currentFilters.category_id)?.name || "Category"}
+            <span className="ml-1">✕</span>
+          </Badge>
+        </div>
+      )}
     </div>
   );
 }

@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useProducts, useUpdateProductWeight, useRecalculateAllOrders } from "@/hooks/use-products";
+import { useCategories } from "@/hooks/use-categories";
+import { useQueryClient } from "@tanstack/react-query";
 import { ProductsFilters } from "./products-filters";
 import { ProductsTableContent } from "./products-table-content";
 import { ProductsPagination } from "./products-pagination";
@@ -10,6 +12,7 @@ import { DeleteProductDialog } from "./delete-product-dialog";
 import { ProductDetailSheet } from "./product-detail-sheet";
 import { Button } from "@/components/ui/button";
 import { Plus, RefreshCw } from "lucide-react";
+import { toast } from "sonner";
 
 interface Product {
   id: string;
@@ -30,6 +33,7 @@ interface Product {
 export function ProductsTable() {
   const [filters, setFilters] = useState<{
     search?: string;
+    category_id?: string;
     sort_by?: "name" | "price" | "weight" | "created_at" | "category";
     sort_order?: "asc" | "desc";
   }>({
@@ -73,8 +77,12 @@ export function ProductsTable() {
     ...filters,
   });
 
+  const { data: categoriesData } = useCategories({ limit: 100 });
+  const categories = categoriesData?.categories || [];
+
   const updateProductWeight = useUpdateProductWeight();
   const recalculateAllOrders = useRecalculateAllOrders();
+  const queryClient = useQueryClient();
 
   const handleFiltersChange = (newFilters: typeof filters) => {
     setFilters(newFilters);
@@ -153,6 +161,59 @@ export function ProductsTable() {
     }
   };
 
+  const handleBulkDelete = async (productIds: string[]) => {
+    try {
+      const response = await fetch("/api/products/bulk-delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ product_ids: productIds }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete products");
+      }
+
+      const result = await response.json();
+      toast.success(`Successfully deleted ${result.deleted_count} product${result.deleted_count > 1 ? 's' : ''}`);
+      
+      // Invalidate and refetch products
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    } catch (error) {
+      console.error("Failed to delete products:", error);
+      toast.error("Failed to delete products");
+    }
+  };
+
+  const handleBulkUpdateCategory = async (productIds: string[], categoryId: string | null) => {
+    try {
+      const response = await fetch("/api/products/bulk-update-category", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          product_ids: productIds,
+          category_id: categoryId 
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update products");
+      }
+
+      const result = await response.json();
+      const categoryName = categoryId 
+        ? categories.find(c => c.id === categoryId)?.name || "selected category"
+        : "no category";
+      
+      toast.success(`Successfully updated ${result.updated_count} product${result.updated_count > 1 ? 's' : ''} to ${categoryName}`);
+      
+      // Invalidate and refetch products
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    } catch (error) {
+      console.error("Failed to update products:", error);
+      toast.error("Failed to update products");
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -190,6 +251,7 @@ export function ProductsTable() {
       <ProductsFilters
         currentFilters={filters}
         onFiltersChange={handleFiltersChange}
+        categories={categories}
       />
 
       {/* Table */}
@@ -203,6 +265,9 @@ export function ProductsTable() {
         onViewProduct={handleViewProduct}
         onWeightUpdate={handleWeightUpdate}
         onFiltersChange={handleFiltersChange}
+        onBulkDelete={handleBulkDelete}
+        onBulkUpdateCategory={handleBulkUpdateCategory}
+        categories={categories}
       />
 
       {/* Pagination */}

@@ -82,6 +82,9 @@ export function WeighOrderView({
   const [selectedReadyIds, setSelectedReadyIds] = useState<Set<string>>(
     new Set()
   );
+  
+  // Trigger for re-rendering order list when weighing progress changes
+  const [weighingProgressTrigger, setWeighingProgressTrigger] = useState<number>(0);
 
   // Weighing state
   const [bagCount, setBagCount] = useState<number>(1);
@@ -107,6 +110,8 @@ export function WeighOrderView({
       timestamp: Date.now()
     };
     localStorage.setItem(`weighing-progress-${orderId}`, JSON.stringify(progress));
+    // Trigger re-render to update orange indicators in the list
+    setWeighingProgressTrigger(prev => prev + 1);
   };
 
   const loadWeighingProgress = (orderId: string) => {
@@ -127,6 +132,8 @@ export function WeighOrderView({
 
   const clearWeighingProgress = (orderId: string) => {
     localStorage.removeItem(`weighing-progress-${orderId}`);
+    // Trigger re-render to update orange indicators in the list
+    setWeighingProgressTrigger(prev => prev + 1);
   };
 
   // Load weighing progress when order changes
@@ -213,6 +220,21 @@ export function WeighOrderView({
     }
     return orders;
   })();
+
+  // Helper to check if order has weighing progress
+  const hasWeighingProgress = (orderId: string): boolean => {
+    try {
+      const saved = localStorage.getItem(`weighing-progress-${orderId}`);
+      if (!saved) return false;
+      const progress = JSON.parse(saved);
+      // Check if progress is recent (within 24 hours) and has actual weight data
+      if (Date.now() - progress.timestamp > 24 * 60 * 60 * 1000) return false;
+      // Check if any bag has weight > 0
+      return progress.bagWeights?.some((bag: BagWeight) => bag.weight > 0) || false;
+    } catch {
+      return false;
+    }
+  };
 
   const toggleSelectReady = (orderId: string) => {
     setSelectedReadyIds((prev) => {
@@ -686,8 +708,8 @@ export function WeighOrderView({
                     )}
                   </div>
                   <div className="flex items-center gap-1">
-                    {/* In Progress Indicator */}
-                    {isSelected && order.status === "pending_weight" && (
+                    {/* Draft Indicator - Shows when order has weighing progress saved */}
+                    {order.status === "pending_weight" && hasWeighingProgress(order.id) && (
                       <div 
                         className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"
                         title="Weighing in progress"

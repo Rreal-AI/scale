@@ -28,14 +28,15 @@ import {
   CheckCircle2,
   LayoutGrid,
   Table,
-  Settings2
+  Settings2,
+  Archive
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Order {
   id: string;
   org_id: string;
-  status: "pending_weight" | "weighed" | "completed" | "cancelled";
+  status: "pending_weight" | "weighed" | "completed" | "cancelled" | "archived";
   type: "delivery" | "takeout";
   check_number: string;
   customer_name: string;
@@ -51,6 +52,8 @@ interface Order {
   input: string;
   structured_output?: Record<string, unknown>;
   weight_verified_at?: string;
+  archived_at?: string;
+  archived_reason?: string;
   created_at: string;
   updated_at: string;
 }
@@ -60,7 +63,7 @@ interface FilterOption {
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   value?: "delivery" | "takeout";
-  status?: "pending_weight" | "completed" | "cancelled";
+  status?: "pending_weight" | "completed" | "cancelled" | "archived";
   color: string;
   count?: number;
 }
@@ -73,7 +76,7 @@ interface OrdersDashboardProps {
 export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardProps = {}) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState<"delivery" | "takeout" | "all">("all");
-  const [selectedStatus, setSelectedStatus] = useState<"pending_weight" | "completed" | "cancelled" | "all">("all");
+  const [selectedStatus, setSelectedStatus] = useState<"pending_weight" | "completed" | "cancelled" | "archived" | "all">("all");
   const [showDispatched, setShowDispatched] = useState<boolean>(() => {
     if (typeof window === "undefined") return true;
     try {
@@ -150,6 +153,7 @@ export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardP
       pending_weight: allOrders.filter(o => o.status === "pending_weight").length,
       completed: allOrders.filter(o => o.status === "completed").length,
       cancelled: allOrders.filter(o => o.status === "cancelled").length,
+      archived: allOrders.filter(o => o.status === "archived").length,
     };
   };
 
@@ -205,6 +209,14 @@ export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardP
       status: "cancelled",
       color: "text-gray-700 hover:bg-gray-100",
       count: counts.cancelled
+    },
+    {
+      id: "archived",
+      label: "Archived",
+      icon: Archive,
+      status: "archived",
+      color: "text-gray-700 hover:bg-gray-100",
+      count: counts.archived
     }
   ];
 

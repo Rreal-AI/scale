@@ -17,6 +17,7 @@ export const orderStatus = pgEnum("order_status", [
   "weighed", // Pesado y verificado
   "completed", // Proceso completado
   "cancelled", // Cancelado
+  "archived", // Archivado por inactividad
 ]);
 
 export const orders = pgTable("orders", {
@@ -45,6 +46,8 @@ export const orders = pgTable("orders", {
   structured_output: jsonb("structured_output"),
 
   weight_verified_at: timestamp("weight_verified_at"),
+  archived_at: timestamp("archived_at"),
+  archived_reason: text("archived_reason"),
   created_at: timestamp("created_at").notNull().defaultNow(),
   updated_at: timestamp("updated_at").notNull().defaultNow(),
 });

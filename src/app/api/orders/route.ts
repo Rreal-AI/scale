@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/db";
 import { orders } from "@/db/schema";
-import { and, eq, ilike, or, asc, desc, count, inArray } from "drizzle-orm";
+import { and, eq, ilike, or, asc, desc, count, inArray, gte, lte } from "drizzle-orm";
 import { z } from "zod";
 
 // GET /api/orders - Listar orders con paginación y filtros
@@ -40,9 +40,12 @@ export async function GET(request: NextRequest) {
         | "pending_weight"
         | "weighed"
         | "completed"
-        | "cancelled") || undefined;
+        | "cancelled"
+        | "archived") || undefined;
     const type =
       (searchParams.get("type") as "delivery" | "takeout") || undefined;
+    const archived_from = searchParams.get("archived_from") || undefined;
+    const archived_to = searchParams.get("archived_to") || undefined;
     const sort_by =
       (searchParams.get("sort_by") as
         | "created_at"
@@ -66,7 +69,7 @@ export async function GET(request: NextRequest) {
       "type",
     ];
     const validSortOrder = ["asc", "desc"];
-    const validStatus = ["pending_weight", "weighed", "completed", "cancelled"];
+    const validStatus = ["pending_weight", "weighed", "completed", "cancelled", "archived"];
     const validType = ["delivery", "takeout"];
 
     const finalSortBy = validSortBy.includes(sort_by) ? sort_by : "created_at";
@@ -99,6 +102,27 @@ export async function GET(request: NextRequest) {
 
     if (finalType) {
       conditions.push(eq(orders.type, finalType));
+    }
+
+    // Archived date filtering
+    if (archived_from) {
+      try {
+        const fromDate = new Date(archived_from);
+        conditions.push(gte(orders.archived_at, fromDate));
+      } catch (e) {
+        console.error("Invalid archived_from date:", e);
+      }
+    }
+
+    if (archived_to) {
+      try {
+        const toDate = new Date(archived_to);
+        // Add one day to include the entire day
+        toDate.setDate(toDate.getDate() + 1);
+        conditions.push(lte(orders.archived_at, toDate));
+      } catch (e) {
+        console.error("Invalid archived_to date:", e);
+      }
     }
 
     // Construir orden

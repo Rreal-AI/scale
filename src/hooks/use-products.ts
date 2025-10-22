@@ -31,6 +31,7 @@ interface ProductsResponse {
   };
   filters: {
     search?: string;
+    category_id?: string;
     sort_by: string;
     sort_order: string;
   };
@@ -59,6 +60,7 @@ interface GetProductsParams {
   page?: number;
   limit?: number;
   search?: string;
+  category_id?: string;
   sort_by?: "name" | "price" | "weight" | "created_at" | "category";
   sort_order?: "asc" | "desc";
 }
@@ -72,6 +74,7 @@ const fetchProducts = async (
   if (params.page) searchParams.set("page", params.page.toString());
   if (params.limit) searchParams.set("limit", params.limit.toString());
   if (params.search) searchParams.set("search", params.search);
+  if (params.category_id) searchParams.set("category_id", params.category_id);
   if (params.sort_by) searchParams.set("sort_by", params.sort_by);
   if (params.sort_order) searchParams.set("sort_order", params.sort_order);
 

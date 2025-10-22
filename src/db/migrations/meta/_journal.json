@@ -64,6 +64,13 @@
       "when": 1757713401967,
       "tag": "0008_handy_captain_cross",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1761142988535,
+      "tag": "0009_greedy_the_renegades",
+      "breakpoints": true
     }
   ]
 }

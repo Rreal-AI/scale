@@ -1,0 +1,77 @@
+feat(orders): implement auto-archiving system for inactive orders
+
+BREAKING CHANGES:
+- Database schema updated with new 'archived' status and related fields
+- Requires migration: src/db/migrations/0009_greedy_the_renegades.sql
+- New environment variable required: CRON_SECRET
+
+Features Added:
+1. Auto-Archiving System
+   - Cron job runs daily at midnight (configurable)
+   - Archives orders with no activity in 24+ hours
+   - Endpoint: GET /api/cron/archive-inactive-orders
+
+2. Manual Archive/Unarchive
+   - POST /api/orders/archive - manually archive orders
+   - PUT /api/orders/archive - restore archived orders
+   - Support for custom archive reasons
+
+3. UI Enhancements
+   - "Archived" quick filter button in orders dashboard
+   - Archive date range filters (from/to)
+   - Archive date badge in order rows (📦 date)
+   - Hover tooltip shows archive reason
+
+4. Data Persistence
+   - Archived orders remain fully searchable
+   - Filter by archive date range
+   - No data loss - all fields preserved
+   - Can be restored to any status
+
+Database Changes:
+- orders.status enum: added 'archived'
+- orders.archived_at: timestamp (nullable)
+- orders.archived_reason: text (nullable)
+
+API Changes:
+- GET /api/orders - supports status=archived, archived_from, archived_to params
+- POST /api/orders/archive - archive orders
+- PUT /api/orders/archive - unarchive orders  
+- GET /api/cron/archive-inactive-orders - auto-archive endpoint
+
+Frontend Changes:
+- src/components/orders/orders-dashboard.tsx - added Archived button
+- src/components/orders/orders-filters.tsx - archive date filters
+- src/components/orders/orders-table-content.tsx - archive badge
+- src/hooks/use-orders.ts - archived status support
+
+Configuration:
+- vercel.json - cron job configuration
+- ARCHIVING_FEATURE.md - comprehensive documentation
+
+Migration Required:
+```bash
+pnpm drizzle-kit push
+```
+
+Environment Setup:
+```bash
+# Add to .env.local
+CRON_SECRET=your-secret-key-here
+```
+
+Deployment:
+```bash
+vercel env add CRON_SECRET production
+vercel --prod
+```
+
+Acceptance Criteria Met:
+✅ Scheduler runs at day rollover (midnight UTC)
+✅ Archives orders with no activity in 24h
+✅ Archived orders remain searchable/filterable
+✅ Banner/tag indicates archive date and reason
+✅ Archive date filtering supported
+✅ "Archived" button next to "Cancelled"
+✅ No data loss - full restoration supported
+✅ Configurable via code (thresholds, exclusions)

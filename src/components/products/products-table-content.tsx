@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { MoreHorizontal, Edit, Trash2, Eye, Save, X, ChevronUp, ChevronDown } from "lucide-react";
+import { MoreHorizontal, Edit, Trash2, Eye, Save, X, ChevronUp, ChevronDown, Tag } from "lucide-react";
 import { formatPrice, formatWeight, formatRelativeTime } from "@/lib/format";
+import { gramsToOunces, ouncesToGrams } from "@/lib/weight-conversion";
 import {
   Table,
   TableBody,
@@ -28,6 +29,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface Product {
   id: string;
@@ -80,6 +82,9 @@ interface ProductsTableContentProps {
     sort_by?: "name" | "price" | "weight" | "created_at" | "category";
     sort_order?: "asc" | "desc";
   }) => void;
+  onBulkDelete?: (productIds: string[]) => Promise<void>;
+  onBulkUpdateCategory?: (productIds: string[], categoryId: string | null) => Promise<void>;
+  categories?: Array<{ id: string; name: string }>;
 }
 
 // Utility functions moved to @/lib/format
@@ -139,11 +144,11 @@ function EditableWeight({ product, onWeightUpdate }: {
   onWeightUpdate: (productId: string, newWeight: number) => Promise<void>; 
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [editWeight, setEditWeight] = useState((product.weight / 28.3495).toFixed(2)); // Convert grams to ounces
+  const [editWeight, setEditWeight] = useState(gramsToOunces(product.weight).toFixed(2)); // Convert grams to ounces
   const [isUpdating, setIsUpdating] = useState(false);
 
   const handleSave = async () => {
-    const weightInGrams = Math.round(parseFloat(editWeight) * 28.3495); // Convert ounces to grams
+    const weightInGrams = ouncesToGrams(parseFloat(editWeight)); // Convert ounces to grams
     if (weightInGrams === product.weight) {
       setIsOpen(false);
       return;
@@ -161,8 +166,18 @@ function EditableWeight({ product, onWeightUpdate }: {
   };
 
   const handleCancel = () => {
-    setEditWeight((product.weight / 28.3495).toFixed(2)); // Reset to original
+    setEditWeight(gramsToOunces(product.weight).toFixed(2)); // Reset to original
     setIsOpen(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleSave();
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      handleCancel();
+    }
   };
 
   return (
@@ -185,8 +200,10 @@ function EditableWeight({ product, onWeightUpdate }: {
               step="0.01"
               value={editWeight}
               onChange={(e) => setEditWeight(e.target.value)}
+              onKeyDown={handleKeyDown}
               placeholder="Enter weight in ounces"
               className="h-8"
+              autoFocus
             />
             <div className="text-xs text-muted-foreground">
               Current: {formatWeight(product.weight)}
@@ -233,6 +250,9 @@ function LoadingSkeleton() {
       {Array.from({ length: 5 }).map((_, i) => (
         <TableRow key={i}>
           <TableCell>
+            <Skeleton className="h-4 w-4" />
+          </TableCell>
+          <TableCell>
             <div className="space-y-2">
               <Skeleton className="h-4 w-[200px]" />
               <Skeleton className="h-3 w-[120px]" />
@@ -269,13 +289,52 @@ export function ProductsTableContent({
   onViewProduct,
   onWeightUpdate,
   onFiltersChange,
+  onBulkDelete,
+  onBulkUpdateCategory,
+  categories = [],
 }: ProductsTableContentProps) {
+  const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
+  const [showBulkActions, setShowBulkActions] = useState(false);
+
   const handleSort = (sortBy: string, sortOrder: "asc" | "desc") => {
     onFiltersChange?.({
       ...currentFilters,
       sort_by: sortBy as "name" | "price" | "weight" | "created_at" | "category",
       sort_order: sortOrder,
     });
+  };
+
+  const handleSelectAll = () => {
+    if (!data) return;
+    if (selectedProducts.size === data.products.length) {
+      setSelectedProducts(new Set());
+    } else {
+      setSelectedProducts(new Set(data.products.map(p => p.id)));
+    }
+  };
+
+  const handleSelectProduct = (productId: string) => {
+    const newSelected = new Set(selectedProducts);
+    if (newSelected.has(productId)) {
+      newSelected.delete(productId);
+    } else {
+      newSelected.add(productId);
+    }
+    setSelectedProducts(newSelected);
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedProducts.size === 0 || !onBulkDelete) return;
+    await onBulkDelete(Array.from(selectedProducts));
+    setSelectedProducts(new Set());
+    setShowBulkActions(false);
+  };
+
+  const handleBulkCategoryUpdate = async (categoryId: string | null) => {
+    if (selectedProducts.size === 0 || !onBulkUpdateCategory) return;
+    await onBulkUpdateCategory(Array.from(selectedProducts), categoryId);
+    setSelectedProducts(new Set());
+    setShowBulkActions(false);
   };
 
   if (error) {
@@ -294,6 +353,7 @@ export function ProductsTableContent({
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-[50px]"></TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Category</TableHead>
               <TableHead>Price</TableHead>
@@ -316,6 +376,7 @@ export function ProductsTableContent({
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-[50px]"></TableHead>
               <SortableHeader sortKey="name" currentSort={currentFilters} onSort={handleSort}>
                 Name
               </SortableHeader>
@@ -336,7 +397,7 @@ export function ProductsTableContent({
           </TableHeader>
           <TableBody>
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-8">
+              <TableCell colSpan={7} className="text-center py-8">
                 <div className="text-muted-foreground">
                   {currentFilters.search ? (
                     <>
@@ -355,40 +416,106 @@ export function ProductsTableContent({
     );
   }
 
+  const allSelected = data && selectedProducts.size > 0 && selectedProducts.size === data.products.length;
+  const someSelected = selectedProducts.size > 0 && !allSelected;
+
   return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <SortableHeader sortKey="name" currentSort={currentFilters} onSort={handleSort}>
-              Name
-            </SortableHeader>
-            <SortableHeader sortKey="category" currentSort={currentFilters} onSort={handleSort}>
-              Category
-            </SortableHeader>
-            <SortableHeader sortKey="price" currentSort={currentFilters} onSort={handleSort}>
-              Price
-            </SortableHeader>
-            <SortableHeader sortKey="weight" currentSort={currentFilters} onSort={handleSort}>
-              Weight
-            </SortableHeader>
-              <SortableHeader sortKey="created_at" currentSort={currentFilters} onSort={handleSort}>
-                Updated
+    <div className="space-y-2">
+      {/* Bulk Actions Toolbar */}
+      {selectedProducts.size > 0 && (
+        <div className="bg-muted/50 border rounded-lg p-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium">
+              {selectedProducts.size} product{selectedProducts.size > 1 ? 's' : ''} selected
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            {/* Category Update Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="gap-2">
+                  <Tag className="h-4 w-4" />
+                  Change Category
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem onClick={() => handleBulkCategoryUpdate(null)}>
+                  <span>Remove Category</span>
+                </DropdownMenuItem>
+                {categories.length > 0 && <DropdownMenuSeparator />}
+                {categories.map((category) => (
+                  <DropdownMenuItem 
+                    key={category.id}
+                    onClick={() => handleBulkCategoryUpdate(category.id)}
+                  >
+                    {category.name}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Bulk Delete Button */}
+            <Button 
+              variant="destructive" 
+              size="sm"
+              className="gap-2"
+              onClick={handleBulkDelete}
+            >
+              <Trash2 className="h-4 w-4" />
+              Delete Selected
+            </Button>
+          </div>
+        </div>
+      )}
+
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[50px]">
+                <Checkbox
+                  checked={allSelected}
+                  onCheckedChange={handleSelectAll}
+                  aria-label="Select all products"
+                  className={someSelected ? "opacity-50" : ""}
+                />
+              </TableHead>
+              <SortableHeader sortKey="name" currentSort={currentFilters} onSort={handleSort}>
+                Name
               </SortableHeader>
-            <TableHead className="w-[50px]"></TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {data.products.map((product) => (
-            <TableRow key={product.id}>
-              <TableCell>
-                <div>
-                  <div className="font-medium">{product.name}</div>
-                  <div className="text-sm text-muted-foreground">
-                    ID: {product.id.slice(0, 8)}...
+              <SortableHeader sortKey="category" currentSort={currentFilters} onSort={handleSort}>
+                Category
+              </SortableHeader>
+              <SortableHeader sortKey="price" currentSort={currentFilters} onSort={handleSort}>
+                Price
+              </SortableHeader>
+              <SortableHeader sortKey="weight" currentSort={currentFilters} onSort={handleSort}>
+                Weight
+              </SortableHeader>
+                <SortableHeader sortKey="created_at" currentSort={currentFilters} onSort={handleSort}>
+                  Updated
+                </SortableHeader>
+              <TableHead className="w-[50px]"></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {data.products.map((product) => (
+              <TableRow key={product.id}>
+                <TableCell>
+                  <Checkbox
+                    checked={selectedProducts.has(product.id)}
+                    onCheckedChange={() => handleSelectProduct(product.id)}
+                    aria-label={`Select ${product.name}`}
+                  />
+                </TableCell>
+                <TableCell>
+                  <div>
+                    <div className="font-medium">{product.name}</div>
+                    <div className="text-sm text-muted-foreground">
+                      ID: {product.id.slice(0, 8)}...
+                    </div>
                   </div>
-                </div>
-              </TableCell>
+                </TableCell>
               <TableCell>
                 {product.category ? (
                   <Badge variant="outline" className="text-xs">
@@ -450,6 +577,7 @@ export function ProductsTableContent({
           ))}
         </TableBody>
       </Table>
+      </div>
     </div>
   );
 }
