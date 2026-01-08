@@ -9,9 +9,11 @@ import { ProductsTableContent } from "./products-table-content";
 import { ProductsPagination } from "./products-pagination";
 import { ProductDialog } from "./product-dialog";
 import { DeleteProductDialog } from "./delete-product-dialog";
+import { DeleteAllProductsDialog } from "./delete-all-products-dialog";
+import { ImportProductsDialog } from "./import-products-dialog";
 import { ProductDetailSheet } from "./product-detail-sheet";
 import { Button } from "@/components/ui/button";
-import { Plus, RefreshCw } from "lucide-react";
+import { Plus, RefreshCw, Upload, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface Product {
@@ -70,6 +72,9 @@ export function ProductsTable() {
     open: false,
     productId: null,
   });
+
+  const [deleteAllDialog, setDeleteAllDialog] = useState(false);
+  const [importDialog, setImportDialog] = useState(false);
 
   const { data, isLoading, error } = useProducts({
     page: currentPage,
@@ -222,7 +227,7 @@ export function ProductsTable() {
           <h1 className="text-2xl font-bold">Products</h1>
           <p className="text-muted-foreground">Manage your product catalog</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <Button 
             variant="outline" 
             onClick={handleRecalculateAll}
@@ -239,6 +244,18 @@ export function ProductsTable() {
                 Recalculate Orders
               </>
             )}
+          </Button>
+          <Button variant="outline" onClick={() => setImportDialog(true)}>
+            <Upload className="h-4 w-4 mr-2" />
+            Import CSV
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={() => setDeleteAllDialog(true)}
+            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            Delete All
           </Button>
           <Button variant="outline" onClick={handleCreateProduct}>
             <Plus className="h-4 w-4 mr-2" />
@@ -303,6 +320,16 @@ export function ProductsTable() {
         productId={detailSheet.productId}
         onEdit={handleEditProduct}
         onDelete={handleDeleteProduct}
+      />
+
+      <DeleteAllProductsDialog
+        open={deleteAllDialog}
+        onOpenChange={setDeleteAllDialog}
+      />
+
+      <ImportProductsDialog
+        open={importDialog}
+        onOpenChange={setImportDialog}
       />
     </div>
   );
