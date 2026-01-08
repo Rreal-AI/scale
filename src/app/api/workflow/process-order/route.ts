@@ -24,7 +24,7 @@ export const { POST } = serve<ProcessOrderPayload>(
         logger.info("Structuring order", { input, org_id });
 
         const { object } = await generateObject({
-          model: "openai/o3",
+          model: "google/gemini-3-flash",
           schema: structuredOrderSchema,
           prompt: PROMPT.replace("{order}", input),
         });
