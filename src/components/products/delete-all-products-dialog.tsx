@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Loader2, AlertTriangle, Trash2 } from "lucide-react";
+import { Loader2, AlertTriangle, Trash2, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface DeleteAllProductsDialogProps {
   open: boolean;
@@ -29,6 +30,9 @@ export function DeleteAllProductsDialog({
   const [isDeleting, setIsDeleting] = useState(false);
   const [productCount, setProductCount] = useState<number | null>(null);
   const [isLoadingCount, setIsLoadingCount] = useState(false);
+  const [hasConflict, setHasConflict] = useState(false);
+  const [referencedCount, setReferencedCount] = useState(0);
+  const [forceDelete, setForceDelete] = useState(false);
   const queryClient = useQueryClient();
 
   const isConfirmed = confirmText.toLowerCase() === "eliminar";
@@ -37,6 +41,9 @@ export function DeleteAllProductsDialog({
   useEffect(() => {
     if (open) {
       setConfirmText("");
+      setHasConflict(false);
+      setReferencedCount(0);
+      setForceDelete(false);
       setIsLoadingCount(true);
       
       fetch("/api/products/delete-all")
@@ -58,22 +65,40 @@ export function DeleteAllProductsDialog({
     if (!isConfirmed) return;
 
     setIsDeleting(true);
+    setHasConflict(false);
 
     try {
-      const response = await fetch("/api/products/delete-all", {
+      const url = forceDelete 
+        ? "/api/products/delete-all?force=true" 
+        : "/api/products/delete-all";
+      
+      const response = await fetch(url, {
         method: "DELETE",
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to delete products");
+      const result = await response.json();
+
+      if (response.status === 409) {
+        // Conflict - products are referenced by orders
+        setHasConflict(true);
+        setReferencedCount(result.referenced_count || 0);
+        toast.error(`${result.referenced_count} productos están siendo usados en órdenes existentes`);
+        return;
       }
 
-      const result = await response.json();
-      toast.success(`Se eliminaron ${result.deleted_count} productos exitosamente`);
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to delete products");
+      }
+
+      let message = `Se eliminaron ${result.deleted_count} productos exitosamente`;
+      if (result.order_items_removed > 0) {
+        message += ` (${result.order_items_removed} referencias de órdenes también eliminadas)`;
+      }
+      toast.success(message);
       
-      // Invalidate products queries
+      // Invalidate products and orders queries
       queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
       
       onOpenChange(false);
     } catch (error) {
@@ -87,6 +112,8 @@ export function DeleteAllProductsDialog({
   const handleOpenChange = (newOpen: boolean) => {
     if (!isDeleting) {
       setConfirmText("");
+      setHasConflict(false);
+      setForceDelete(false);
       onOpenChange(newOpen);
     }
   };
@@ -131,6 +158,37 @@ export function DeleteAllProductsDialog({
             </div>
           </div>
 
+          {/* Warning about referenced products */}
+          {hasConflict && (
+            <div className="rounded-lg border border-amber-500/50 bg-amber-500/5 p-4">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5" />
+                <div className="space-y-2">
+                  <p className="font-medium text-amber-700 dark:text-amber-400">
+                    {referencedCount} productos están siendo usados en órdenes
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Algunos productos están referenciados por órdenes existentes. 
+                    Si los eliminas, también se eliminarán esas referencias de las órdenes.
+                  </p>
+                  <div className="flex items-center space-x-2 pt-1">
+                    <Checkbox
+                      id="force-delete"
+                      checked={forceDelete}
+                      onCheckedChange={(checked) => setForceDelete(checked === true)}
+                    />
+                    <Label
+                      htmlFor="force-delete"
+                      className="text-sm font-medium cursor-pointer text-amber-700 dark:text-amber-400"
+                    >
+                      Eliminar de todas formas (incluye referencias en órdenes)
+                    </Label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="space-y-2">
             <Label htmlFor="confirm-delete" className="text-sm font-medium">
               Para confirmar, escribe <span className="font-bold text-destructive">&quot;Eliminar&quot;</span> a continuación:
@@ -168,7 +226,7 @@ export function DeleteAllProductsDialog({
           <Button
             variant="destructive"
             onClick={handleDelete}
-            disabled={!isConfirmed || isDeleting || productCount === 0}
+            disabled={!isConfirmed || isDeleting || productCount === 0 || (hasConflict && !forceDelete)}
           >
             {isDeleting ? (
               <>
