@@ -8,7 +8,7 @@ import { z } from "zod";
 // Schema for validating CSV row
 const csvRowSchema = z.object({
   name: z.string().min(1, "Product name is required"),
-  price: z.number().positive("Price must be positive"),
+  price: z.number().nonnegative("Price must be zero or positive"),
   weight: z.number().int().positive("Weight must be a positive integer"),
   category: z.string().optional(),
 });
@@ -141,7 +141,7 @@ export async function POST(request: NextRequest) {
           continue;
         }
 
-        if (isNaN(price) || price <= 0) {
+        if (isNaN(price) || price < 0) {
           errors.push({ row: i + 1, error: `Invalid price: ${priceStr}` });
           continue;
         }

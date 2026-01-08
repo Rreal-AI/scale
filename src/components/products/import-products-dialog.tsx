@@ -189,7 +189,7 @@ export function ImportProductsDialog({
             continue;
           }
 
-          if (isNaN(price) || price <= 0) {
+          if (isNaN(price) || price < 0) {
             errors.push({ row: i + 1, error: `Precio inválido: ${priceStr}` });
             continue;
           }
