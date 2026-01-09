@@ -57,6 +57,7 @@ const statusLabels = {
   weighed: "Weighed",
   completed: "Dispatched",
   cancelled: "Cancelled",
+  archived: "Archived",
 };
 
 const statusColors = {
@@ -64,6 +65,7 @@ const statusColors = {
   weighed: "secondary" as const,
   completed: "outline" as const,
   cancelled: "destructive" as const,
+  archived: "outline" as const,
 };
 
 const typeLabels = {
