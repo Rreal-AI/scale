@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import { useOrders } from "@/hooks/use-orders";
+import { useOrderSelection } from "@/hooks/use-order-selection";
 import { OrdersFilters } from "./orders-filters";
 import { OrdersTableContent } from "./orders-table-content";
 import { OrdersPagination } from "./orders-pagination";
 import { OrderDetailSheet } from "./order-detail-sheet";
+import { BulkActionsToolbar } from "./bulk-actions-toolbar";
 import { Button } from "@/components/ui/button";
-import { LayoutGrid, Table, RefreshCw } from "lucide-react";
+import { LayoutGrid, Table, RefreshCw, CheckSquare, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Order {
@@ -77,6 +79,19 @@ export function OrdersTable({ viewMode, onViewModeChange }: OrdersTableProps = {
     ...filters,
   });
 
+  // Selection mode state
+  const [selectionMode, setSelectionMode] = useState(false);
+  const {
+    selectedIds,
+    selectedOrderIds,
+    selectedCount,
+    isAllSelected,
+    isSomeSelected,
+    toggleSelection,
+    selectAll,
+    deselectAll,
+  } = useOrderSelection(data?.orders || []);
+
   const handleFiltersChange = (newFilters: typeof filters) => {
     setFilters(newFilters);
     setCurrentPage(1); // Reset to first page when filters change
@@ -112,6 +127,34 @@ export function OrdersTable({ viewMode, onViewModeChange }: OrdersTableProps = {
         </div>
         
         <div className="flex items-center gap-2">
+          {/* Select Mode Toggle */}
+          <Button
+            variant={selectionMode ? "default" : "outline"}
+            size="sm"
+            onClick={() => {
+              if (selectionMode) {
+                deselectAll();
+              }
+              setSelectionMode(!selectionMode);
+            }}
+            className={cn(
+              "flex items-center gap-2",
+              selectionMode && "bg-gray-900 text-white"
+            )}
+          >
+            {selectionMode ? (
+              <>
+                <X className="h-4 w-4" />
+                Cancel
+              </>
+            ) : (
+              <>
+                <CheckSquare className="h-4 w-4" />
+                Select
+              </>
+            )}
+          </Button>
+
           {/* View Toggle */}
           {onViewModeChange && (
             <div className="flex items-center rounded-lg border p-1 bg-muted/50">
@@ -166,6 +209,13 @@ export function OrdersTable({ viewMode, onViewModeChange }: OrdersTableProps = {
         error={error}
         currentFilters={filters}
         onViewOrder={handleViewOrder}
+        selectable={selectionMode}
+        selectedIds={selectedIds}
+        isAllSelected={isAllSelected}
+        isSomeSelected={isSomeSelected}
+        onToggleSelection={toggleSelection}
+        onSelectAll={selectAll}
+        onDeselectAll={deselectAll}
       />
 
       {/* Pagination */}
@@ -186,6 +236,16 @@ export function OrdersTable({ viewMode, onViewModeChange }: OrdersTableProps = {
         open={detailSheet.open}
         onOpenChange={handleDetailSheetClose}
         orderId={detailSheet.orderId}
+      />
+
+      {/* Bulk Actions Toolbar */}
+      <BulkActionsToolbar
+        selectedCount={selectedCount}
+        selectedOrderIds={selectedOrderIds}
+        onDeselectAll={() => {
+          deselectAll();
+          setSelectionMode(false);
+        }}
       />
     </div>
   );

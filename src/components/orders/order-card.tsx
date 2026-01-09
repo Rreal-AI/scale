@@ -3,6 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { formatPrice, formatRelativeTime } from "@/lib/format";
 import { gramsToOunces } from "@/lib/weight-conversion";
 import { 
@@ -49,6 +50,9 @@ interface OrderCardProps {
   onCardClick?: (order: Order) => void;
   variant?: "default" | "compact";
   className?: string;
+  selectable?: boolean;
+  isSelected?: boolean;
+  onSelectionChange?: (orderId: string) => void;
 }
 
 const getStatusConfig = (status: Order["status"]) => {
@@ -217,7 +221,7 @@ const getItemsPreview = (order: Order): { items: React.ReactNode; hasMore: boole
   };
 };
 
-export function OrderCard({ order, onWeigh, onViewDetails, onCardClick, variant = "default", className }: OrderCardProps) {
+export function OrderCard({ order, onWeigh, onViewDetails, onCardClick, variant = "default", className, selectable, isSelected, onSelectionChange }: OrderCardProps) {
   const statusConfig = getStatusConfig(order.status);
   const typeConfig = getTypeConfig(order.type);
   const { time: dueTime, isUrgent, originalDue, overdueBy } = getDueTime(order.created_at, order.status);
@@ -265,8 +269,22 @@ export function OrderCard({ order, onWeigh, onViewDetails, onCardClick, variant 
         )}
 
         <CardContent className="p-4 flex flex-col min-h-[140px]">
+          {/* Selection checkbox */}
+          {selectable && (
+            <div
+              className="absolute top-2 left-2 z-10"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Checkbox
+                checked={isSelected}
+                onCheckedChange={() => onSelectionChange?.(order.id)}
+                className="bg-white border-gray-300"
+              />
+            </div>
+          )}
+
           {/* Content area - flexible height */}
-          <div className="flex-1 space-y-1.5 min-h-0">
+          <div className={cn("flex-1 space-y-1.5 min-h-0", selectable && "pl-6")}>
             {/* Header row with badges */}
             <div className="flex items-center gap-2">
               <h3 className="text-sm font-semibold">#{order.check_number}</h3>
@@ -431,7 +449,21 @@ export function OrderCard({ order, onWeigh, onViewDetails, onCardClick, variant 
       )}
 
       <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
+        {/* Selection checkbox */}
+        {selectable && (
+          <div
+            className="absolute top-3 left-3 z-10"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Checkbox
+              checked={isSelected}
+              onCheckedChange={() => onSelectionChange?.(order.id)}
+              className="bg-white border-gray-300"
+            />
+          </div>
+        )}
+
+        <div className={cn("flex items-start justify-between", selectable && "pl-8")}>
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <h3 className="text-h3">#{order.check_number}</h3>

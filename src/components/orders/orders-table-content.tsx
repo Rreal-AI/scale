@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface Order {
   id: string;
@@ -80,6 +81,13 @@ interface OrdersTableContentProps {
     sort_order?: "asc" | "desc";
   };
   onViewOrder?: (order: Order) => void;
+  selectable?: boolean;
+  selectedIds?: Set<string>;
+  isAllSelected?: boolean;
+  isSomeSelected?: boolean;
+  onToggleSelection?: (orderId: string) => void;
+  onSelectAll?: () => void;
+  onDeselectAll?: () => void;
 }
 
 const statusLabels = {
@@ -144,6 +152,13 @@ export function OrdersTableContent({
   error,
   currentFilters,
   onViewOrder,
+  selectable,
+  selectedIds,
+  isAllSelected,
+  isSomeSelected,
+  onToggleSelection,
+  onSelectAll,
+  onDeselectAll,
 }: OrdersTableContentProps) {
   if (error) {
     return (
@@ -217,6 +232,25 @@ export function OrdersTableContent({
       <Table>
         <TableHeader>
           <TableRow>
+            {selectable && (
+              <TableHead className="w-[50px]">
+                <Checkbox
+                  checked={isAllSelected}
+                  ref={(el) => {
+                    if (el) {
+                      (el as HTMLButtonElement & { indeterminate: boolean }).indeterminate = isSomeSelected || false;
+                    }
+                  }}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      onSelectAll?.();
+                    } else {
+                      onDeselectAll?.();
+                    }
+                  }}
+                />
+              </TableHead>
+            )}
             <TableHead>Customer</TableHead>
             <TableHead>Check & Status</TableHead>
             <TableHead>Type</TableHead>
@@ -228,6 +262,14 @@ export function OrdersTableContent({
         <TableBody>
           {data.orders.map((order) => (
             <TableRow key={order.id}>
+              {selectable && (
+                <TableCell>
+                  <Checkbox
+                    checked={selectedIds?.has(order.id)}
+                    onCheckedChange={() => onToggleSelection?.(order.id)}
+                  />
+                </TableCell>
+              )}
               <TableCell>
                 <div>
                   <div className="font-medium">{order.customer_name}</div>

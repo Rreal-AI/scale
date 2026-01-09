@@ -284,4 +284,39 @@ export const useBatchCompleteOrders = () => {
   });
 };
 
+// Bulk delete orders (permanent hard delete)
+const bulkDeleteOrders = async (
+  orderIds: string[]
+): Promise<{
+  message: string;
+  deleted_count: number;
+  deleted_ids: string[];
+}> => {
+  const response = await fetch(`/api/orders/bulk`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ order_ids: orderIds }),
+  });
 
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Failed to delete orders");
+  }
+
+  return response.json();
+};
+
+export const useBulkDeleteOrders = () => {
+  const { orgId } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: bulkDeleteOrders,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["orders", orgId],
+        exact: false,
+      });
+    },
+  });
+};

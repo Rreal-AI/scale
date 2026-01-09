@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useRealTimeOrders, useUpdateOrderWeight } from "@/hooks/use-orders";
+import { useOrderSelection } from "@/hooks/use-order-selection";
 import { OrderCard } from "./order-card";
 import { OrderDetailSheet } from "./order-detail-sheet";
 import { OrdersStats } from "./orders-stats";
 import { WeighOrderView } from "./weigh-order-view";
+import { BulkActionsToolbar } from "./bulk-actions-toolbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -16,11 +18,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { 
-  Search, 
-  Filter, 
-  Truck, 
-  Package, 
+import {
+  Search,
+  Filter,
+  Truck,
+  Package,
   RefreshCw,
   AlertTriangle,
   Timer,
@@ -29,7 +31,9 @@ import {
   LayoutGrid,
   Table,
   Settings2,
-  Archive
+  Archive,
+  CheckSquare,
+  X
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -133,6 +137,19 @@ export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardP
   });
 
   const orders = data?.orders || [];
+
+  // Selection mode state
+  const [selectionMode, setSelectionMode] = useState(false);
+  const {
+    selectedOrderIds,
+    selectedCount,
+    isSelected,
+    isAllSelected,
+    isSomeSelected,
+    toggleSelection,
+    selectAll,
+    deselectAll,
+  } = useOrderSelection(orders);
 
   // Fetch all orders for accurate counts (without filters)
   const { data: allOrdersData } = useRealTimeOrders({
@@ -292,6 +309,34 @@ export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardP
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         
         <div className="flex items-center gap-2">
+          {/* Select Mode Toggle */}
+          <Button
+            variant={selectionMode ? "default" : "outline"}
+            size="sm"
+            onClick={() => {
+              if (selectionMode) {
+                deselectAll();
+              }
+              setSelectionMode(!selectionMode);
+            }}
+            className={cn(
+              "flex items-center gap-2",
+              selectionMode && "bg-gray-900 text-white"
+            )}
+          >
+            {selectionMode ? (
+              <>
+                <X className="h-4 w-4" />
+                Cancel
+              </>
+            ) : (
+              <>
+                <CheckSquare className="h-4 w-4" />
+                Select
+              </>
+            )}
+          </Button>
+
           {/* Components Selector */}
           <Popover>
             <PopoverTrigger asChild>
@@ -508,6 +553,35 @@ export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardP
         </div>
       </div>
 
+      {/* Select All when in selection mode */}
+      {selectionMode && orders.length > 0 && (
+        <div className="flex items-center gap-3 px-3 py-2 bg-gray-50 rounded-md border">
+          <Checkbox
+            checked={isAllSelected}
+            ref={(el) => {
+              if (el) {
+                (el as HTMLButtonElement & { indeterminate: boolean }).indeterminate = isSomeSelected || false;
+              }
+            }}
+            onCheckedChange={(checked) => {
+              if (checked) {
+                selectAll();
+              } else {
+                deselectAll();
+              }
+            }}
+          />
+          <span className="text-sm text-gray-600">
+            Select all ({orders.length} orders)
+          </span>
+          {selectedCount > 0 && (
+            <Badge variant="secondary" className="ml-auto">
+              {selectedCount} selected
+            </Badge>
+          )}
+        </div>
+      )}
+
       {/* Orders Grid */}
       {isLoading ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3">
@@ -559,7 +633,10 @@ export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardP
                       variant="compact"
                       onWeigh={handleWeighOrder}
                       onViewDetails={handleViewDetails}
-                      onCardClick={order.status === "pending_weight" ? handleWeighOrder : handleViewDetails}
+                      onCardClick={selectionMode ? undefined : (order.status === "pending_weight" ? handleWeighOrder : handleViewDetails)}
+                      selectable={selectionMode}
+                      isSelected={isSelected(order.id)}
+                      onSelectionChange={toggleSelection}
                     />
                   ))}
                 </div>
@@ -579,7 +656,10 @@ export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardP
                           variant="compact"
                           onWeigh={handleWeighOrder}
                           onViewDetails={handleViewDetails}
-                          onCardClick={handleWeighOrder}
+                          onCardClick={selectionMode ? undefined : handleWeighOrder}
+                          selectable={selectionMode}
+                          isSelected={isSelected(order.id)}
+                          onSelectionChange={toggleSelection}
                         />
                       ))}
                     </div>
@@ -604,7 +684,10 @@ export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardP
                           variant="compact"
                           onWeigh={handleWeighOrder}
                           onViewDetails={handleViewDetails}
-                          onCardClick={handleViewDetails}
+                          onCardClick={selectionMode ? undefined : handleViewDetails}
+                          selectable={selectionMode}
+                          isSelected={isSelected(order.id)}
+                          onSelectionChange={toggleSelection}
                         />
                       ))}
                     </div>
@@ -641,6 +724,16 @@ export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardP
         open={detailSheet.open}
         onOpenChange={handleDetailSheetClose}
         orderId={detailSheet.orderId}
+      />
+
+      {/* Bulk Actions Toolbar */}
+      <BulkActionsToolbar
+        selectedCount={selectedCount}
+        selectedOrderIds={selectedOrderIds}
+        onDeselectAll={() => {
+          deselectAll();
+          setSelectionMode(false);
+        }}
       />
     </div>
   );
