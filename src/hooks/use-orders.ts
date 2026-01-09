@@ -284,9 +284,21 @@ export const useBatchCompleteOrders = () => {
   });
 };
 
+// Bulk delete params - supports both individual IDs and select_all mode
+type BulkDeleteParams =
+  | { order_ids: string[] }
+  | {
+      select_all: true;
+      filters?: {
+        search?: string;
+        status?: "pending_weight" | "weighed" | "completed" | "cancelled" | "archived";
+        type?: "delivery" | "takeout";
+      };
+    };
+
 // Bulk delete orders (permanent hard delete)
 const bulkDeleteOrders = async (
-  orderIds: string[]
+  params: BulkDeleteParams
 ): Promise<{
   message: string;
   deleted_count: number;
@@ -295,7 +307,7 @@ const bulkDeleteOrders = async (
   const response = await fetch(`/api/orders/bulk`, {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ order_ids: orderIds }),
+    body: JSON.stringify(params),
   });
 
   if (!response.ok) {

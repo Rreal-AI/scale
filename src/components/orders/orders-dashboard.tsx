@@ -146,10 +146,20 @@ export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardP
     isSelected,
     isAllSelected,
     isSomeSelected,
+    isSelectAllGlobal,
     toggleSelection,
     selectAll,
+    selectAllGlobal,
     deselectAll,
+    getBulkDeleteParams,
   } = useOrderSelection(orders);
+
+  // Build current filters for global selection
+  const currentFilters = {
+    search: searchQuery || undefined,
+    type: selectedType !== "all" ? selectedType : undefined,
+    status: selectedStatus !== "all" ? selectedStatus : undefined,
+  };
 
   // Fetch all orders for accurate counts (without filters)
   const { data: allOrdersData } = useRealTimeOrders({
@@ -557,9 +567,9 @@ export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardP
       {selectionMode && orders.length > 0 && (
         <div className="flex items-center gap-3 px-3 py-2 bg-gray-50 rounded-md border">
           <Checkbox
-            checked={isAllSelected}
+            checked={isAllSelected || isSelectAllGlobal}
             ref={(el) => {
-              if (el) {
+              if (el && !isSelectAllGlobal) {
                 (el as HTMLButtonElement & { indeterminate: boolean }).indeterminate = isSomeSelected || false;
               }
             }}
@@ -572,9 +582,27 @@ export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardP
             }}
           />
           <span className="text-sm text-gray-600">
-            Select all ({orders.length} orders)
+            Select all ({orders.length} visible)
           </span>
-          {selectedCount > 0 && (
+
+          {/* Link to select ALL orders in database */}
+          {data?.pagination.total_count && data.pagination.total_count > orders.length && !isSelectAllGlobal && (
+            <button
+              onClick={() => selectAllGlobal(currentFilters, data.pagination.total_count)}
+              className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+            >
+              Select all {data.pagination.total_count} orders
+            </button>
+          )}
+
+          {/* Badge when global selection is active */}
+          {isSelectAllGlobal && (
+            <Badge variant="default" className="bg-blue-600 text-white">
+              All {selectedCount} orders selected
+            </Badge>
+          )}
+
+          {selectedCount > 0 && !isSelectAllGlobal && (
             <Badge variant="secondary" className="ml-auto">
               {selectedCount} selected
             </Badge>
@@ -734,6 +762,8 @@ export function OrdersDashboard({ viewMode, onViewModeChange }: OrdersDashboardP
           deselectAll();
           setSelectionMode(false);
         }}
+        isSelectAllGlobal={isSelectAllGlobal}
+        getBulkDeleteParams={getBulkDeleteParams}
       />
     </div>
   );

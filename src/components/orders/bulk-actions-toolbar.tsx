@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,20 +14,25 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Trash2, X } from "lucide-react";
+import { Trash2, X, Globe } from "lucide-react";
 import { useBulkDeleteOrders } from "@/hooks/use-orders";
+import { type BulkDeleteParams } from "@/hooks/use-order-selection";
 import { toast } from "sonner";
 
 interface BulkActionsToolbarProps {
   selectedCount: number;
   selectedOrderIds: string[];
   onDeselectAll: () => void;
+  isSelectAllGlobal?: boolean;
+  getBulkDeleteParams?: () => BulkDeleteParams;
 }
 
 export function BulkActionsToolbar({
   selectedCount,
   selectedOrderIds,
   onDeselectAll,
+  isSelectAllGlobal,
+  getBulkDeleteParams,
 }: BulkActionsToolbarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const bulkDeleteMutation = useBulkDeleteOrders();
@@ -37,7 +43,12 @@ export function BulkActionsToolbar({
 
   const handleDelete = async () => {
     try {
-      const result = await bulkDeleteMutation.mutateAsync(selectedOrderIds);
+      // Use getBulkDeleteParams if available (supports global mode), otherwise fall back to order_ids
+      const params = getBulkDeleteParams
+        ? getBulkDeleteParams()
+        : { order_ids: selectedOrderIds };
+
+      const result = await bulkDeleteMutation.mutateAsync(params);
       toast.success(`${result.deleted_count} order${result.deleted_count !== 1 ? "s" : ""} deleted successfully`);
       onDeselectAll();
       setIsOpen(false);
@@ -50,7 +61,13 @@ export function BulkActionsToolbar({
   return (
     <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
       <div className="flex items-center gap-3 bg-gray-900 text-white px-4 py-3 rounded-lg shadow-lg">
-        <span className="text-sm font-medium">
+        <span className="text-sm font-medium flex items-center gap-2">
+          {isSelectAllGlobal && (
+            <Badge variant="secondary" className="bg-blue-600 text-white hover:bg-blue-600">
+              <Globe className="h-3 w-3 mr-1" />
+              All
+            </Badge>
+          )}
           {selectedCount} order{selectedCount !== 1 ? "s" : ""} selected
         </span>
 
@@ -72,10 +89,17 @@ export function BulkActionsToolbar({
               <AlertDialogTitle>
                 Delete {selectedCount} order{selectedCount !== 1 ? "s" : ""}?
               </AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete the
-                selected order{selectedCount !== 1 ? "s" : ""} and all
-                associated items from the database.
+              <AlertDialogDescription className="space-y-2">
+                <span>
+                  This action cannot be undone. This will permanently delete the
+                  selected order{selectedCount !== 1 ? "s" : ""} and all
+                  associated items from the database.
+                </span>
+                {isSelectAllGlobal && selectedCount > 100 && (
+                  <span className="block text-amber-500 font-medium">
+                    Warning: You are about to delete {selectedCount} orders. This is a large operation.
+                  </span>
+                )}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

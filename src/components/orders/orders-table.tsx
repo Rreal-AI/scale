@@ -9,6 +9,7 @@ import { OrdersPagination } from "./orders-pagination";
 import { OrderDetailSheet } from "./order-detail-sheet";
 import { BulkActionsToolbar } from "./bulk-actions-toolbar";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { LayoutGrid, Table, RefreshCw, CheckSquare, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -87,10 +88,20 @@ export function OrdersTable({ viewMode, onViewModeChange }: OrdersTableProps = {
     selectedCount,
     isAllSelected,
     isSomeSelected,
+    isSelectAllGlobal,
     toggleSelection,
     selectAll,
+    selectAllGlobal,
     deselectAll,
+    getBulkDeleteParams,
   } = useOrderSelection(data?.orders || []);
+
+  // Build current filters for global selection
+  const currentFilters = {
+    search: filters.search,
+    type: filters.type,
+    status: filters.status,
+  };
 
   const handleFiltersChange = (newFilters: typeof filters) => {
     setFilters(newFilters);
@@ -202,6 +213,38 @@ export function OrdersTable({ viewMode, onViewModeChange }: OrdersTableProps = {
         onFiltersChange={handleFiltersChange}
       />
 
+      {/* Select All when in selection mode */}
+      {selectionMode && data?.orders && data.orders.length > 0 && (
+        <div className="flex items-center gap-3 px-3 py-2 bg-gray-50 rounded-md border">
+          <span className="text-sm text-gray-600">
+            {data.orders.length} visible orders
+          </span>
+
+          {/* Link to select ALL orders in database */}
+          {data.pagination.total_count > data.orders.length && !isSelectAllGlobal && (
+            <button
+              onClick={() => selectAllGlobal(currentFilters, data.pagination.total_count)}
+              className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+            >
+              Select all {data.pagination.total_count} orders
+            </button>
+          )}
+
+          {/* Badge when global selection is active */}
+          {isSelectAllGlobal && (
+            <Badge variant="default" className="bg-blue-600 text-white">
+              All {selectedCount} orders selected
+            </Badge>
+          )}
+
+          {selectedCount > 0 && !isSelectAllGlobal && (
+            <Badge variant="secondary" className="ml-auto">
+              {selectedCount} selected
+            </Badge>
+          )}
+        </div>
+      )}
+
       {/* Table */}
       <OrdersTableContent
         data={data}
@@ -246,6 +289,8 @@ export function OrdersTable({ viewMode, onViewModeChange }: OrdersTableProps = {
           deselectAll();
           setSelectionMode(false);
         }}
+        isSelectAllGlobal={isSelectAllGlobal}
+        getBulkDeleteParams={getBulkDeleteParams}
       />
     </div>
   );
