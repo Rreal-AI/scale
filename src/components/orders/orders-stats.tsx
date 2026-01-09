@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 
 interface Order {
   id: string;
-  status: "pending_weight" | "weighed" | "completed" | "cancelled";
+  status: "pending_weight" | "weighed" | "completed" | "cancelled" | "archived";
   type: "delivery" | "takeout";
   created_at: string;
   total_amount: number;

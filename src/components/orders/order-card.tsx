@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils";
 interface Order {
   id: string;
   org_id: string;
-  status: "pending_weight" | "weighed" | "completed" | "cancelled";
+  status: "pending_weight" | "weighed" | "completed" | "cancelled" | "archived";
   type: "delivery" | "takeout";
   check_number: string;
   customer_name: string;
@@ -36,6 +36,8 @@ interface Order {
   input: string;
   structured_output?: Record<string, unknown>;
   weight_verified_at?: string;
+  archived_at?: string;
+  archived_reason?: string;
   created_at: string;
   updated_at: string;
 }
@@ -84,6 +86,16 @@ const getStatusConfig = (status: Order["status"]) => {
     case "cancelled":
       return {
         label: "Cancelled",
+        variant: "outline" as const,
+        style: {
+          color: "var(--color-neutral-dark)",
+          backgroundColor: "var(--color-neutral)",
+          borderColor: "var(--color-neutral-border)"
+        }
+      };
+    case "archived":
+      return {
+        label: "Archived",
         variant: "outline" as const,
         style: {
           color: "var(--color-neutral-dark)",
