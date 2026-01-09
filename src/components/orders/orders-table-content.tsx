@@ -52,8 +52,10 @@ interface OrdersResponse {
   };
   filters: {
     search?: string;
-    status?: "pending_weight" | "weighed" | "completed" | "cancelled";
+    status?: "pending_weight" | "weighed" | "completed" | "cancelled" | "archived";
     type?: "delivery" | "takeout";
+    archived_from?: string;
+    archived_to?: string;
     sort_by: string;
     sort_order: string;
   };

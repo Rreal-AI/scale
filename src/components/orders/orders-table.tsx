@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 interface Order {
   id: string;
   org_id: string;
-  status: "pending_weight" | "weighed" | "completed" | "cancelled";
+  status: "pending_weight" | "weighed" | "completed" | "cancelled" | "archived";
   type: "delivery" | "takeout";
   check_number: string;
   customer_name: string;
@@ -41,8 +41,10 @@ interface OrdersTableProps {
 export function OrdersTable({ viewMode, onViewModeChange }: OrdersTableProps = {}) {
   const [filters, setFilters] = useState<{
     search?: string;
-    status?: "pending_weight" | "weighed" | "completed" | "cancelled";
+    status?: "pending_weight" | "weighed" | "completed" | "cancelled" | "archived";
     type?: "delivery" | "takeout";
+    archived_from?: string;
+    archived_to?: string;
     sort_by?:
       | "created_at"
       | "updated_at"
