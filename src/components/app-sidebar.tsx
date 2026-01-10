@@ -11,6 +11,7 @@ import {
   Tag,
   Scale,
   Cog,
+  SlidersHorizontal,
 } from "lucide-react";
 import { useSidebar } from "@/components/ui/sidebar";
 import {
@@ -56,6 +57,11 @@ const navigationItems = [
     title: "Orders",
     href: "/orders",
     icon: FileText,
+  },
+  {
+    title: "Weight Settings",
+    href: "/weight-settings",
+    icon: SlidersHorizontal,
   },
   {
     title: "Settings",

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRealTimeOrders, useOrder, useRevertOrderStatus } from "@/hooks/use-orders";
 import { usePackaging } from "@/hooks/use-packaging";
+import { useOrganization } from "@/hooks/use-organization";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -104,6 +105,11 @@ export function WeighOrderView({
   const { data: packagingData } = usePackaging({ limit: 100 });
   const packagingOptions = packagingData?.packaging ?? [];
 
+  // Fetch organization settings for weight tolerance
+  const { data: orgData } = useOrganization();
+  const toleranceGrams = orgData?.order_weight_delta_tolerance ?? 100;
+  const toleranceOz = gramsToOunces(toleranceGrams);
+
   // Weighing state
   const [bagCount, setBagCount] = useState<number>(1);
   const [bagWeights, setBagWeights] = useState<BagWeight[]>([
@@ -117,6 +123,7 @@ export function WeighOrderView({
     number: number;
   } | null>(null);
   const [revertDialogOpen, setRevertDialogOpen] = useState(false);
+  const [overrideDialogOpen, setOverrideDialogOpen] = useState(false);
 
   // Revert order status hook
   const revertOrderStatus = useRevertOrderStatus();
@@ -383,7 +390,6 @@ export function WeighOrderView({
 
     // Only analyze if we have expected weight
     if (expectedWeightOz > 0) {
-      const toleranceOz = gramsToOunces(100);
       const structuredOutput = selectedOrder?.structured_output as {
         items?: Array<{
           name: string;
@@ -1004,7 +1010,6 @@ export function WeighOrderView({
                           const expectedWeightOz = selectedOrder.expected_weight
                             ? gramsToOunces(selectedOrder.expected_weight)
                             : 0;
-                          const toleranceOz = gramsToOunces(100); // 100g tolerance
                           // Skip analysis if no expected weight - just allow completion
                           const structuredOutput =
                             selectedOrder.structured_output as {
@@ -1123,7 +1128,6 @@ export function WeighOrderView({
                           const expectedWeightOz = selectedOrder.expected_weight
                             ? gramsToOunces(selectedOrder.expected_weight)
                             : 0;
-                          const toleranceOz = gramsToOunces(100);
 
                           // Only analyze if we have expected weight
                           const structuredOutput =
@@ -1151,16 +1155,30 @@ export function WeighOrderView({
                           // Check if user has actually weighed any bag (not just packaging weight)
                           const hasActualWeight = bagWeights.some(bag => bag.weight > 0);
 
-                          // If underweight AND user has actually weighed something, show re-weigh button
+                          // If underweight AND user has actually weighed something, show re-weigh button with override option
                           if (analysis?.status === "underweight" && hasActualWeight) {
                             return (
-                              <Button
-                                onClick={handleWeighAction}
-                                disabled={totalWeight === 0}
-                                className="w-full h-16 text-xl font-semibold bg-amber-600 hover:bg-amber-700 disabled:bg-gray-300"
-                              >
-                                Re-weigh Order
-                              </Button>
+                              <div className="space-y-4">
+                                {/* Main action - Reweigh */}
+                                <Button
+                                  onClick={handleWeighAction}
+                                  disabled={totalWeight === 0}
+                                  className="w-full h-16 text-xl font-semibold bg-amber-600 hover:bg-amber-700 disabled:bg-gray-300"
+                                >
+                                  Re-weigh Order
+                                </Button>
+
+                                {/* Secondary action - Override (smaller, below) */}
+                                <div className="text-center">
+                                  <button
+                                    type="button"
+                                    className="text-sm text-gray-500 hover:text-gray-700 underline"
+                                    onClick={() => setOverrideDialogOpen(true)}
+                                  >
+                                    Override and mark as Ready for Lockers
+                                  </button>
+                                </div>
+                              </div>
                             );
                           }
 
@@ -1326,6 +1344,63 @@ export function WeighOrderView({
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               )}
               Confirm Revert
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Override Underweight Order Confirmation Dialog */}
+      <AlertDialog open={overrideDialogOpen} onOpenChange={setOverrideDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-500/10">
+                <AlertTriangle className="h-5 w-5 text-red-600" />
+              </div>
+              <div>
+                <AlertDialogTitle>Override Weight Check</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This order appears to be missing items
+                </AlertDialogDescription>
+              </div>
+            </div>
+          </AlertDialogHeader>
+
+          <div className="my-4 rounded-lg border border-red-200 p-4 bg-red-50">
+            <p className="text-sm text-red-800">
+              The actual weight is significantly below the expected weight. This may indicate missing items in the order.
+            </p>
+          </div>
+
+          <AlertDialogDescription>
+            Are you sure you want to mark this order as <strong>Ready for Lockers</strong> anyway?
+          </AlertDialogDescription>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={async () => {
+                if (!selectedOrderId) return;
+                try {
+                  await onOrderWeighed(
+                    selectedOrderId,
+                    ouncesToGrams(totalWeight),
+                    "weighed"
+                  );
+                  resetWeighingState();
+                  setOverrideDialogOpen(false);
+                  toast.success("Order marked as Ready for Lockers (override)");
+                } catch (error) {
+                  toast.error(
+                    error instanceof Error
+                      ? error.message
+                      : "Failed to override order"
+                  );
+                }
+              }}
+              className="bg-red-600 text-white hover:bg-red-700"
+            >
+              Confirm Override
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
