@@ -9,8 +9,7 @@ export const orderItemModifiers = pgTable("order_item_modifiers", {
     .references(() => orderItems.id, { onDelete: "cascade" })
     .notNull(),
   modifier_id: uuid("modifier_id")
-    .references(() => modifiers.id)
-    .notNull(),
+    .references(() => modifiers.id, { onDelete: "set null" }),
 
   name: text("name").notNull(),
   total_price: integer("total_price").notNull(), // in cents

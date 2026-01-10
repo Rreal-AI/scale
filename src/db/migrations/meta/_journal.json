@@ -71,6 +71,13 @@
       "when": 1761142988535,
       "tag": "0009_greedy_the_renegades",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1768078552433,
+      "tag": "0010_many_wiccan",
+      "breakpoints": true
     }
   ]
 }
