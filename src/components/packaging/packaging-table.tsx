@@ -16,6 +16,7 @@ interface Packaging {
   org_id: string;
   name: string;
   weight: number;
+  is_default: boolean;
   created_at: string;
   updated_at: string;
 }

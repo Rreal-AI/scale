@@ -78,6 +78,13 @@
       "when": 1768078552433,
       "tag": "0010_many_wiccan",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1768081266993,
+      "tag": "0011_lovely_roulette",
+      "breakpoints": true
     }
   ]
 }

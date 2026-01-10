@@ -33,12 +33,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { NumberInput } from "@/components/ui/number-input";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface Packaging {
   id: string;
   org_id: string;
   name: string;
   weight: number;
+  is_default: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -68,6 +70,7 @@ export function PackagingDialog({
     defaultValues: {
       name: "",
       weight: 0,
+      is_default: false,
     },
   });
 
@@ -78,11 +81,13 @@ export function PackagingDialog({
         form.reset({
           name: packaging.name,
           weight: packaging.weight,
+          is_default: packaging.is_default,
         });
       } else {
         form.reset({
           name: "",
           weight: 0,
+          is_default: false,
         });
       }
     }
@@ -187,6 +192,28 @@ export function PackagingDialog({
                   </FormControl>
                   <FormDescription>Packaging weight in grams</FormDescription>
                   <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="is_default"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      disabled={isLoading}
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>Set as default</FormLabel>
+                    <FormDescription>
+                      This packaging will be pre-selected when weighing orders
+                    </FormDescription>
+                  </div>
                 </FormItem>
               )}
             />

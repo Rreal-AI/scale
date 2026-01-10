@@ -7,6 +7,7 @@ export const createPackagingSchema = z.object({
     .min(1, "Name is required")
     .max(255, "Name cannot exceed 255 characters"),
   weight: z.number().int().positive("Weight must be a positive integer"),
+  is_default: z.boolean().optional(),
 });
 
 // Schema para crear un packaging (Frontend)
@@ -16,6 +17,7 @@ export const createPackagingFormSchema = z.object({
     .min(1, "Name is required")
     .max(255, "Name cannot exceed 255 characters"),
   weight: z.number().int().positive("Weight must be a positive integer"),
+  is_default: z.boolean().optional(),
 });
 
 // Schema para actualizar un packaging (API)
@@ -30,6 +32,7 @@ export const updatePackagingSchema = z.object({
     .int()
     .positive("Weight must be a positive integer")
     .optional(),
+  is_default: z.boolean().optional(),
 });
 
 // Schema para actualizar un packaging (Frontend)
@@ -44,6 +47,7 @@ export const updatePackagingFormSchema = z.object({
     .int()
     .positive("Weight must be a positive integer")
     .optional(),
+  is_default: z.boolean().optional(),
 });
 
 // Schema para filtros de búsqueda

@@ -160,6 +160,14 @@ export async function POST(request: NextRequest) {
 
     const validatedData = parseResult.data;
 
+    // If setting as default, first unset all others in this org
+    if (validatedData.is_default === true) {
+      await db
+        .update(packaging)
+        .set({ is_default: false, updated_at: new Date() })
+        .where(eq(packaging.org_id, orgId));
+    }
+
     // Crear el packaging
     const newPackaging = await db
       .insert(packaging)

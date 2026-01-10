@@ -27,6 +27,7 @@ interface Packaging {
   org_id: string;
   name: string;
   weight: number;
+  is_default: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -176,7 +177,14 @@ export function PackagingTableContent({
             <TableRow key={packaging.id}>
               <TableCell>
                 <div>
-                  <div className="font-medium">{packaging.name}</div>
+                  <div className="font-medium flex items-center gap-2">
+                    {packaging.name}
+                    {packaging.is_default && (
+                      <Badge variant="default" className="bg-blue-600 text-xs">
+                        Default
+                      </Badge>
+                    )}
+                  </div>
                   <div className="text-sm text-muted-foreground">
                     ID: {packaging.id.slice(0, 8)}...
                   </div>

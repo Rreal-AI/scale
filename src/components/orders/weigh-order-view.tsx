@@ -140,6 +140,9 @@ export function WeighOrderView({
     setWeighingProgressTrigger(prev => prev + 1);
   };
 
+  // Find default packaging from database
+  const defaultPackaging = packagingOptions.find(p => p.is_default);
+
   // Load weighing progress when order changes
   useEffect(() => {
     if (selectedOrderId) {
@@ -152,11 +155,13 @@ export function WeighOrderView({
       } else {
         // Reset to default if no saved progress
         setBagWeights([{ id: "bag-1", weight: 0 }]);
-        setBagPackaging({}); // Start with no packaging selected
+        // Pre-select default packaging if one exists
+        const defaultPkgId = defaultPackaging?.id || "";
+        setBagPackaging(defaultPkgId ? { "bag-1": defaultPkgId } : {});
         setBagCount(1);
       }
     }
-  }, [selectedOrderId]);
+  }, [selectedOrderId, defaultPackaging?.id]);
 
   // Fetch orders for sidebar
   const { data: ordersData } = useRealTimeOrders({
@@ -273,7 +278,10 @@ export function WeighOrderView({
         }
         return updated;
       });
-      // No need to set default packaging for new bags - user will select from dropdown
+      // Pre-select default packaging for new bags
+      if (defaultPackaging?.id) {
+        setBagPackaging((prev) => ({ ...prev, [id]: defaultPackaging.id }));
+      }
     }
   };
 
@@ -402,7 +410,9 @@ export function WeighOrderView({
   const resetWeighingState = () => {
     setBagCount(1);
     setBagWeights([{ id: "bag-1", weight: 0 }]);
-    setBagPackaging({}); // Reset to no packaging selected
+    // Reset to default packaging if one exists
+    const defaultPkgId = defaultPackaging?.id || "";
+    setBagPackaging(defaultPkgId ? { "bag-1": defaultPkgId } : {});
     // Clear saved progress when resetting
     if (selectedOrderId) {
       clearWeighingProgress(selectedOrderId);
