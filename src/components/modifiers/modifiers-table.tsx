@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useModifiers } from "@/hooks/use-modifiers";
+import { useModifierSelection } from "@/hooks/use-modifier-selection";
 import { ModifiersFilters } from "./modifiers-filters";
 import { ModifiersTableContent } from "./modifiers-table-content";
 import { ModifiersPagination } from "./modifiers-pagination";
@@ -9,8 +10,11 @@ import { ModifierDialog } from "./modifier-dialog";
 import { DeleteModifierDialog } from "./delete-modifier-dialog";
 import { ModifierDetailSheet } from "./modifier-detail-sheet";
 import { ImportModifiersDialog } from "./import-modifiers-dialog";
+import { ModifierBulkActionsToolbar } from "./modifier-bulk-actions-toolbar";
 import { Button } from "@/components/ui/button";
-import { Plus, Upload, Download } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
+import { Plus, Upload, Download, CheckSquare } from "lucide-react";
 import { toast } from "sonner";
 
 interface Modifier {
@@ -65,12 +69,36 @@ export function ModifiersTable() {
 
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [selectionMode, setSelectionMode] = useState(false);
 
   const { data, isLoading, error } = useModifiers({
     page: currentPage,
     limit: pageSize,
     ...filters,
   });
+
+  // Get modifiers array for selection hook
+  const modifiers = data?.modifiers ?? [];
+
+  // Selection hook
+  const {
+    selectedModifierIds,
+    selectedCount,
+    isSelected,
+    isAllSelected,
+    isSomeSelected,
+    isSelectAllGlobal,
+    toggleSelection,
+    selectAll,
+    selectAllGlobal,
+    deselectAll,
+    getBulkDeleteParams,
+  } = useModifierSelection(modifiers);
+
+  // Build current filters for global selection
+  const currentFilters = {
+    search: filters.search || undefined,
+  };
 
   const handleFiltersChange = (newFilters: typeof filters) => {
     setFilters(newFilters);
@@ -171,6 +199,18 @@ export function ModifiersTable() {
           <p className="text-muted-foreground">Manage your product modifiers</p>
         </div>
         <div className="flex gap-2">
+          <Button
+            variant={selectionMode ? "default" : "outline"}
+            onClick={() => {
+              if (selectionMode) {
+                deselectAll();
+              }
+              setSelectionMode(!selectionMode);
+            }}
+          >
+            <CheckSquare className="h-4 w-4 mr-2" />
+            {selectionMode ? "Cancel" : "Select"}
+          </Button>
           <Button variant="outline" onClick={() => setImportDialogOpen(true)}>
             <Upload className="h-4 w-4 mr-2" />
             Import CSV
@@ -192,6 +232,53 @@ export function ModifiersTable() {
         onFiltersChange={handleFiltersChange}
       />
 
+      {/* Select All when in selection mode */}
+      {selectionMode && modifiers.length > 0 && (
+        <div className="flex items-center gap-3 px-3 py-2 bg-gray-50 rounded-md border">
+          <Checkbox
+            checked={isAllSelected || isSelectAllGlobal}
+            ref={(el) => {
+              if (el && !isSelectAllGlobal) {
+                (el as HTMLButtonElement & { indeterminate: boolean }).indeterminate = isSomeSelected || false;
+              }
+            }}
+            onCheckedChange={(checked) => {
+              if (checked) {
+                selectAll();
+              } else {
+                deselectAll();
+              }
+            }}
+          />
+          <span className="text-sm text-gray-600">
+            Select all ({modifiers.length} visible)
+          </span>
+
+          {/* Link to select ALL modifiers in database */}
+          {data?.pagination.total_count && data.pagination.total_count > modifiers.length && !isSelectAllGlobal && (
+            <button
+              onClick={() => selectAllGlobal(currentFilters, data.pagination.total_count)}
+              className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+            >
+              Select all {data.pagination.total_count} modifiers
+            </button>
+          )}
+
+          {/* Badge when global selection is active */}
+          {isSelectAllGlobal && (
+            <Badge variant="default" className="bg-blue-600 text-white">
+              All {selectedCount} modifiers selected
+            </Badge>
+          )}
+
+          {selectedCount > 0 && !isSelectAllGlobal && (
+            <Badge variant="secondary" className="ml-auto">
+              {selectedCount} selected
+            </Badge>
+          )}
+        </div>
+      )}
+
       {/* Table */}
       <ModifiersTableContent
         data={data}
@@ -201,6 +288,9 @@ export function ModifiersTable() {
         onEditModifier={handleEditModifier}
         onDeleteModifier={handleDeleteModifier}
         onViewModifier={handleViewModifier}
+        selectionMode={selectionMode}
+        isSelected={isSelected}
+        onToggleSelection={toggleSelection}
       />
 
       {/* Pagination */}
@@ -241,6 +331,18 @@ export function ModifiersTable() {
       <ImportModifiersDialog
         open={importDialogOpen}
         onOpenChange={setImportDialogOpen}
+      />
+
+      {/* Bulk Actions Toolbar */}
+      <ModifierBulkActionsToolbar
+        selectedCount={selectedCount}
+        selectedModifierIds={selectedModifierIds}
+        onDeselectAll={() => {
+          deselectAll();
+          setSelectionMode(false);
+        }}
+        isSelectAllGlobal={isSelectAllGlobal}
+        getBulkDeleteParams={getBulkDeleteParams}
       />
     </div>
   );

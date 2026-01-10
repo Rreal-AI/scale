@@ -218,3 +218,53 @@ export const useDeleteModifier = () => {
     },
   });
 };
+
+// Bulk delete params - supports both individual IDs and select_all mode
+type BulkDeleteModifiersParams =
+  | { modifier_ids: string[] }
+  | {
+      select_all: true;
+      filters?: {
+        search?: string;
+      };
+    };
+
+// Bulk delete response
+interface BulkDeleteModifiersResponse {
+  message: string;
+  deleted_count: number;
+  deleted_ids: string[];
+}
+
+// Bulk delete modifiers (permanent hard delete)
+const bulkDeleteModifiers = async (
+  params: BulkDeleteModifiersParams
+): Promise<BulkDeleteModifiersResponse> => {
+  const response = await fetch(`/api/modifiers/bulk`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(params),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Failed to delete modifiers");
+  }
+
+  return response.json();
+};
+
+export const useBulkDeleteModifiers = () => {
+  const { orgId } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: bulkDeleteModifiers,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["modifiers", orgId],
+        exact: false,
+      });
+    },
+  });
+};

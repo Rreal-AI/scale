@@ -1,6 +1,5 @@
 "use client";
 
-// useState removed - not used in this component
 import { MoreHorizontal, Edit, Trash2, Eye } from "lucide-react";
 import { formatPrice, formatWeight, formatRelativeTime } from "@/lib/format";
 import {
@@ -22,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface Modifier {
   id: string;
@@ -62,6 +62,10 @@ interface ModifiersTableContentProps {
   onEditModifier?: (modifier: Modifier) => void;
   onDeleteModifier?: (modifier: Modifier) => void;
   onViewModifier?: (modifier: Modifier) => void;
+  // Selection mode props
+  selectionMode?: boolean;
+  isSelected?: (modifierId: string) => boolean;
+  onToggleSelection?: (modifierId: string) => void;
 }
 
 function LoadingSkeleton() {
@@ -101,6 +105,9 @@ export function ModifiersTableContent({
   onEditModifier,
   onDeleteModifier,
   onViewModifier,
+  selectionMode,
+  isSelected,
+  onToggleSelection,
 }: ModifiersTableContentProps) {
   if (error) {
     return (
@@ -118,6 +125,7 @@ export function ModifiersTableContent({
         <Table>
           <TableHeader>
             <TableRow>
+              {selectionMode && <TableHead className="w-[50px]"></TableHead>}
               <TableHead>Name</TableHead>
               <TableHead>Price</TableHead>
               <TableHead>Weight</TableHead>
@@ -139,6 +147,7 @@ export function ModifiersTableContent({
         <Table>
           <TableHeader>
             <TableRow>
+              {selectionMode && <TableHead className="w-[50px]"></TableHead>}
               <TableHead>Name</TableHead>
               <TableHead>Price</TableHead>
               <TableHead>Weight</TableHead>
@@ -148,7 +157,7 @@ export function ModifiersTableContent({
           </TableHeader>
           <TableBody>
             <TableRow>
-              <TableCell colSpan={5} className="text-center py-8">
+              <TableCell colSpan={selectionMode ? 6 : 5} className="text-center py-8">
                 <div className="text-muted-foreground">
                   {currentFilters.search ? (
                     <>
@@ -172,6 +181,7 @@ export function ModifiersTableContent({
       <Table>
         <TableHeader>
           <TableRow>
+            {selectionMode && <TableHead className="w-[50px]"></TableHead>}
             <TableHead>Name</TableHead>
             <TableHead>Price</TableHead>
             <TableHead>Weight</TableHead>
@@ -182,6 +192,14 @@ export function ModifiersTableContent({
         <TableBody>
           {data.modifiers.map((modifier) => (
             <TableRow key={modifier.id}>
+              {selectionMode && (
+                <TableCell>
+                  <Checkbox
+                    checked={isSelected?.(modifier.id) ?? false}
+                    onCheckedChange={() => onToggleSelection?.(modifier.id)}
+                  />
+                </TableCell>
+              )}
               <TableCell>
                 <div>
                   <div className="font-medium">{modifier.name}</div>
