@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,10 +38,15 @@ export function PackagingFilters({
 }: PackagingFiltersProps) {
   const [localSearch, setLocalSearch] = useState(currentFilters.search || "");
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onFiltersChange({ ...currentFilters, search: localSearch || undefined });
-  };
+  // Debounce search - triggers after 300ms of no typing
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (localSearch !== (currentFilters.search || "")) {
+        onFiltersChange({ ...currentFilters, search: localSearch || undefined });
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [localSearch]);
 
   const handleSortChange = (sort_by: "name" | "weight" | "created_at") => {
     onFiltersChange({ ...currentFilters, sort_by });
@@ -64,10 +69,7 @@ export function PackagingFilters({
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       {/* Search */}
-      <form
-        onSubmit={handleSearchSubmit}
-        className="flex gap-2 flex-1 max-w-sm"
-      >
+      <div className="flex gap-2 flex-1 max-w-sm">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -77,10 +79,7 @@ export function PackagingFilters({
             className="pl-10"
           />
         </div>
-        <Button type="submit" variant="outline">
-          Search
-        </Button>
-      </form>
+      </div>
 
       {/* Sort and Filters */}
       <div className="flex items-center gap-2">
@@ -164,24 +163,13 @@ export function PackagingFilters({
                 </Select>
               </div>
 
-              <div className="flex justify-between pt-2">
+              <div className="flex justify-end pt-2">
                 <Button
                   variant="outline"
                   onClick={clearFilters}
                   disabled={!hasActiveFilters}
                 >
-                  Clear
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() =>
-                    onFiltersChange({
-                      ...currentFilters,
-                      search: localSearch || undefined,
-                    })
-                  }
-                >
-                  Apply
+                  Clear filters
                 </Button>
               </div>
             </div>
