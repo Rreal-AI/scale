@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRealTimeOrders, useOrder } from "@/hooks/use-orders";
+import { useRealTimeOrders, useOrder, useRevertOrderStatus } from "@/hooks/use-orders";
 import { usePackaging } from "@/hooks/use-packaging";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,7 +22,20 @@ import {
   AlertTriangle,
   Plus,
   Minus,
+  Undo2,
+  Loader2,
 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 interface Order {
@@ -103,6 +116,10 @@ export function WeighOrderView({
     id: string;
     number: number;
   } | null>(null);
+  const [revertDialogOpen, setRevertDialogOpen] = useState(false);
+
+  // Revert order status hook
+  const revertOrderStatus = useRevertOrderStatus();
 
   // Auto-save weighing progress
   const saveWeighingProgress = (orderId: string, bagWeights: BagWeight[], bagPackaging: Record<string, string>, bagCount: number) => {
@@ -1185,9 +1202,24 @@ export function WeighOrderView({
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">
                       Order Already Processed
                     </h3>
-                    <p className="text-gray-500">
-                      This order has already been weighed or completed
+                    <p className="text-gray-500 mb-4">
+                      {selectedOrder.status === "weighed"
+                        ? "This order is ready for lockers"
+                        : "This order has been completed"}
                     </p>
+                    {(selectedOrder.status === "weighed" ||
+                      selectedOrder.status === "completed") && (
+                      <Button
+                        variant="outline"
+                        className="border-amber-500 text-amber-600 hover:bg-amber-50"
+                        onClick={() => setRevertDialogOpen(true)}
+                      >
+                        <Undo2 className="h-4 w-4 mr-2" />
+                        {selectedOrder.status === "weighed"
+                          ? "Revert to Pending"
+                          : "Revert to Ready for Lockers"}
+                      </Button>
+                    )}
                   </div>
                 </div>
               )}
@@ -1222,6 +1254,82 @@ export function WeighOrderView({
         onWeightConfirm={handleWeightConfirm}
         totalBags={bagCount}
       />
+
+      {/* Revert Order Status Confirmation Dialog */}
+      <AlertDialog open={revertDialogOpen} onOpenChange={setRevertDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-500/10">
+                <Undo2 className="h-5 w-5 text-amber-600" />
+              </div>
+              <div>
+                <AlertDialogTitle>Revert Order Status</AlertDialogTitle>
+                <AlertDialogDescription>
+                  {selectedOrder?.status === "weighed"
+                    ? "This will move the order back to pending weight"
+                    : "This will move the order back to ready for lockers"}
+                </AlertDialogDescription>
+              </div>
+            </div>
+          </AlertDialogHeader>
+
+          <div className="my-4 rounded-lg border p-4 bg-muted/50">
+            <p className="text-sm">
+              <strong>Order #{selectedOrder?.check_number}</strong> -{" "}
+              {selectedOrder?.customer_name}
+            </p>
+          </div>
+
+          <AlertDialogDescription>
+            {selectedOrder?.status === "weighed" ? (
+              <>
+                This will clear the recorded weight and you&apos;ll need to
+                weigh this order again.
+              </>
+            ) : (
+              <>
+                This will move the order back to &quot;Ready for Lockers&quot;
+                status.
+              </>
+            )}
+          </AlertDialogDescription>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={revertOrderStatus.isPending}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={async () => {
+                if (!selectedOrderId) return;
+                try {
+                  await revertOrderStatus.mutateAsync(selectedOrderId);
+                  toast.success("Order status reverted successfully");
+                  setRevertDialogOpen(false);
+                  // Clear local weighing state when reverting
+                  if (selectedOrder?.status === "weighed") {
+                    clearWeighingProgress(selectedOrderId);
+                    resetWeighingState();
+                  }
+                } catch (error) {
+                  toast.error(
+                    error instanceof Error
+                      ? error.message
+                      : "Failed to revert order status"
+                  );
+                }
+              }}
+              disabled={revertOrderStatus.isPending}
+              className="bg-amber-600 text-white hover:bg-amber-700"
+            >
+              {revertOrderStatus.isPending && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              Confirm Revert
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -332,3 +332,39 @@ export const useBulkDeleteOrders = () => {
     },
   });
 };
+
+// Revert order to previous status
+const revertOrderStatus = async (
+  orderId: string
+): Promise<{ order: Order; message: string }> => {
+  const response = await fetch(`/api/orders/${orderId}/revert`, {
+    method: "POST",
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Failed to revert order status");
+  }
+
+  return response.json();
+};
+
+export const useRevertOrderStatus = () => {
+  const { orgId } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: revertOrderStatus,
+    onSuccess: (data, orderId) => {
+      // Invalidar la query del order específico
+      queryClient.invalidateQueries({
+        queryKey: ["orders", orgId, orderId],
+      });
+      // Invalidar la lista de orders
+      queryClient.invalidateQueries({
+        queryKey: ["orders", orgId],
+        exact: false,
+      });
+    },
+  });
+};
