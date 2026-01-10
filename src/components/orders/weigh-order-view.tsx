@@ -92,8 +92,8 @@ export function WeighOrderView({
     { id: "bag-1", weight: 0 },
   ]);
   const [bagPackaging, setBagPackaging] = useState<
-    Record<string, "none" | "paper" | "plastic" | "box">
-  >({ "bag-1": "paper" });
+    Record<string, "none" | "paper" | "plastic" | "box" | "box_plastic">
+  >({ "bag-1": "box" });
   const [weightModalOpen, setWeightModalOpen] = useState(false);
   const [selectedBagForWeighing, setSelectedBagForWeighing] = useState<{
     id: string;
@@ -148,7 +148,7 @@ export function WeighOrderView({
       } else {
         // Reset to default if no saved progress
         setBagWeights([{ id: "bag-1", weight: 0 }]);
-        setBagPackaging({ "bag-1": "paper" });
+        setBagPackaging({ "bag-1": "box" });
         setBagCount(1);
       }
     }
@@ -270,7 +270,7 @@ export function WeighOrderView({
         return updated;
       });
       setBagPackaging((prev) => {
-        const updated = { ...prev, [id]: "paper" as "none" | "paper" | "plastic" | "box" };
+        const updated = { ...prev, [id]: "box" as "none" | "paper" | "plastic" | "box" | "box_plastic" };
         // Auto-save progress
         if (selectedOrderId) {
           saveWeighingProgress(selectedOrderId, bagWeights, updated, newBagCount);
@@ -343,11 +343,12 @@ export function WeighOrderView({
   const totalWeight = Math.round(
     bagWeights.reduce((sum, bag) => {
       const bagWeight = bag.weight;
-      const packaging = bagPackaging[bag.id] || "paper"; // Default to paper bag
-      const packagingWeight = packaging === "none" ? 0 : 
+      const packaging = bagPackaging[bag.id] || "box"; // Default to box
+      const packagingWeight = packaging === "none" ? 0 :
                              packaging === "paper" ? 0.1 : // Paper bag weight in oz
                              packaging === "plastic" ? 0.05 : // Plastic bag weight in oz
-                             packaging === "box" ? 0.2 : 0; // Box weight in oz
+                             packaging === "box" ? 0.2 : // Box weight in oz
+                             packaging === "box_plastic" ? 0.25 : 0; // Box + Plastic bag weight in oz
       return sum + bagWeight + packagingWeight;
     }, 0) * 100
   ) / 100; // Round to 2 decimal places to fix floating point precision
@@ -406,7 +407,7 @@ export function WeighOrderView({
   const resetWeighingState = () => {
     setBagCount(1);
     setBagWeights([{ id: "bag-1", weight: 0 }]);
-    setBagPackaging({ "bag-1": "paper" });
+    setBagPackaging({ "bag-1": "box" });
     // Clear saved progress when resetting
     if (selectedOrderId) {
       clearWeighingProgress(selectedOrderId);
@@ -923,7 +924,7 @@ export function WeighOrderView({
                               {/* Type of bag selector */}
                               <select
                                 className="h-10 border rounded px-2 text-sm text-gray-700"
-                                value={bagPackaging[bag.id] || "paper"}
+                                value={bagPackaging[bag.id] || "box"}
                                 onChange={(e) =>
                                   setBagPackaging((prev) => {
                                     const updated = {
@@ -932,7 +933,8 @@ export function WeighOrderView({
                                         | "none"
                                         | "paper"
                                         | "plastic"
-                                        | "box",
+                                        | "box"
+                                        | "box_plastic",
                                     };
                                     // Auto-save progress
                                     if (selectedOrderId) {
@@ -942,9 +944,10 @@ export function WeighOrderView({
                                   })
                                 }
                               >
-                                <option value="paper">Type</option>
-                                <option value="plastic">Plastic bag</option>
                                 <option value="box">Box</option>
+                                <option value="box_plastic">Box + Plastic Bag</option>
+                                <option value="plastic">Plastic bag</option>
+                                <option value="paper">Paper bag</option>
                                 <option value="none">No packaging</option>
                               </select>
                               <Button
@@ -1127,8 +1130,11 @@ export function WeighOrderView({
                                 )
                               : null;
 
-                          // If underweight, show re-weigh button
-                          if (analysis?.status === "underweight") {
+                          // Check if user has actually weighed any bag (not just packaging weight)
+                          const hasActualWeight = bagWeights.some(bag => bag.weight > 0);
+
+                          // If underweight AND user has actually weighed something, show re-weigh button
+                          if (analysis?.status === "underweight" && hasActualWeight) {
                             return (
                               <Button
                                 onClick={handleWeighAction}
@@ -1141,6 +1147,7 @@ export function WeighOrderView({
                           }
 
                           // Default: Ready for lockers (works for no expected weight too)
+                          // Disabled if no actual weight has been recorded
                           return (
                             <Button
                               onClick={async () => {
@@ -1155,7 +1162,7 @@ export function WeighOrderView({
                                   console.error(e);
                                 }
                               }}
-                              disabled={totalWeight === 0}
+                              disabled={!hasActualWeight}
                               className="w-full h-16 text-xl font-semibold bg-green-600 hover:bg-green-700 disabled:bg-gray-300"
                             >
                               Ready for Lockers
