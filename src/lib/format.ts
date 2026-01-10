@@ -37,14 +37,6 @@ export function formatPrice(priceInCents: number): string {
 
 export function formatWeight(weightInGrams: number): string {
   const ounces = Math.round((weightInGrams / 28.3495) * 100) / 100;
-  if (ounces >= 16) {
-    const pounds = Math.floor(ounces / 16);
-    const remainingOz = Math.round((ounces % 16) * 100) / 100;
-    if (remainingOz === 0) {
-      return `${pounds} lb`;
-    }
-    return `${pounds} lb ${remainingOz} oz`;
-  }
   return `${ounces} oz`;
 }
 
