@@ -5,7 +5,7 @@ import { PROMPT } from "@/lib/prompt";
 import { findByNormalizedProperty, normalizeText } from "@/lib/normalize";
 import { db } from "@/db";
 import { orders } from "@/db/schema/orders";
-import { orderItemModifiers, orderItems } from "@/db/schema";
+import { orderItemModifiers, orderItems, modifiers as modifiersTable } from "@/db/schema";
 import { Workflow } from "@/lib/workflow";
 import { eq, or } from "drizzle-orm";
 import { logger } from "@/lib/logger";
@@ -51,7 +51,7 @@ export const { POST } = serve<ProcessOrderPayload>(
             ),
         });
 
-        const modifiers = await tx.query.modifiers.findMany({
+        let modifiers = await tx.query.modifiers.findMany({
           where: (table, { eq, and, or, ilike }) =>
             and(
               eq(table.org_id, org_id),
@@ -64,6 +64,45 @@ export const { POST } = serve<ProcessOrderPayload>(
               )
             ),
         });
+
+        // Auto-create modifiers that don't exist
+        const existingModifierNames = new Set(
+          modifiers.map((m) => normalizeText(m.name))
+        );
+
+        const missingModifiers = structuredOrder.items
+          .flatMap((item) => item.modifiers)
+          .filter((m) => !existingModifierNames.has(normalizeText(m.name)));
+
+        // Get unique missing modifiers by normalized name
+        const uniqueMissingModifiers = Array.from(
+          new Map(
+            missingModifiers.map((m) => [normalizeText(m.name), m])
+          ).values()
+        );
+
+        // Create missing modifiers with default weight of 0
+        if (uniqueMissingModifiers.length > 0) {
+          logger.info("Auto-creating missing modifiers", {
+            modifiers: uniqueMissingModifiers.map((m) => m.name),
+            org_id,
+          });
+
+          const createdModifiers = await tx
+            .insert(modifiersTable)
+            .values(
+              uniqueMissingModifiers.map((m) => ({
+                org_id,
+                name: m.name,
+                price: Math.round(m.price * 100), // Convert to cents
+                weight: 0, // Default weight - user can update later
+              }))
+            )
+            .returning();
+
+          // Add created modifiers to the modifiers array
+          modifiers = [...modifiers, ...createdModifiers];
+        }
 
         // Calculate expected weight before creating the order (in grams)
         let expectedWeight = 0;
