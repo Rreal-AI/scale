@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRealTimeOrders, useOrder } from "@/hooks/use-orders";
+import { usePackaging } from "@/hooks/use-packaging";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -86,14 +87,17 @@ export function WeighOrderView({
   // Trigger for re-rendering order list when weighing progress changes
   const [weighingProgressTrigger, setWeighingProgressTrigger] = useState<number>(0);
 
+  // Fetch packaging options from database
+  const { data: packagingData } = usePackaging({ limit: 100 });
+  const packagingOptions = packagingData?.packaging ?? [];
+
   // Weighing state
   const [bagCount, setBagCount] = useState<number>(1);
   const [bagWeights, setBagWeights] = useState<BagWeight[]>([
     { id: "bag-1", weight: 0 },
   ]);
-  const [bagPackaging, setBagPackaging] = useState<
-    Record<string, "none" | "paper" | "plastic" | "box" | "box_plastic">
-  >({ "bag-1": "box" });
+  // Store packaging ID (from database) instead of hardcoded type
+  const [bagPackaging, setBagPackaging] = useState<Record<string, string>>({});
   const [weightModalOpen, setWeightModalOpen] = useState(false);
   const [selectedBagForWeighing, setSelectedBagForWeighing] = useState<{
     id: string;
@@ -148,7 +152,7 @@ export function WeighOrderView({
       } else {
         // Reset to default if no saved progress
         setBagWeights([{ id: "bag-1", weight: 0 }]);
-        setBagPackaging({ "bag-1": "box" });
+        setBagPackaging({}); // Start with no packaging selected
         setBagCount(1);
       }
     }
@@ -269,14 +273,7 @@ export function WeighOrderView({
         }
         return updated;
       });
-      setBagPackaging((prev) => {
-        const updated = { ...prev, [id]: "box" as "none" | "paper" | "plastic" | "box" | "box_plastic" };
-        // Auto-save progress
-        if (selectedOrderId) {
-          saveWeighingProgress(selectedOrderId, bagWeights, updated, newBagCount);
-        }
-        return updated;
-      });
+      // No need to set default packaging for new bags - user will select from dropdown
     }
   };
 
@@ -339,17 +336,15 @@ export function WeighOrderView({
     });
   };
 
-  // Calculate total weight including packaging
+  // Calculate total weight including packaging (from database)
   const totalWeight = Math.round(
     bagWeights.reduce((sum, bag) => {
       const bagWeight = bag.weight;
-      const packaging = bagPackaging[bag.id] || "box"; // Default to box
-      const packagingWeight = packaging === "none" ? 0 :
-                             packaging === "paper" ? 0.1 : // Paper bag weight in oz
-                             packaging === "plastic" ? 0.05 : // Plastic bag weight in oz
-                             packaging === "box" ? 0.2 : // Box weight in oz
-                             packaging === "box_plastic" ? 0.25 : 0; // Box + Plastic bag weight in oz
-      return sum + bagWeight + packagingWeight;
+      const packagingId = bagPackaging[bag.id];
+      const packagingItem = packagingOptions.find(p => p.id === packagingId);
+      // Convert grams to oz (packaging weight is stored in grams in DB)
+      const packagingWeightOz = packagingItem ? gramsToOunces(packagingItem.weight) : 0;
+      return sum + bagWeight + packagingWeightOz;
     }, 0) * 100
   ) / 100; // Round to 2 decimal places to fix floating point precision
 
@@ -407,7 +402,7 @@ export function WeighOrderView({
   const resetWeighingState = () => {
     setBagCount(1);
     setBagWeights([{ id: "bag-1", weight: 0 }]);
-    setBagPackaging({ "bag-1": "box" });
+    setBagPackaging({}); // Reset to no packaging selected
     // Clear saved progress when resetting
     if (selectedOrderId) {
       clearWeighingProgress(selectedOrderId);
@@ -921,20 +916,15 @@ export function WeighOrderView({
                               <div className="text-lg font-medium text-gray-700 w-20">
                                 Bag {index + 1}
                               </div>
-                              {/* Type of bag selector */}
+                              {/* Packaging selector - options from database */}
                               <select
                                 className="h-10 border rounded px-2 text-sm text-gray-700"
-                                value={bagPackaging[bag.id] || "box"}
+                                value={bagPackaging[bag.id] || ""}
                                 onChange={(e) =>
                                   setBagPackaging((prev) => {
                                     const updated = {
                                       ...prev,
-                                      [bag.id]: e.target.value as
-                                        | "none"
-                                        | "paper"
-                                        | "plastic"
-                                        | "box"
-                                        | "box_plastic",
+                                      [bag.id]: e.target.value,
                                     };
                                     // Auto-save progress
                                     if (selectedOrderId) {
@@ -944,11 +934,12 @@ export function WeighOrderView({
                                   })
                                 }
                               >
-                                <option value="box">Box</option>
-                                <option value="box_plastic">Box + Plastic Bag</option>
-                                <option value="plastic">Plastic bag</option>
-                                <option value="paper">Paper bag</option>
-                                <option value="none">No packaging</option>
+                                <option value="">No packaging</option>
+                                {packagingOptions.map((pkg) => (
+                                  <option key={pkg.id} value={pkg.id}>
+                                    {pkg.name} ({gramsToOunces(pkg.weight).toFixed(2)} oz)
+                                  </option>
+                                ))}
                               </select>
                               <Button
                                 variant="outline"
