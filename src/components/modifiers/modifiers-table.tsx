@@ -8,8 +8,10 @@ import { ModifiersPagination } from "./modifiers-pagination";
 import { ModifierDialog } from "./modifier-dialog";
 import { DeleteModifierDialog } from "./delete-modifier-dialog";
 import { ModifierDetailSheet } from "./modifier-detail-sheet";
+import { ImportModifiersDialog } from "./import-modifiers-dialog";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Upload, Download } from "lucide-react";
+import { toast } from "sonner";
 
 interface Modifier {
   id: string;
@@ -60,6 +62,9 @@ export function ModifiersTable() {
     open: false,
     modifierId: null,
   });
+
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   const { data, isLoading, error } = useModifiers({
     page: currentPage,
@@ -129,6 +134,34 @@ export function ModifiersTable() {
     });
   };
 
+  const handleExport = async () => {
+    setIsExporting(true);
+    try {
+      const response = await fetch("/api/modifiers/export");
+      if (!response.ok) {
+        throw new Error("Failed to export modifiers");
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      const contentDisposition = response.headers.get("Content-Disposition");
+      const filename = contentDisposition?.match(/filename="(.+)"/)?.[1] || "modifiers.csv";
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      toast.success("Modifiers exportados correctamente");
+    } catch (error) {
+      console.error("Error exporting modifiers:", error);
+      toast.error("Error al exportar modifiers");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -137,10 +170,20 @@ export function ModifiersTable() {
           <h1 className="text-2xl font-bold">Modifiers</h1>
           <p className="text-muted-foreground">Manage your product modifiers</p>
         </div>
-        <Button variant="outline" onClick={handleCreateModifier}>
-          <Plus className="h-4 w-4 mr-2" />
-          New Modifier
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setImportDialogOpen(true)}>
+            <Upload className="h-4 w-4 mr-2" />
+            Import CSV
+          </Button>
+          <Button variant="outline" onClick={handleExport} disabled={isExporting}>
+            <Download className="h-4 w-4 mr-2" />
+            {isExporting ? "Exporting..." : "Export CSV"}
+          </Button>
+          <Button variant="outline" onClick={handleCreateModifier}>
+            <Plus className="h-4 w-4 mr-2" />
+            New Modifier
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -193,6 +236,11 @@ export function ModifiersTable() {
         modifierId={detailSheet.modifierId}
         onEdit={handleEditModifier}
         onDelete={handleDeleteModifier}
+      />
+
+      <ImportModifiersDialog
+        open={importDialogOpen}
+        onOpenChange={setImportDialogOpen}
       />
     </div>
   );
