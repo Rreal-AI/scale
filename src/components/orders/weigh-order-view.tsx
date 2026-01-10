@@ -981,8 +981,8 @@ export function WeighOrderView({
 
                         <Separator />
 
-                        {/* Total Weight Display with Analysis */}
-                        {(() => {
+                        {/* Total Weight Display with Analysis - only show after user has weighed something */}
+                        {bagWeights.some(bag => bag.weight > 0) && (() => {
                           const expectedWeightOz = selectedOrder.expected_weight
                             ? gramsToOunces(selectedOrder.expected_weight)
                             : 0;
