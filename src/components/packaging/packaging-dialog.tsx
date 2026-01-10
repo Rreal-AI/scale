@@ -3,9 +3,9 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
+import { Loader2, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
-import { useCreatePackaging, useUpdatePackaging } from "@/hooks/use-packaging";
+import { useCreatePackaging, useUpdatePackaging, usePackaging } from "@/hooks/use-packaging";
 import {
   createPackagingFormSchema,
   updatePackagingFormSchema,
@@ -34,6 +34,16 @@ import { Input } from "@/components/ui/input";
 import { NumberInput } from "@/components/ui/number-input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Packaging {
   id: string;
@@ -59,9 +69,22 @@ export function PackagingDialog({
   mode,
 }: PackagingDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [confirmDialog, setConfirmDialog] = useState<{
+    open: boolean;
+    currentDefault: Packaging | null;
+    pendingValues: CreatePackagingFormInput | UpdatePackagingFormInput | null;
+  }>({
+    open: false,
+    currentDefault: null,
+    pendingValues: null,
+  });
 
   const createPackaging = useCreatePackaging();
   const updatePackaging = useUpdatePackaging();
+
+  // Fetch all packaging to find current default
+  const { data: allPackagingData } = usePackaging({ limit: 100 });
+  const allPackaging = allPackagingData?.packaging ?? [];
 
   const form = useForm<CreatePackagingFormInput | UpdatePackagingFormInput>({
     resolver: zodResolver(
@@ -93,7 +116,7 @@ export function PackagingDialog({
     }
   }, [open, mode, packaging, form]);
 
-  const onSubmit = async (
+  const performSubmit = async (
     values: CreatePackagingFormInput | UpdatePackagingFormInput
   ) => {
     setIsSubmitting(true);
@@ -123,6 +146,41 @@ export function PackagingDialog({
     }
   };
 
+  const onSubmit = async (
+    values: CreatePackagingFormInput | UpdatePackagingFormInput
+  ) => {
+    // Check if trying to set as default
+    const isSettingAsDefault = values.is_default === true;
+    const wasAlreadyDefault = mode === "edit" && packaging?.is_default === true;
+
+    if (isSettingAsDefault && !wasAlreadyDefault) {
+      // Find current default (excluding this one if editing)
+      const currentDefault = allPackaging.find(
+        (p) => p.is_default && p.id !== packaging?.id
+      );
+
+      if (currentDefault) {
+        // Show confirmation dialog
+        setConfirmDialog({
+          open: true,
+          currentDefault,
+          pendingValues: values,
+        });
+        return; // Don't submit yet
+      }
+    }
+
+    // No conflict, proceed with submission
+    await performSubmit(values);
+  };
+
+  const handleConfirmDefault = async () => {
+    if (confirmDialog.pendingValues) {
+      await performSubmit(confirmDialog.pendingValues);
+    }
+    setConfirmDialog({ open: false, currentDefault: null, pendingValues: null });
+  };
+
   const handleOpenChange = (newOpen: boolean) => {
     if (!isSubmitting) {
       onOpenChange(newOpen);
@@ -136,6 +194,7 @@ export function PackagingDialog({
     isSubmitting || createPackaging.isPending || updatePackaging.isPending;
 
   return (
+    <>
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
@@ -236,5 +295,55 @@ export function PackagingDialog({
         </Form>
       </DialogContent>
     </Dialog>
+
+    {/* Confirmation dialog when changing default */}
+    <AlertDialog
+      open={confirmDialog.open}
+      onOpenChange={(open) =>
+        !open && setConfirmDialog((prev) => ({ ...prev, open: false }))
+      }
+    >
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-500/10">
+              <AlertTriangle className="h-5 w-5 text-amber-600" />
+            </div>
+            <div>
+              <AlertDialogTitle>Change Default Packaging</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will update your default packaging selection
+              </AlertDialogDescription>
+            </div>
+          </div>
+        </AlertDialogHeader>
+
+        <div className="my-4 rounded-lg border p-4 bg-muted/50">
+          <p className="text-sm">
+            <strong>{confirmDialog.currentDefault?.name}</strong> is currently
+            the default.
+          </p>
+        </div>
+
+        <AlertDialogDescription>
+          Setting <strong>{form.getValues("name")}</strong> as default will
+          remove <strong>{confirmDialog.currentDefault?.name}</strong> as the
+          default.
+        </AlertDialogDescription>
+
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={handleConfirmDefault}
+            disabled={isLoading}
+            className="bg-amber-600 text-white hover:bg-amber-700"
+          >
+            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Confirm Change
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
   );
 }
