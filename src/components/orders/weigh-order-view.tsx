@@ -1039,8 +1039,8 @@ export function WeighOrderView({
                               </div>
                               {/* Expected weight is now shown before input */}
 
-                              {/* Immediate Analysis Feedback */}
-                              {totalWeight > 0 && (
+                              {/* Immediate Analysis Feedback - only show after user has weighed something */}
+                              {totalWeight > 0 && bagWeights.some(bag => bag.weight > 0) && (
                                 <div className="mt-4 pt-4 border-t border-gray-200">
                                   {analysis ? (
                                     <>
