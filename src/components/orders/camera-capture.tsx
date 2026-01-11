@@ -179,15 +179,14 @@ export function CameraCapture({
         </DialogHeader>
 
         <div className="relative aspect-[4/3] bg-gray-900 rounded-lg overflow-hidden">
-          {cameraState === "streaming" && (
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              muted
-              className="w-full h-full object-cover"
-            />
-          )}
+          {/* Video element always exists but hidden when not streaming */}
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            muted
+            className={`w-full h-full object-cover ${cameraState === "streaming" ? "block" : "hidden"}`}
+          />
 
           {cameraState === "captured" && capturedImage && (
             <img
@@ -197,7 +196,7 @@ export function CameraCapture({
             />
           )}
 
-          {cameraState === "requesting" && (
+          {(cameraState === "requesting" || cameraState === "idle") && (
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center text-white">
                 <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
