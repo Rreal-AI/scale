@@ -191,3 +191,35 @@ export const useCreateWeightSample = () => {
     },
   });
 };
+
+const deleteWeightSample = async (id: string): Promise<{ message: string }> => {
+  const response = await fetch(`/api/product-weight-samples/${id}`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Failed to delete weight sample");
+  }
+
+  return response.json();
+};
+
+export const useDeleteWeightSample = () => {
+  const { orgId } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: deleteWeightSample,
+    onSuccess: () => {
+      // Invalidate all weight samples queries
+      queryClient.invalidateQueries({
+        queryKey: ["weight-samples", orgId],
+      });
+      // Invalidate stats queries
+      queryClient.invalidateQueries({
+        queryKey: ["weight-sample-stats", orgId],
+      });
+    },
+  });
+};

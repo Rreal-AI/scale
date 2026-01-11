@@ -10,6 +10,7 @@ interface Product {
   price: number;
   weight: number;
   category_id: string | null;
+  notes: string | null;
   created_at: string;
   updated_at: string;
   category: {
@@ -175,6 +176,29 @@ const deleteProduct = async (id: string): Promise<DeleteProductResponse> => {
   return response.json();
 };
 
+const updateProductNotes = async ({
+  id,
+  notes,
+}: {
+  id: string;
+  notes: string | null;
+}): Promise<UpdateProductResponse> => {
+  const response = await fetch(`/api/products/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ notes }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Failed to update product notes");
+  }
+
+  return response.json();
+};
+
 // Hooks de React Query
 export const useProducts = (params: GetProductsParams = {}) => {
   const { orgId } = useAuth();
@@ -286,6 +310,26 @@ export const useDeleteProduct = () => {
       // Remover la query del producto específico
       queryClient.removeQueries({
         queryKey: ["products", orgId, id],
+      });
+      // Invalidar la lista de productos
+      queryClient.invalidateQueries({
+        queryKey: ["products", orgId],
+        exact: false,
+      });
+    },
+  });
+};
+
+export const useUpdateProductNotes = () => {
+  const { orgId } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateProductNotes,
+    onSuccess: (_, variables) => {
+      // Invalidar la query del producto específico
+      queryClient.invalidateQueries({
+        queryKey: ["products", orgId, variables.id],
       });
       // Invalidar la lista de productos
       queryClient.invalidateQueries({

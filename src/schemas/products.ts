@@ -9,6 +9,7 @@ export const createProductSchema = z.object({
   price: z.number().int().positive("Price must be a positive integer"),
   weight: z.number().int().positive("Weight must be a positive integer"),
   category_id: z.string().uuid("Invalid category ID").optional(),
+  notes: z.string().max(1000, "Notes cannot exceed 1000 characters").optional().nullable(),
 });
 
 // Schema para crear un producto (Frontend - accepts float)
@@ -20,6 +21,7 @@ export const createProductFormSchema = z.object({
   price: z.number().positive("Price must be a positive number"),
   weight: z.number().int().positive("Weight must be a positive integer"),
   category_id: z.string().uuid("Invalid category ID").optional(),
+  notes: z.string().max(1000, "Notes cannot exceed 1000 characters").optional().nullable(),
 });
 
 // Schema para actualizar un producto (API - expects cents)
@@ -40,6 +42,7 @@ export const updateProductSchema = z.object({
     .positive("Weight must be a positive integer")
     .optional(),
   category_id: z.string().uuid("Invalid category ID").optional(),
+  notes: z.string().max(1000, "Notes cannot exceed 1000 characters").optional().nullable(),
 });
 
 // Schema para actualizar un producto (Frontend - accepts float)
@@ -56,6 +59,7 @@ export const updateProductFormSchema = z.object({
     .positive("Weight must be a positive integer")
     .optional(),
   category_id: z.string().uuid("Invalid category ID").optional(),
+  notes: z.string().max(1000, "Notes cannot exceed 1000 characters").optional().nullable(),
 });
 
 // Schema para filtros de búsqueda

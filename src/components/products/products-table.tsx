@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useProducts, useUpdateProductWeight, useRecalculateAllOrders } from "@/hooks/use-products";
+import { useProducts, useUpdateProductWeight, useUpdateProductNotes, useRecalculateAllOrders } from "@/hooks/use-products";
 import { useCategories } from "@/hooks/use-categories";
 import { useQueryClient } from "@tanstack/react-query";
 import { ProductsFilters } from "./products-filters";
@@ -23,6 +23,7 @@ interface Product {
   price: number;
   weight: number;
   category_id: string | null;
+  notes: string | null;
   created_at: string;
   updated_at: string;
   category: {
@@ -86,6 +87,7 @@ export function ProductsTable() {
   const categories = categoriesData?.categories || [];
 
   const updateProductWeight = useUpdateProductWeight();
+  const updateProductNotes = useUpdateProductNotes();
   const recalculateAllOrders = useRecalculateAllOrders();
   const queryClient = useQueryClient();
 
@@ -133,6 +135,13 @@ export function ProductsTable() {
     await updateProductWeight.mutateAsync({
       id: productId,
       weight: newWeight,
+    });
+  };
+
+  const handleNotesUpdate = async (productId: string, notes: string | null) => {
+    await updateProductNotes.mutateAsync({
+      id: productId,
+      notes,
     });
   };
 
@@ -281,6 +290,7 @@ export function ProductsTable() {
         onDeleteProduct={handleDeleteProduct}
         onViewProduct={handleViewProduct}
         onWeightUpdate={handleWeightUpdate}
+        onNotesUpdate={handleNotesUpdate}
         onFiltersChange={handleFiltersChange}
         onBulkDelete={handleBulkDelete}
         onBulkUpdateCategory={handleBulkUpdateCategory}

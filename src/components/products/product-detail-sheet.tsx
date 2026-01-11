@@ -38,6 +38,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { WeightSamplesSection } from "./weight-samples-section";
 
 interface Product {
   id: string;
@@ -314,6 +315,14 @@ export function ProductDetailSheet({
                     </div>
                   </div>
                 </div>
+
+                <Separator />
+
+                {/* Weight Samples Section */}
+                <WeightSamplesSection
+                  productId={product.id}
+                  productWeight={product.weight}
+                />
               </>
             ) : null}
           </div>

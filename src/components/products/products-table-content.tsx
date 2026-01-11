@@ -1,9 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { MoreHorizontal, Edit, Trash2, Eye, Save, X, ChevronUp, ChevronDown, Tag } from "lucide-react";
 import { formatPrice, formatWeight, formatRelativeTime } from "@/lib/format";
 import { gramsToOunces, ouncesToGrams } from "@/lib/weight-conversion";
+import { useWeightSampleStats } from "@/hooks/use-product-weight-samples";
+import { WeightDeviationIndicator } from "./weight-deviation-indicator";
+import { EditableNotes } from "./editable-notes";
 import {
   Table,
   TableBody,
@@ -38,6 +41,7 @@ interface Product {
   price: number;
   weight: number;
   category_id: string | null;
+  notes: string | null;
   created_at: string;
   updated_at: string;
   category: {
@@ -77,6 +81,7 @@ interface ProductsTableContentProps {
   onDeleteProduct?: (product: Product) => void;
   onViewProduct?: (product: Product) => void;
   onWeightUpdate?: (productId: string, newWeight: number) => Promise<void>;
+  onNotesUpdate?: (productId: string, notes: string | null) => Promise<void>;
   onFiltersChange?: (filters: {
     search?: string;
     sort_by?: "name" | "price" | "weight" | "created_at" | "category";
@@ -279,6 +284,20 @@ function LoadingSkeleton() {
   );
 }
 
+interface WeightSampleStats {
+  product_id: string;
+  product_name: string | null;
+  product_weight: number | null;
+  sample_count: number;
+  min_weight: number | null;
+  max_weight: number | null;
+  avg_weight: string | null;
+}
+
+interface WeightSampleStatsResponse {
+  stats: WeightSampleStats[];
+}
+
 export function ProductsTableContent({
   data,
   isLoading,
@@ -288,6 +307,7 @@ export function ProductsTableContent({
   onDeleteProduct,
   onViewProduct,
   onWeightUpdate,
+  onNotesUpdate,
   onFiltersChange,
   onBulkDelete,
   onBulkUpdateCategory,
@@ -295,6 +315,19 @@ export function ProductsTableContent({
 }: ProductsTableContentProps) {
   const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
   const [showBulkActions, setShowBulkActions] = useState(false);
+
+  // Fetch weight sample stats for all products
+  const { data: statsData } = useWeightSampleStats();
+  const statsMap = useMemo(() => {
+    const map = new Map<string, WeightSampleStats>();
+    const stats = (statsData as WeightSampleStatsResponse)?.stats;
+    if (stats) {
+      stats.forEach((stat) => {
+        map.set(stat.product_id, stat);
+      });
+    }
+    return map;
+  }, [statsData]);
 
   const handleSort = (sortBy: string, sortOrder: "asc" | "desc") => {
     onFiltersChange?.({
@@ -358,6 +391,7 @@ export function ProductsTableContent({
               <TableHead>Category</TableHead>
               <TableHead>Price</TableHead>
               <TableHead>Weight</TableHead>
+              <TableHead className="w-[50px]">Notes</TableHead>
               <TableHead>Updated</TableHead>
               <TableHead className="w-[50px]"></TableHead>
             </TableRow>
@@ -389,6 +423,7 @@ export function ProductsTableContent({
               <SortableHeader sortKey="weight" currentSort={currentFilters} onSort={handleSort}>
                 Weight
               </SortableHeader>
+              <TableHead className="w-[50px]">Notes</TableHead>
               <SortableHeader sortKey="created_at" currentSort={currentFilters} onSort={handleSort}>
                 Updated
               </SortableHeader>
@@ -397,7 +432,7 @@ export function ProductsTableContent({
           </TableHeader>
           <TableBody>
             <TableRow>
-              <TableCell colSpan={7} className="text-center py-8">
+              <TableCell colSpan={8} className="text-center py-8">
                 <div className="text-muted-foreground">
                   {currentFilters.search ? (
                     <>
@@ -492,9 +527,10 @@ export function ProductsTableContent({
               <SortableHeader sortKey="weight" currentSort={currentFilters} onSort={handleSort}>
                 Weight
               </SortableHeader>
-                <SortableHeader sortKey="created_at" currentSort={currentFilters} onSort={handleSort}>
-                  Updated
-                </SortableHeader>
+              <TableHead className="w-[50px]">Notes</TableHead>
+              <SortableHeader sortKey="created_at" currentSort={currentFilters} onSort={handleSort}>
+                Updated
+              </SortableHeader>
               <TableHead className="w-[50px]"></TableHead>
             </TableRow>
           </TableHeader>
@@ -531,13 +567,40 @@ export function ProductsTableContent({
                 <Badge variant="outline">{formatPrice(product.price)}</Badge>
               </TableCell>
               <TableCell>
-                {onWeightUpdate ? (
-                  <EditableWeight 
-                    product={product} 
-                    onWeightUpdate={onWeightUpdate} 
+                <div className="flex items-center gap-2">
+                  {onWeightUpdate ? (
+                    <EditableWeight
+                      product={product}
+                      onWeightUpdate={onWeightUpdate}
+                    />
+                  ) : (
+                    <Badge variant="outline">{formatWeight(product.weight)}</Badge>
+                  )}
+                  {(() => {
+                    const stat = statsMap.get(product.id);
+                    if (!stat) return null;
+                    return (
+                      <WeightDeviationIndicator
+                        productWeight={product.weight}
+                        avgSampleWeight={stat.avg_weight ? parseFloat(stat.avg_weight) : null}
+                        sampleCount={stat.sample_count}
+                      />
+                    );
+                  })()}
+                </div>
+              </TableCell>
+              <TableCell>
+                {onNotesUpdate ? (
+                  <EditableNotes
+                    product={product}
+                    onNotesUpdate={onNotesUpdate}
                   />
                 ) : (
-                  <Badge variant="outline">{formatWeight(product.weight)}</Badge>
+                  product.notes ? (
+                    <span className="text-xs text-muted-foreground truncate max-w-[100px]">
+                      {product.notes}
+                    </span>
+                  ) : null
                 )}
               </TableCell>
               <TableCell>

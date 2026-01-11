@@ -9,6 +9,7 @@ export const products = pgTable("products", {
   price: integer("price").notNull(), // in cents
   weight: integer("weight").notNull(), // in grams
   category_id: uuid("category_id").references(() => categories.id), // optional category reference
+  notes: text("notes"), // optional observations/notes
 
   created_at: timestamp("created_at").notNull().defaultNow(),
   updated_at: timestamp("updated_at").notNull().defaultNow(),
