@@ -26,6 +26,7 @@ import {
   Minus,
   Undo2,
   Loader2,
+  X,
 } from "lucide-react";
 import {
   AlertDialog,
@@ -79,6 +80,11 @@ interface BagWeight {
   weight: number;
 }
 
+interface PackagingSelection {
+  packagingId: string;
+  quantity: number;
+}
+
 export function WeighOrderView({
   selectedOrderId,
   onBack,
@@ -116,8 +122,8 @@ export function WeighOrderView({
   const [bagWeights, setBagWeights] = useState<BagWeight[]>([
     { id: "bag-1", weight: 0 },
   ]);
-  // Store packaging ID (from database) instead of hardcoded type
-  const [bagPackaging, setBagPackaging] = useState<Record<string, string>>({});
+  // Store packaging selections (multiple per bag with quantity)
+  const [bagPackaging, setBagPackaging] = useState<Record<string, PackagingSelection[]>>({});
   const [weightModalOpen, setWeightModalOpen] = useState(false);
   const [selectedBagForWeighing, setSelectedBagForWeighing] = useState<{
     id: string;
@@ -133,7 +139,7 @@ export function WeighOrderView({
   const createWeightSample = useCreateWeightSample();
 
   // Auto-save weighing progress
-  const saveWeighingProgress = (orderId: string, bagWeights: BagWeight[], bagPackaging: Record<string, string>, bagCount: number) => {
+  const saveWeighingProgress = (orderId: string, bagWeights: BagWeight[], bagPackaging: Record<string, PackagingSelection[]>, bagCount: number) => {
     const progress = {
       orderId,
       bagWeights,
@@ -185,7 +191,7 @@ export function WeighOrderView({
         setBagWeights([{ id: "bag-1", weight: 0 }]);
         // Pre-select default packaging if one exists
         const defaultPkgId = defaultPackaging?.id || "";
-        setBagPackaging(defaultPkgId ? { "bag-1": defaultPkgId } : {});
+        setBagPackaging(defaultPkgId ? { "bag-1": [{ packagingId: defaultPkgId, quantity: 1 }] } : {});
         setBagCount(1);
       }
     }
@@ -308,7 +314,7 @@ export function WeighOrderView({
       });
       // Pre-select default packaging for new bags
       if (defaultPackaging?.id) {
-        setBagPackaging((prev) => ({ ...prev, [id]: defaultPackaging.id }));
+        setBagPackaging((prev) => ({ ...prev, [id]: [{ packagingId: defaultPackaging.id, quantity: 1 }] }));
       }
     }
   };
@@ -376,11 +382,16 @@ export function WeighOrderView({
   const totalWeight = Math.round(
     bagWeights.reduce((sum, bag) => {
       const bagWeight = bag.weight;
-      const packagingId = bagPackaging[bag.id];
-      const packagingItem = packagingOptions.find(p => p.id === packagingId);
-      // Convert grams to oz (packaging weight is stored in grams in DB)
-      const packagingWeightOz = packagingItem ? gramsToOunces(packagingItem.weight) : 0;
-      return sum + bagWeight + packagingWeightOz;
+      // Sum all packaging selections for this bag
+      const packagingSelections = bagPackaging[bag.id] || [];
+      const totalPackagingWeightOz = packagingSelections.reduce((pkgSum, selection) => {
+        const packagingItem = packagingOptions.find(p => p.id === selection.packagingId);
+        if (packagingItem) {
+          return pkgSum + gramsToOunces(packagingItem.weight) * selection.quantity;
+        }
+        return pkgSum;
+      }, 0);
+      return sum + bagWeight + totalPackagingWeightOz;
     }, 0) * 100
   ) / 100; // Round to 2 decimal places to fix floating point precision
 
@@ -439,7 +450,7 @@ export function WeighOrderView({
     setBagWeights([{ id: "bag-1", weight: 0 }]);
     // Reset to default packaging if one exists
     const defaultPkgId = defaultPackaging?.id || "";
-    setBagPackaging(defaultPkgId ? { "bag-1": defaultPkgId } : {});
+    setBagPackaging(defaultPkgId ? { "bag-1": [{ packagingId: defaultPkgId, quantity: 1 }] } : {});
     // Clear saved progress when resetting
     if (selectedOrderId) {
       clearWeighingProgress(selectedOrderId);
@@ -948,37 +959,13 @@ export function WeighOrderView({
                           {bagWeights.map((bag, index) => (
                             <div
                               key={bag.id}
-                              className="flex items-center gap-4"
+                              className="border rounded-lg p-3 space-y-3"
                             >
-                              <div className="text-lg font-medium text-gray-700 w-20">
-                                Bag {index + 1}
-                              </div>
-                              {/* Packaging selector - options from database */}
-                              <select
-                                className="h-10 border rounded px-2 text-sm text-gray-700"
-                                value={bagPackaging[bag.id] || ""}
-                                onChange={(e) =>
-                                  setBagPackaging((prev) => {
-                                    const updated = {
-                                      ...prev,
-                                      [bag.id]: e.target.value,
-                                    };
-                                    // Auto-save progress
-                                    if (selectedOrderId) {
-                                      saveWeighingProgress(selectedOrderId, bagWeights, updated, bagCount);
-                                    }
-                                    return updated;
-                                  })
-                                }
-                              >
-                                <option value="">No packaging</option>
-                                {packagingOptions.map((pkg) => (
-                                  <option key={pkg.id} value={pkg.id}>
-                                    {pkg.name} ({gramsToOunces(pkg.weight).toFixed(2)} oz)
-                                  </option>
-                                ))}
-                              </select>
-                              <Button
+                              <div className="flex items-center gap-4">
+                                <div className="text-lg font-medium text-gray-700 w-20">
+                                  Bag {index + 1}
+                                </div>
+                                <Button
                                 variant="outline"
                                 className={cn(
                                   "flex-1 h-16 text-lg justify-center transition-all border-2",
@@ -1003,6 +990,104 @@ export function WeighOrderView({
                                   ×
                                 </Button>
                               )}
+                              </div>
+
+                              {/* Packaging selections for this bag */}
+                              <div className="space-y-2 ml-24">
+                                {(bagPackaging[bag.id] || []).map((selection, selIndex) => (
+                                  <div key={selIndex} className="flex items-center gap-2">
+                                    <select
+                                      className="h-9 border rounded px-2 text-sm text-gray-700 flex-1"
+                                      value={selection.packagingId}
+                                      onChange={(e) => {
+                                        setBagPackaging((prev) => {
+                                          const current = [...(prev[bag.id] || [])];
+                                          current[selIndex] = { ...current[selIndex], packagingId: e.target.value };
+                                          const updated = { ...prev, [bag.id]: current };
+                                          if (selectedOrderId) {
+                                            saveWeighingProgress(selectedOrderId, bagWeights, updated, bagCount);
+                                          }
+                                          return updated;
+                                        });
+                                      }}
+                                    >
+                                      <option value="">Select packaging</option>
+                                      {packagingOptions.map((pkg) => (
+                                        <option key={pkg.id} value={pkg.id}>
+                                          {pkg.name} ({gramsToOunces(pkg.weight).toFixed(2)} oz)
+                                        </option>
+                                      ))}
+                                    </select>
+
+                                    {/* Quantity input */}
+                                    <div className="flex items-center gap-1">
+                                      <span className="text-xs text-gray-500">x</span>
+                                      <input
+                                        type="number"
+                                        min="1"
+                                        max="10"
+                                        className="w-14 h-9 border rounded px-2 text-sm text-center"
+                                        value={selection.quantity}
+                                        onChange={(e) => {
+                                          const qty = Math.max(1, Math.min(10, parseInt(e.target.value) || 1));
+                                          setBagPackaging((prev) => {
+                                            const current = [...(prev[bag.id] || [])];
+                                            current[selIndex] = { ...current[selIndex], quantity: qty };
+                                            const updated = { ...prev, [bag.id]: current };
+                                            if (selectedOrderId) {
+                                              saveWeighingProgress(selectedOrderId, bagWeights, updated, bagCount);
+                                            }
+                                            return updated;
+                                          });
+                                        }}
+                                      />
+                                    </div>
+
+                                    {/* Remove button */}
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-9 w-9 text-gray-400 hover:text-red-500"
+                                      onClick={() => {
+                                        setBagPackaging((prev) => {
+                                          const current = [...(prev[bag.id] || [])];
+                                          current.splice(selIndex, 1);
+                                          const updated = { ...prev, [bag.id]: current };
+                                          if (selectedOrderId) {
+                                            saveWeighingProgress(selectedOrderId, bagWeights, updated, bagCount);
+                                          }
+                                          return updated;
+                                        });
+                                      }}
+                                    >
+                                      <X className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                ))}
+
+                                {/* Add packaging button */}
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="w-full text-gray-600"
+                                  onClick={() => {
+                                    setBagPackaging((prev) => {
+                                      const current = prev[bag.id] || [];
+                                      const updated = {
+                                        ...prev,
+                                        [bag.id]: [...current, { packagingId: "", quantity: 1 }],
+                                      };
+                                      if (selectedOrderId) {
+                                        saveWeighingProgress(selectedOrderId, bagWeights, updated, bagCount);
+                                      }
+                                      return updated;
+                                    });
+                                  }}
+                                >
+                                  <Plus className="h-4 w-4 mr-1" />
+                                  Add Packaging
+                                </Button>
+                              </div>
                             </div>
                           ))}
                         </div>
