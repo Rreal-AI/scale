@@ -1246,10 +1246,12 @@ export function WeighOrderView({
 
                           // If underweight AND user has actually weighed something, show re-weigh button with override option
                           if (analysis?.status === "underweight" && hasActualWeight) {
-                            // Check if this is a single-product order (can save as weight sample)
-                            const orderItemsUnderweight = (selectedOrder as { items?: Array<{ product_id: string; quantity: number }> }).items;
-                            const isSingleProductUnderweight = orderItemsUnderweight?.length === 1 && orderItemsUnderweight[0].quantity === 1;
-                            const singleProductIdUnderweight = isSingleProductUnderweight ? orderItemsUnderweight[0].product_id : null;
+                            // Prepare weight sample data for all orders
+                            const orderItemsUnderweight = (selectedOrder as { items?: Array<{ product_id: string; quantity: number; name: string }> }).items || [];
+                            const isSingleProductUnderweight = orderItemsUnderweight.length === 1 && orderItemsUnderweight[0].quantity === 1;
+                            const singleProductIdUnderweight = isSingleProductUnderweight ? orderItemsUnderweight[0].product_id : undefined;
+                            const itemCountUnderweight = orderItemsUnderweight.reduce((sum, item) => sum + item.quantity, 0);
+                            const itemsSummaryUnderweight = orderItemsUnderweight.map(item => `${item.quantity}x ${item.name}`).join(", ");
 
                             return (
                               <div className="space-y-4">
@@ -1273,34 +1275,36 @@ export function WeighOrderView({
                                   </button>
                                 </div>
 
-                                {/* Save as Sample button - only for single-product orders */}
-                                {isSingleProductUnderweight && singleProductIdUnderweight && (
-                                  <Button
-                                    variant="outline"
-                                    onClick={async () => {
-                                      try {
-                                        await createWeightSample.mutateAsync({
-                                          product_id: singleProductIdUnderweight,
-                                          order_id: selectedOrder.id,
-                                          weight: Math.round(ouncesToGrams(totalWeight)),
-                                        });
-                                        toast.success("Weight sample saved for calibration");
-                                      } catch (e) {
-                                        console.error(e);
-                                        toast.error("Failed to save weight sample");
-                                      }
-                                    }}
-                                    disabled={createWeightSample.isPending}
-                                    className="w-full text-blue-600 border-blue-300 hover:bg-blue-50"
-                                  >
-                                    {createWeightSample.isPending ? (
-                                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                    ) : (
-                                      <Scale className="h-4 w-4 mr-2" />
-                                    )}
-                                    Save as Weight Sample
-                                  </Button>
-                                )}
+                                {/* Save as Sample button - available for ALL orders */}
+                                <Button
+                                  variant="outline"
+                                  onClick={async () => {
+                                    try {
+                                      await createWeightSample.mutateAsync({
+                                        product_id: singleProductIdUnderweight,
+                                        order_id: selectedOrder.id,
+                                        weight: Math.round(ouncesToGrams(totalWeight)),
+                                        item_count: itemCountUnderweight,
+                                        is_single_product: isSingleProductUnderweight,
+                                        check_number: selectedOrder.check_number,
+                                        items_summary: itemsSummaryUnderweight,
+                                      });
+                                      toast.success("Weight sample saved for calibration");
+                                    } catch (e) {
+                                      console.error(e);
+                                      toast.error("Failed to save weight sample");
+                                    }
+                                  }}
+                                  disabled={createWeightSample.isPending}
+                                  className="w-full text-blue-600 border-blue-300 hover:bg-blue-50"
+                                >
+                                  {createWeightSample.isPending ? (
+                                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                  ) : (
+                                    <Scale className="h-4 w-4 mr-2" />
+                                  )}
+                                  Save as Weight Sample
+                                </Button>
                               </div>
                             );
                           }
@@ -1308,10 +1312,12 @@ export function WeighOrderView({
                           // Default: Ready for lockers (works for no expected weight too)
                           // Disabled if no actual weight has been recorded
 
-                          // Check if this is a single-product order (can save as weight sample)
-                          const orderItems = (selectedOrder as { items?: Array<{ product_id: string; quantity: number }> }).items;
-                          const isSingleProductOrder = orderItems?.length === 1 && orderItems[0].quantity === 1;
-                          const singleProductId = isSingleProductOrder ? orderItems[0].product_id : null;
+                          // Prepare weight sample data for all orders
+                          const orderItems = (selectedOrder as { items?: Array<{ product_id: string; quantity: number; name: string }> }).items || [];
+                          const isSingleProductOrder = orderItems.length === 1 && orderItems[0].quantity === 1;
+                          const singleProductId = isSingleProductOrder ? orderItems[0].product_id : undefined;
+                          const itemCount = orderItems.reduce((sum, item) => sum + item.quantity, 0);
+                          const itemsSummary = orderItems.map(item => `${item.quantity}x ${item.name}`).join(", ");
 
                           return (
                             <div className="space-y-3">
@@ -1334,8 +1340,8 @@ export function WeighOrderView({
                                 Ready for Lockers
                               </Button>
 
-                              {/* Save as Sample button - only for single-product orders */}
-                              {isSingleProductOrder && singleProductId && hasActualWeight && (
+                              {/* Save as Sample button - available for ALL orders */}
+                              {hasActualWeight && (
                                 <Button
                                   variant="outline"
                                   onClick={async () => {
@@ -1344,6 +1350,10 @@ export function WeighOrderView({
                                         product_id: singleProductId,
                                         order_id: selectedOrder.id,
                                         weight: Math.round(ouncesToGrams(totalWeight)),
+                                        item_count: itemCount,
+                                        is_single_product: isSingleProductOrder,
+                                        check_number: selectedOrder.check_number,
+                                        items_summary: itemsSummary,
                                       });
                                       toast.success("Weight sample saved for calibration");
                                     } catch (e) {

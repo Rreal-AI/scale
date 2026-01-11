@@ -5,9 +5,13 @@ import { useAuth } from "@clerk/nextjs";
 interface WeightSample {
   id: string;
   org_id: string;
-  product_id: string;
+  product_id: string | null;
   order_id: string | null;
   weight: number;
+  item_count: number;
+  is_single_product: boolean;
+  check_number: string | null;
+  items_summary: string | null;
   created_at: string;
   updated_at: string;
   product: {
@@ -29,6 +33,7 @@ interface WeightSamplesResponse {
   };
   filters: {
     product_id?: string;
+    is_single_product?: boolean;
     sort_by: string;
     sort_order: string;
   };
@@ -64,9 +69,13 @@ interface SingleProductStatsResponse {
 }
 
 interface CreateWeightSampleInput {
-  product_id: string;
+  product_id?: string;
   order_id?: string;
   weight: number;
+  item_count?: number;
+  is_single_product?: boolean;
+  check_number?: string;
+  items_summary?: string;
 }
 
 interface CreateWeightSampleResponse {
@@ -79,6 +88,7 @@ interface GetWeightSamplesParams {
   page?: number;
   limit?: number;
   product_id?: string;
+  is_single_product?: boolean;
   sort_by?: "weight" | "created_at";
   sort_order?: "asc" | "desc";
 }
@@ -92,6 +102,7 @@ const fetchWeightSamples = async (
   if (params.page) searchParams.set("page", params.page.toString());
   if (params.limit) searchParams.set("limit", params.limit.toString());
   if (params.product_id) searchParams.set("product_id", params.product_id);
+  if (params.is_single_product !== undefined) searchParams.set("is_single_product", params.is_single_product.toString());
   if (params.sort_by) searchParams.set("sort_by", params.sort_by);
   if (params.sort_order) searchParams.set("sort_order", params.sort_order);
 

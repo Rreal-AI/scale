@@ -17,10 +17,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Scale, ChevronDown, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Loader2, Scale, ChevronDown, ChevronRight, Download } from "lucide-react";
 import { useWeightSampleStats, useWeightSamples } from "@/hooks/use-product-weight-samples";
 import { gramsToOunces } from "@/lib/weight-conversion";
 import { formatRelativeTime } from "@/lib/format";
+import { toast } from "sonner";
 
 interface WeightSampleStats {
   product_id: string;
@@ -32,9 +34,53 @@ interface WeightSampleStats {
   avg_weight: string | null;
 }
 
+type FilterType = "all" | "single" | "multi";
+
 export function WeightSamplesContent() {
-  const { data: statsData, isLoading, error } = useWeightSampleStats();
+  const [filterType, setFilterType] = useState<FilterType>("all");
   const [expandedProduct, setExpandedProduct] = useState<string | null>(null);
+
+  // Convert filter to API parameter
+  const isSingleProductParam = filterType === "all" ? undefined : filterType === "single";
+
+  const { data: statsData, isLoading: statsLoading } = useWeightSampleStats();
+  const { data: allSamplesData, isLoading: samplesLoading, error } = useWeightSamples({
+    is_single_product: isSingleProductParam,
+    limit: 100,
+    sort_by: "created_at",
+    sort_order: "desc",
+  });
+
+  const isLoading = statsLoading || samplesLoading;
+
+  const handleExportCSV = async () => {
+    try {
+      const params = new URLSearchParams();
+      if (filterType === "single") params.set("is_single_product", "true");
+      if (filterType === "multi") params.set("is_single_product", "false");
+
+      const response = await fetch(`/api/product-weight-samples/export?${params}`);
+
+      if (!response.ok) {
+        throw new Error("Failed to export CSV");
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `weight-samples-${new Date().toISOString().split("T")[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+
+      toast.success("CSV exported successfully");
+    } catch (e) {
+      console.error(e);
+      toast.error("Failed to export CSV");
+    }
+  };
 
   if (isLoading) {
     return (
@@ -73,14 +119,47 @@ export function WeightSamplesContent() {
   }
 
   const stats = (statsData as { stats: WeightSampleStats[] })?.stats || [];
+  const allSamples = allSamplesData?.samples || [];
+
+  // Count samples by type
+  const singleProductCount = allSamples.filter(s => s.is_single_product).length;
+  const multiProductCount = allSamples.filter(s => !s.is_single_product).length;
 
   return (
     <div className="space-y-6 p-6">
-      <div>
-        <h1 className="text-2xl font-bold">Weight Samples</h1>
-        <p className="text-muted-foreground">
-          View weight calibration samples and statistics per product
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">Weight Samples</h1>
+          <p className="text-muted-foreground">
+            View weight calibration samples and statistics
+          </p>
+        </div>
+        <Button variant="outline" onClick={handleExportCSV}>
+          <Download className="h-4 w-4 mr-2" />
+          Export CSV
+        </Button>
+      </div>
+
+      {/* Filter Buttons */}
+      <div className="flex gap-2">
+        <Button
+          variant={filterType === "all" ? "default" : "outline"}
+          onClick={() => setFilterType("all")}
+        >
+          All Orders ({allSamples.length})
+        </Button>
+        <Button
+          variant={filterType === "single" ? "default" : "outline"}
+          onClick={() => setFilterType("single")}
+        >
+          Single Product ({singleProductCount})
+        </Button>
+        <Button
+          variant={filterType === "multi" ? "default" : "outline"}
+          onClick={() => setFilterType("multi")}
+        >
+          Multiple Products ({multiProductCount})
+        </Button>
       </div>
 
       {/* Summary Section */}
@@ -95,38 +174,31 @@ export function WeightSamplesContent() {
           <CardHeader className="pb-2">
             <CardDescription>Total Samples</CardDescription>
             <CardTitle className="text-3xl">
-              {stats.reduce((sum, s) => sum + s.sample_count, 0)}
+              {allSamples.length}
             </CardTitle>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardDescription>Avg Samples per Product</CardDescription>
-            <CardTitle className="text-3xl">
-              {stats.length > 0
-                ? (
-                    stats.reduce((sum, s) => sum + s.sample_count, 0) /
-                    stats.length
-                  ).toFixed(1)
-                : 0}
-            </CardTitle>
+            <CardDescription>Multi-Product Samples</CardDescription>
+            <CardTitle className="text-3xl">{multiProductCount}</CardTitle>
           </CardHeader>
         </Card>
       </div>
 
-      {/* Stats Table */}
+      {/* All Samples Table */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Scale className="h-5 w-5" />
-            Product Weight Statistics
+            Weight Samples
           </CardTitle>
           <CardDescription>
-            Statistics from weighing samples collected during order processing
+            All recorded weight samples from order processing
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {stats.length === 0 ? (
+          {allSamples.length === 0 ? (
             <div className="py-12 text-center text-muted-foreground">
               <Scale className="mx-auto h-12 w-12 text-gray-300 mb-4" />
               <p className="text-lg font-medium">No weight samples yet</p>
@@ -136,6 +208,73 @@ export function WeightSamplesContent() {
               </p>
             </div>
           ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Check #</TableHead>
+                  <TableHead>Items</TableHead>
+                  <TableHead className="text-center">Count</TableHead>
+                  <TableHead className="text-center">Type</TableHead>
+                  <TableHead className="text-right">Weight (oz)</TableHead>
+                  <TableHead className="text-right">Weight (g)</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {allSamples.map((sample) => (
+                  <TableRow key={sample.id}>
+                    <TableCell className="text-muted-foreground">
+                      {formatRelativeTime(sample.created_at)}
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      {sample.check_number || "-"}
+                    </TableCell>
+                    <TableCell className="max-w-xs truncate" title={sample.items_summary || sample.product?.name || "-"}>
+                      {sample.is_single_product
+                        ? sample.product?.name || "Unknown Product"
+                        : sample.items_summary || "Multiple Items"}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Badge variant="secondary">{sample.item_count}</Badge>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {sample.is_single_product ? (
+                        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                          Single
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
+                          Multi
+                        </Badge>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right font-mono">
+                      {gramsToOunces(sample.weight).toFixed(2)}
+                    </TableCell>
+                    <TableCell className="text-right font-mono text-muted-foreground">
+                      {sample.weight}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Stats Table - Only for single product samples */}
+      {filterType !== "multi" && stats.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Scale className="h-5 w-5" />
+              Single Product Statistics
+            </CardTitle>
+            <CardDescription>
+              Statistics aggregated by product (only for single-product samples)
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
@@ -236,9 +375,9 @@ export function WeightSamplesContent() {
                 })}
               </TableBody>
             </Table>
-          )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Information Card */}
       <Card>
@@ -249,19 +388,19 @@ export function WeightSamplesContent() {
             </h4>
             <ul className="text-sm text-blue-700 space-y-1 list-disc list-inside">
               <li>
-                When weighing an order with only <strong>one product</strong>,
-                you&apos;ll see a &quot;Save as Weight Sample&quot; button
+                When weighing any order, you&apos;ll see a &quot;Save as Weight Sample&quot; button
               </li>
               <li>
-                Click the button to save the actual weight as a calibration
-                sample
+                Click the button to save the actual weight as a calibration sample
               </li>
               <li>
-                Collect multiple samples per product to get accurate statistics
+                <strong>Single product</strong> samples help calibrate individual product weights
               </li>
               <li>
-                Compare the average sampled weight with the configured weight to
-                identify discrepancies
+                <strong>Multi-product</strong> samples help analyze order patterns and packaging estimates
+              </li>
+              <li>
+                Use the filters above to view samples by type and export to CSV for further analysis
               </li>
             </ul>
           </div>

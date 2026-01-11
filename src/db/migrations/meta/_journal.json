@@ -92,6 +92,13 @@
       "when": 1768090468282,
       "tag": "0012_steep_rogue",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1768096392542,
+      "tag": "0013_clumsy_silver_centurion",
+      "breakpoints": true
     }
   ]
 }

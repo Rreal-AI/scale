@@ -6,9 +6,13 @@ import { and, eq, asc, desc, count } from "drizzle-orm";
 import { z } from "zod";
 
 const createWeightSampleSchema = z.object({
-  product_id: z.string().uuid("Invalid product ID"),
+  product_id: z.string().uuid("Invalid product ID").optional(),
   order_id: z.string().uuid("Invalid order ID").optional(),
   weight: z.number().int().positive("Weight must be positive"),
+  item_count: z.number().int().positive().default(1),
+  is_single_product: z.boolean().default(true),
+  check_number: z.string().optional(),
+  items_summary: z.string().optional(),
 });
 
 // GET /api/product-weight-samples - List weight samples with pagination
@@ -38,6 +42,7 @@ export async function GET(request: NextRequest) {
       Math.max(1, parseInt(searchParams.get("limit") || "50", 10))
     );
     const product_id = searchParams.get("product_id") || undefined;
+    const is_single_product = searchParams.get("is_single_product");
     const sort_by =
       (searchParams.get("sort_by") as "weight" | "created_at") || "created_at";
     const sort_order =
@@ -50,6 +55,10 @@ export async function GET(request: NextRequest) {
 
     if (product_id) {
       conditions.push(eq(productWeightSamples.product_id, product_id));
+    }
+
+    if (is_single_product !== null && is_single_product !== undefined) {
+      conditions.push(eq(productWeightSamples.is_single_product, is_single_product === "true"));
     }
 
     // Build order
@@ -68,6 +77,10 @@ export async function GET(request: NextRequest) {
           product_id: productWeightSamples.product_id,
           order_id: productWeightSamples.order_id,
           weight: productWeightSamples.weight,
+          item_count: productWeightSamples.item_count,
+          is_single_product: productWeightSamples.is_single_product,
+          check_number: productWeightSamples.check_number,
+          items_summary: productWeightSamples.items_summary,
           created_at: productWeightSamples.created_at,
           updated_at: productWeightSamples.updated_at,
           product: {
@@ -105,6 +118,7 @@ export async function GET(request: NextRequest) {
       },
       filters: {
         product_id,
+        is_single_product: is_single_product === "true" ? true : is_single_product === "false" ? false : undefined,
         sort_by,
         sort_order,
       },
@@ -155,30 +169,38 @@ export async function POST(request: NextRequest) {
 
     const validatedData = parseResult.data;
 
-    // Verify product exists and belongs to org
-    const product = await db
-      .select()
-      .from(products)
-      .where(
-        and(
-          eq(products.id, validatedData.product_id),
-          eq(products.org_id, orgId)
+    // Verify product exists and belongs to org (only if product_id is provided)
+    if (validatedData.product_id) {
+      const product = await db
+        .select()
+        .from(products)
+        .where(
+          and(
+            eq(products.id, validatedData.product_id),
+            eq(products.org_id, orgId)
+          )
         )
-      )
-      .limit(1);
+        .limit(1);
 
-    if (product.length === 0) {
-      return NextResponse.json(
-        { error: "Product not found" },
-        { status: 404 }
-      );
+      if (product.length === 0) {
+        return NextResponse.json(
+          { error: "Product not found" },
+          { status: 404 }
+        );
+      }
     }
 
     // Create the weight sample
     const newSample = await db
       .insert(productWeightSamples)
       .values({
-        ...validatedData,
+        product_id: validatedData.product_id || null,
+        order_id: validatedData.order_id || null,
+        weight: validatedData.weight,
+        item_count: validatedData.item_count,
+        is_single_product: validatedData.is_single_product,
+        check_number: validatedData.check_number || null,
+        items_summary: validatedData.items_summary || null,
         org_id: orgId,
       })
       .returning();
