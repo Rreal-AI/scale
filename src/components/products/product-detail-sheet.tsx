@@ -47,6 +47,7 @@ interface Product {
   price: number;
   weight: number;
   category_id: string | null;
+  notes: string | null;
   created_at: string;
   updated_at: string;
   category: {

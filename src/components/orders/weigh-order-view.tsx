@@ -27,7 +27,13 @@ import {
   Undo2,
   Loader2,
   X,
+  Camera,
+  Eye,
 } from "lucide-react";
+import { CameraCapture } from "./camera-capture";
+import { VisualVerificationResultCard } from "./visual-verification-result";
+import { useVisualVerification } from "@/hooks/use-visual-verification";
+import type { VisualVerificationResult } from "@/schemas/visual-verification";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -138,6 +144,14 @@ export function WeighOrderView({
   // Weight sample hook
   const createWeightSample = useCreateWeightSample();
 
+  // Visual verification state
+  const [cameraOpen, setCameraOpen] = useState(false);
+  const [visualResult, setVisualResult] = useState<{
+    result: VisualVerificationResult;
+    status: "verified" | "missing_items" | "extra_items" | "uncertain";
+  } | null>(null);
+  const visualVerification = useVisualVerification();
+
   // Auto-save weighing progress
   const saveWeighingProgress = (orderId: string, bagWeights: BagWeight[], bagPackaging: Record<string, PackagingSelection[]>, bagCount: number) => {
     const progress = {
@@ -196,6 +210,40 @@ export function WeighOrderView({
       }
     }
   }, [selectedOrderId, defaultPackaging?.id]);
+
+  // Clear visual verification result when order changes
+  useEffect(() => {
+    setVisualResult(null);
+  }, [selectedOrderId]);
+
+  // Handler for visual verification
+  const handleVisualVerification = async (imageBase64: string) => {
+    if (!selectedOrderId) return;
+
+    try {
+      const response = await visualVerification.mutateAsync({
+        orderId: selectedOrderId,
+        image: imageBase64,
+      });
+
+      setVisualResult({
+        result: response.result,
+        status: response.status,
+      });
+      setCameraOpen(false);
+
+      if (response.status === "verified") {
+        toast.success("Pedido verificado visualmente");
+      } else if (response.status === "missing_items") {
+        toast.error("Se detectaron items faltantes");
+      } else {
+        toast.warning("Verificacion requiere revision manual");
+      }
+    } catch (error) {
+      toast.error("Error al verificar visualmente");
+      console.error(error);
+    }
+  };
 
   // Fetch orders for sidebar
   const { data: ordersData } = useRealTimeOrders({
@@ -1094,6 +1142,49 @@ export function WeighOrderView({
 
                         <Separator />
 
+                        {/* Visual Verification Section */}
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between">
+                            <h4 className="font-medium text-gray-700 flex items-center gap-2">
+                              <Eye className="h-4 w-4" />
+                              Verificacion Visual (AI)
+                            </h4>
+                          </div>
+
+                          {!visualResult ? (
+                            <Button
+                              variant="outline"
+                              onClick={() => setCameraOpen(true)}
+                              disabled={visualVerification.isPending}
+                              className="w-full border-blue-300 text-blue-700 hover:bg-blue-50"
+                            >
+                              {visualVerification.isPending ? (
+                                <>
+                                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                  Analizando imagen...
+                                </>
+                              ) : (
+                                <>
+                                  <Camera className="h-4 w-4 mr-2" />
+                                  Verificar con Foto
+                                </>
+                              )}
+                            </Button>
+                          ) : (
+                            <VisualVerificationResultCard
+                              result={visualResult.result}
+                              status={visualResult.status}
+                              onRetry={() => {
+                                setVisualResult(null);
+                                setCameraOpen(true);
+                              }}
+                              onDismiss={() => setVisualResult(null)}
+                            />
+                          )}
+                        </div>
+
+                        <Separator />
+
                         {/* Total Weight Display with Analysis - only show after user has weighed something */}
                         {bagWeights.some(bag => bag.weight > 0) && (() => {
                           const expectedWeightOz = selectedOrder.expected_weight
@@ -1575,6 +1666,14 @@ export function WeighOrderView({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Camera Capture Modal for Visual Verification */}
+      <CameraCapture
+        open={cameraOpen}
+        onOpenChange={setCameraOpen}
+        onCapture={handleVisualVerification}
+        isProcessing={visualVerification.isPending}
+      />
     </div>
   );
 }
