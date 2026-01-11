@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRealTimeOrders, useOrder, useRevertOrderStatus } from "@/hooks/use-orders";
 import { usePackaging } from "@/hooks/use-packaging";
 import { useOrganization } from "@/hooks/use-organization";
+import { useCreateWeightSample } from "@/hooks/use-product-weight-samples";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -127,6 +128,9 @@ export function WeighOrderView({
 
   // Revert order status hook
   const revertOrderStatus = useRevertOrderStatus();
+
+  // Weight sample hook
+  const createWeightSample = useCreateWeightSample();
 
   // Auto-save weighing progress
   const saveWeighingProgress = (orderId: string, bagWeights: BagWeight[], bagPackaging: Record<string, string>, bagCount: number) => {
@@ -1157,6 +1161,11 @@ export function WeighOrderView({
 
                           // If underweight AND user has actually weighed something, show re-weigh button with override option
                           if (analysis?.status === "underweight" && hasActualWeight) {
+                            // Check if this is a single-product order (can save as weight sample)
+                            const orderItemsUnderweight = (selectedOrder as { items?: Array<{ product_id: string; quantity: number }> }).items;
+                            const isSingleProductUnderweight = orderItemsUnderweight?.length === 1 && orderItemsUnderweight[0].quantity === 1;
+                            const singleProductIdUnderweight = isSingleProductUnderweight ? orderItemsUnderweight[0].product_id : null;
+
                             return (
                               <div className="space-y-4">
                                 {/* Main action - Reweigh */}
@@ -1178,31 +1187,97 @@ export function WeighOrderView({
                                     Override and mark as Ready for Lockers
                                   </button>
                                 </div>
+
+                                {/* Save as Sample button - only for single-product orders */}
+                                {isSingleProductUnderweight && singleProductIdUnderweight && (
+                                  <Button
+                                    variant="outline"
+                                    onClick={async () => {
+                                      try {
+                                        await createWeightSample.mutateAsync({
+                                          product_id: singleProductIdUnderweight,
+                                          order_id: selectedOrder.id,
+                                          weight: Math.round(ouncesToGrams(totalWeight)),
+                                        });
+                                        toast.success("Weight sample saved for calibration");
+                                      } catch (e) {
+                                        console.error(e);
+                                        toast.error("Failed to save weight sample");
+                                      }
+                                    }}
+                                    disabled={createWeightSample.isPending}
+                                    className="w-full text-blue-600 border-blue-300 hover:bg-blue-50"
+                                  >
+                                    {createWeightSample.isPending ? (
+                                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                    ) : (
+                                      <Scale className="h-4 w-4 mr-2" />
+                                    )}
+                                    Save as Weight Sample
+                                  </Button>
+                                )}
                               </div>
                             );
                           }
 
                           // Default: Ready for lockers (works for no expected weight too)
                           // Disabled if no actual weight has been recorded
+
+                          // Check if this is a single-product order (can save as weight sample)
+                          const orderItems = (selectedOrder as { items?: Array<{ product_id: string; quantity: number }> }).items;
+                          const isSingleProductOrder = orderItems?.length === 1 && orderItems[0].quantity === 1;
+                          const singleProductId = isSingleProductOrder ? orderItems[0].product_id : null;
+
                           return (
-                            <Button
-                              onClick={async () => {
-                                try {
-                                  await onOrderWeighed(
-                                    selectedOrder.id,
-                                    ouncesToGrams(totalWeight),
-                                    "weighed"
-                                  );
-                                  resetWeighingState();
-                                } catch (e) {
-                                  console.error(e);
-                                }
-                              }}
-                              disabled={!hasActualWeight}
-                              className="w-full h-16 text-xl font-semibold bg-green-600 hover:bg-green-700 disabled:bg-gray-300"
-                            >
-                              Ready for Lockers
-                            </Button>
+                            <div className="space-y-3">
+                              <Button
+                                onClick={async () => {
+                                  try {
+                                    await onOrderWeighed(
+                                      selectedOrder.id,
+                                      ouncesToGrams(totalWeight),
+                                      "weighed"
+                                    );
+                                    resetWeighingState();
+                                  } catch (e) {
+                                    console.error(e);
+                                  }
+                                }}
+                                disabled={!hasActualWeight}
+                                className="w-full h-16 text-xl font-semibold bg-green-600 hover:bg-green-700 disabled:bg-gray-300"
+                              >
+                                Ready for Lockers
+                              </Button>
+
+                              {/* Save as Sample button - only for single-product orders */}
+                              {isSingleProductOrder && singleProductId && hasActualWeight && (
+                                <Button
+                                  variant="outline"
+                                  onClick={async () => {
+                                    try {
+                                      await createWeightSample.mutateAsync({
+                                        product_id: singleProductId,
+                                        order_id: selectedOrder.id,
+                                        weight: Math.round(ouncesToGrams(totalWeight)),
+                                      });
+                                      toast.success("Weight sample saved for calibration");
+                                    } catch (e) {
+                                      console.error(e);
+                                      toast.error("Failed to save weight sample");
+                                    }
+                                  }}
+                                  disabled={createWeightSample.isPending}
+                                  className="w-full text-blue-600 border-blue-300 hover:bg-blue-50"
+                                >
+                                  {createWeightSample.isPending ? (
+                                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                  ) : (
+                                    <Scale className="h-4 w-4 mr-2" />
+                                  )}
+                                  Save as Weight Sample
+                                </Button>
+                              )}
+                            </div>
                           );
                         })()}
                       </CardContent>

@@ -64,6 +64,11 @@ const navigationItems = [
     icon: SlidersHorizontal,
   },
   {
+    title: "Weight Samples",
+    href: "/weight-samples",
+    icon: Scale,
+  },
+  {
     title: "Settings",
     href: "/settings",
     icon: Cog,
