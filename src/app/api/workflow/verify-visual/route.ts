@@ -137,13 +137,16 @@ export const { POST } = serve<VerifyVisualPayload>(
             ? "extra_items"
             : "uncertain";
 
-    // Update order with verification result
+    // Update order with verification result (including images)
     await context.run("Update order", async () => {
       await db
         .update(orders)
         .set({
           visual_verification_status: status,
-          visual_verification_result: verificationResult,
+          visual_verification_result: {
+            ...verificationResult,
+            images: images, // Store the images for later viewing
+          },
           visual_verified_at: new Date(),
           updated_at: new Date(),
         })

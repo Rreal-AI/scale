@@ -32,6 +32,10 @@ export const visualVerificationResultSchema = z.object({
     .string()
     .optional()
     .describe("Additional observations about the image or verification"),
+  images: z
+    .array(z.string())
+    .optional()
+    .describe("Base64 encoded images used for verification"),
 });
 
 export type VisualVerificationResult = z.infer<

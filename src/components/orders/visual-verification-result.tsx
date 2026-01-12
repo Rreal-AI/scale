@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,8 +11,10 @@ import {
   HelpCircle,
   Camera,
   X,
+  ImageIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ImageViewer } from "@/components/ui/image-viewer";
 import type { VisualVerificationResult } from "@/schemas/visual-verification";
 
 interface VisualVerificationResultProps {
@@ -67,7 +70,22 @@ export function VisualVerificationResultCard({
   const config = statusConfig[status];
   const Icon = config.icon;
 
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
+  const handleOpenImage = (index: number) => {
+    setSelectedImageIndex(index);
+    setViewerOpen(true);
+  };
+
   return (
+    <>
+      <ImageViewer
+        images={result.images || []}
+        initialIndex={selectedImageIndex}
+        open={viewerOpen}
+        onOpenChange={setViewerOpen}
+      />
     <Card
       className={cn(
         "relative transition-all duration-300 border-2",
@@ -155,6 +173,31 @@ export function VisualVerificationResultCard({
             <p className="text-sm text-gray-600 italic">{result.notes}</p>
           )}
 
+          {/* Images thumbnails */}
+          {result.images && result.images.length > 0 && (
+            <div className="space-y-2">
+              <h4 className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <ImageIcon className="h-4 w-4" />
+                Fotos de verificacion ({result.images.length})
+              </h4>
+              <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1">
+                {result.images.map((img, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleOpenImage(index)}
+                    className="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 border-gray-200 hover:border-blue-400 transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <img
+                      src={img}
+                      alt={`Foto ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {onRetry && (
             <Button variant="outline" onClick={onRetry} className="w-full">
               <Camera className="h-4 w-4 mr-2" />
@@ -164,5 +207,6 @@ export function VisualVerificationResultCard({
         </div>
       </CardContent>
     </Card>
+    </>
   );
 }
