@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
+import { generateObject } from "ai";
+import { visualVerificationResultSchema } from "@/schemas/visual-verification";
 import { db } from "@/db";
 import { orders } from "@/db/schema/orders";
 import { eq, and } from "drizzle-orm";
-import type { VisualVerificationResult } from "@/schemas/visual-verification";
 
 const VISUAL_VERIFICATION_PROMPT = `You are an AI assistant specialized in verifying food orders by analyzing photos.
 
@@ -31,21 +32,7 @@ ANALYSIS INSTRUCTIONS:
 
 5. Note any items visible that are NOT in the expected order (potential extras)
 
-Respond with a JSON object in this exact format:
-{
-  "match": boolean (true if all expected items appear to be present),
-  "confidence": number (0-100, overall confidence score),
-  "identified_items": [
-    {
-      "name": "item name",
-      "found": boolean,
-      "confidence": number (0-100)
-    }
-  ],
-  "missing_items": ["item names that appear to be missing"],
-  "extra_items": ["item names found that were not in the order"],
-  "notes": "optional additional observations"
-}`;
+Provide your analysis with confidence scores for each item and overall assessment.`;
 
 export async function POST(
   request: NextRequest,
@@ -103,91 +90,37 @@ export async function POST(
 
     const prompt = VISUAL_VERIFICATION_PROMPT.replace("{items}", itemsList);
 
-    // Extract base64 data from data URL if needed
-    const base64Data = image.startsWith("data:")
-      ? image.split(",")[1]
-      : image;
+    // Ensure image is a proper data URL
+    const imageData = image.startsWith("data:")
+      ? image
+      : `data:image/jpeg;base64,${image}`;
 
-    // Call Gemini API directly
-    const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
-    if (!apiKey) {
-      return NextResponse.json(
-        { error: "Google AI API key not configured" },
-        { status: 500 }
-      );
-    }
-
-    const geminiResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                { text: prompt },
-                {
-                  inline_data: {
-                    mime_type: "image/jpeg",
-                    data: base64Data,
-                  },
-                },
-              ],
-            },
+    const { object } = await generateObject({
+      model: "google/gemini-3-flash",
+      schema: visualVerificationResultSchema,
+      messages: [
+        {
+          role: "user",
+          content: [
+            { type: "text", text: prompt },
+            { type: "image", image: imageData },
           ],
-          generationConfig: {
-            responseMimeType: "application/json",
-          },
-        }),
-      }
-    );
-
-    if (!geminiResponse.ok) {
-      const errorText = await geminiResponse.text();
-      console.error("Gemini API error:", errorText);
-      return NextResponse.json(
-        { error: "Failed to process image with AI" },
-        { status: 500 }
-      );
-    }
-
-    const geminiData = await geminiResponse.json();
-    const responseText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
-
-    if (!responseText) {
-      return NextResponse.json(
-        { error: "No response from AI" },
-        { status: 500 }
-      );
-    }
-
-    // Parse the JSON response
-    let result: VisualVerificationResult;
-    try {
-      result = JSON.parse(responseText);
-    } catch {
-      console.error("Failed to parse AI response:", responseText);
-      return NextResponse.json(
-        { error: "Invalid AI response format" },
-        { status: 500 }
-      );
-    }
+        },
+      ],
+    });
 
     const status: "verified" | "missing_items" | "extra_items" | "uncertain" =
-      result.match && result.confidence >= 70
+      object.match && object.confidence >= 70
         ? "verified"
-        : result.missing_items.length > 0
+        : object.missing_items.length > 0
           ? "missing_items"
-          : result.extra_items.length > 0
+          : object.extra_items.length > 0
             ? "extra_items"
             : "uncertain";
 
     return NextResponse.json({
       success: true,
-      result,
+      result: object,
       status,
     });
   } catch (error) {
