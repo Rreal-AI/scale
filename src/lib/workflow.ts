@@ -25,12 +25,18 @@ function getWorkflowRoute(workflow: string) {
 
 export const Workflow = {
   ProcessOrder: getWorkflowRoute("process-order"),
+  VerifyVisual: getWorkflowRoute("verify-visual"),
 } as const;
 
 export const WorkflowPayload = {
   ProcessOrder: z.object({
     input: z.string(),
     org_id: z.string(),
+  }),
+  VerifyVisual: z.object({
+    orderId: z.string(),
+    orgId: z.string(),
+    images: z.array(z.string()), // base64 encoded images
   }),
 } satisfies Record<keyof typeof Workflow, z.ZodType>;
 

@@ -65,6 +65,14 @@ interface Order {
   input: string;
   structured_output?: Record<string, unknown>;
   weight_verified_at?: string;
+  visual_verification_status?:
+    | "pending"
+    | "verified"
+    | "missing_items"
+    | "extra_items"
+    | "uncertain";
+  visual_verification_result?: Record<string, unknown>;
+  visual_verified_at?: string;
   archived_at?: string;
   archived_reason?: string;
   created_at: string;

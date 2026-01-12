@@ -1,5 +1,4 @@
 import { useMutation } from "@tanstack/react-query";
-import type { VisualVerificationResult } from "@/schemas/visual-verification";
 
 interface VerifyVisualParams {
   orderId: string;
@@ -8,8 +7,8 @@ interface VerifyVisualParams {
 
 interface VerifyVisualResponse {
   success: boolean;
-  result: VisualVerificationResult;
-  status: "verified" | "missing_items" | "extra_items" | "uncertain";
+  status: "pending";
+  message: string;
 }
 
 const verifyOrderVisual = async ({
@@ -26,7 +25,7 @@ const verifyOrderVisual = async ({
 
   if (!response.ok) {
     const error = await response.json();
-    throw new Error(error.error || "Failed to verify order visually");
+    throw new Error(error.error || "Failed to start visual verification");
   }
 
   return response.json();

@@ -146,10 +146,6 @@ export function WeighOrderView({
 
   // Visual verification state
   const [cameraOpen, setCameraOpen] = useState(false);
-  const [visualResult, setVisualResult] = useState<{
-    result: VisualVerificationResult;
-    status: "verified" | "missing_items" | "extra_items" | "uncertain";
-  } | null>(null);
   const visualVerification = useVisualVerification();
 
   // Auto-save weighing progress
@@ -211,36 +207,21 @@ export function WeighOrderView({
     }
   }, [selectedOrderId, defaultPackaging?.id]);
 
-  // Clear visual verification result when order changes
-  useEffect(() => {
-    setVisualResult(null);
-  }, [selectedOrderId]);
-
-  // Handler for visual verification
+  // Handler for visual verification - closes modal immediately, processes in background
   const handleVisualVerification = async (images: string[]) => {
     if (!selectedOrderId) return;
 
+    // Close modal immediately
+    setCameraOpen(false);
+    toast.info("Verificacion visual iniciada. Procesando en segundo plano...");
+
     try {
-      const response = await visualVerification.mutateAsync({
+      await visualVerification.mutateAsync({
         orderId: selectedOrderId,
         images,
       });
-
-      setVisualResult({
-        result: response.result,
-        status: response.status,
-      });
-      setCameraOpen(false);
-
-      if (response.status === "verified") {
-        toast.success("Pedido verificado visualmente");
-      } else if (response.status === "missing_items") {
-        toast.error("Se detectaron items faltantes");
-      } else {
-        toast.warning("Verificacion requiere revision manual");
-      }
     } catch (error) {
-      toast.error("Error al verificar visualmente");
+      toast.error("Error al iniciar verificacion visual");
       console.error(error);
     }
   };
@@ -1151,36 +1132,48 @@ export function WeighOrderView({
                             </h4>
                           </div>
 
-                          {!visualResult ? (
-                            <Button
-                              variant="outline"
-                              onClick={() => setCameraOpen(true)}
-                              disabled={visualVerification.isPending}
-                              className="w-full border-blue-300 text-blue-700 hover:bg-blue-50"
-                            >
-                              {visualVerification.isPending ? (
-                                <>
-                                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                  Analizando imagen...
-                                </>
-                              ) : (
-                                <>
-                                  <Camera className="h-4 w-4 mr-2" />
-                                  Verificar con Foto
-                                </>
-                              )}
-                            </Button>
-                          ) : (
-                            <VisualVerificationResultCard
-                              result={visualResult.result}
-                              status={visualResult.status}
-                              onRetry={() => {
-                                setVisualResult(null);
-                                setCameraOpen(true);
-                              }}
-                              onDismiss={() => setVisualResult(null)}
-                            />
-                          )}
+                          {(() => {
+                            const visualStatus = selectedOrder.visual_verification_status as
+                              | "pending"
+                              | "verified"
+                              | "missing_items"
+                              | "extra_items"
+                              | "uncertain"
+                              | null;
+                            const visualResultData = selectedOrder.visual_verification_result as VisualVerificationResult | null;
+
+                            if (visualStatus === "pending") {
+                              return (
+                                <div className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                  <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+                                  <span className="text-sm text-blue-700">
+                                    Procesando verificacion visual...
+                                  </span>
+                                </div>
+                              );
+                            }
+
+                            if (visualStatus && visualResultData) {
+                              return (
+                                <VisualVerificationResultCard
+                                  result={visualResultData}
+                                  status={visualStatus}
+                                  onRetry={() => setCameraOpen(true)}
+                                />
+                              );
+                            }
+
+                            return (
+                              <Button
+                                variant="outline"
+                                onClick={() => setCameraOpen(true)}
+                                className="w-full border-blue-300 text-blue-700 hover:bg-blue-50"
+                              >
+                                <Camera className="h-4 w-4 mr-2" />
+                                Verificar con Foto
+                              </Button>
+                            );
+                          })()}
                         </div>
 
                         <Separator />

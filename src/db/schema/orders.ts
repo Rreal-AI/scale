@@ -20,6 +20,14 @@ export const orderStatus = pgEnum("order_status", [
   "archived", // Archivado por inactividad
 ]);
 
+export const visualVerificationStatus = pgEnum("visual_verification_status", [
+  "pending", // Enviado a procesar
+  "verified", // Verificado correctamente
+  "missing_items", // Items faltantes detectados
+  "extra_items", // Items extra detectados
+  "uncertain", // No se pudo determinar con certeza
+]);
+
 export const orders = pgTable("orders", {
   id: uuid("id").primaryKey().defaultRandom(),
   org_id: text("org_id").notNull(), // organization id from clerk
@@ -46,6 +54,14 @@ export const orders = pgTable("orders", {
   structured_output: jsonb("structured_output"),
 
   weight_verified_at: timestamp("weight_verified_at"),
+
+  // Visual verification fields
+  visual_verification_status: visualVerificationStatus(
+    "visual_verification_status"
+  ),
+  visual_verification_result: jsonb("visual_verification_result"),
+  visual_verified_at: timestamp("visual_verified_at"),
+
   archived_at: timestamp("archived_at"),
   archived_reason: text("archived_reason"),
   created_at: timestamp("created_at").notNull().defaultNow(),
