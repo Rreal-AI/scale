@@ -31,6 +31,7 @@ export async function GET() {
       timezone: org.timezone,
       currency: org.currency,
       order_weight_delta_tolerance: org.order_weight_delta_tolerance,
+      visual_verification_prompt: org.visual_verification_prompt,
     });
   } catch (error) {
     console.error("Error fetching organization:", error);
@@ -47,6 +48,10 @@ const updateOrganizationSchema = z.object({
     .number()
     .int()
     .positive("Tolerance must be a positive integer")
+    .optional(),
+  visual_verification_prompt: z
+    .string()
+    .nullable()
     .optional(),
 });
 
@@ -94,6 +99,7 @@ export async function PUT(request: NextRequest) {
       id: updatedOrg.id,
       name: updatedOrg.name,
       order_weight_delta_tolerance: updatedOrg.order_weight_delta_tolerance,
+      visual_verification_prompt: updatedOrg.visual_verification_prompt,
       message: "Organization settings updated successfully",
     });
   } catch (error) {

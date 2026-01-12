@@ -127,6 +127,13 @@
       "when": 1768244520058,
       "tag": "0017_chilly_joseph",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1768247214208,
+      "tag": "0018_reflective_vulture",
+      "breakpoints": true
     }
   ]
 }

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Copy, Check, Mail, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { VisualVerificationSettings } from "./visual-verification-settings";
 
 interface OrganizationData {
   id: string;
@@ -13,6 +14,7 @@ interface OrganizationData {
   inbound_email: string;
   timezone: string;
   currency: string;
+  visual_verification_prompt: string | null;
 }
 
 export function SettingsContent() {
@@ -170,6 +172,25 @@ export function SettingsContent() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Visual Verification Settings */}
+      <VisualVerificationSettings
+        currentPrompt={orgData?.visual_verification_prompt || null}
+        onUpdate={async (prompt) => {
+          const response = await fetch("/api/organization", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ visual_verification_prompt: prompt }),
+          });
+          if (!response.ok) {
+            throw new Error("Failed to update");
+          }
+          const data = await response.json();
+          setOrgData((prev) =>
+            prev ? { ...prev, visual_verification_prompt: data.visual_verification_prompt } : prev
+          );
+        }}
+      />
     </div>
   );
 }

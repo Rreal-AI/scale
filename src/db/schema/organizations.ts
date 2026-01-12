@@ -8,6 +8,7 @@ export const organizations = pgTable("organizations", {
   order_weight_delta_tolerance: integer("order_weight_delta_tolerance")
     .notNull()
     .default(100), // in grams (~3.5 oz tolerance)
+  visual_verification_prompt: text("visual_verification_prompt"), // Custom AI prompt for visual verification (null = use default)
   inbound_order_email_inbox_id: uuid("inbound_order_email_inbox_id")
     .notNull()
     .defaultRandom(),
