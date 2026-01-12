@@ -5,9 +5,8 @@ import { PROMPT } from "@/lib/prompt";
 import { findByNormalizedProperty, normalizeText } from "@/lib/normalize";
 import { db } from "@/db";
 import { orders } from "@/db/schema/orders";
-import { orderItemModifiers, orderItems, modifiers as modifiersTable, orderEvents } from "@/db/schema";
+import { orderItemModifiers, orderItems, modifiers as modifiersTable, orderEvents, products as productsTable } from "@/db/schema";
 import { Workflow } from "@/lib/workflow";
-import { eq, or } from "drizzle-orm";
 import { logger } from "@/lib/logger";
 
 interface ProcessOrderPayload {
@@ -39,7 +38,7 @@ export const { POST } = serve<ProcessOrderPayload>(
       logger.info("Creating order", { structuredOrder, org_id });
 
       return db.transaction(async (tx) => {
-        const products = await tx.query.products.findMany({
+        let products = await tx.query.products.findMany({
           where: (table, { eq, and, or, ilike }) =>
             and(
               eq(table.org_id, org_id),
@@ -50,6 +49,44 @@ export const { POST } = serve<ProcessOrderPayload>(
               )
             ),
         });
+
+        // Auto-create products that don't exist
+        const existingProductNames = new Set(
+          products.map((p) => normalizeText(p.name))
+        );
+
+        const missingProducts = structuredOrder.items
+          .filter((item) => !existingProductNames.has(normalizeText(item.name)));
+
+        // Get unique missing products by normalized name
+        const uniqueMissingProducts = Array.from(
+          new Map(
+            missingProducts.map((p) => [normalizeText(p.name), p])
+          ).values()
+        );
+
+        // Create missing products with default weight of 0
+        if (uniqueMissingProducts.length > 0) {
+          logger.info("Auto-creating missing products", {
+            products: uniqueMissingProducts.map((p) => p.name),
+            org_id,
+          });
+
+          const createdProducts = await tx
+            .insert(productsTable)
+            .values(
+              uniqueMissingProducts.map((p) => ({
+                org_id,
+                name: p.name,
+                price: Math.round(p.price * 100 / p.quantity), // Price per unit in cents
+                weight: 0, // Default weight - user can update later
+              }))
+            )
+            .returning();
+
+          // Add created products to the products array
+          products = [...products, ...createdProducts];
+        }
 
         let modifiers = await tx.query.modifiers.findMany({
           where: (table, { eq, and, or, ilike }) =>
