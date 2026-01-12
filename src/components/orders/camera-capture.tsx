@@ -17,6 +17,8 @@ import {
   AlertCircle,
   SwitchCamera,
   X,
+  Zap,
+  ZapOff,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -45,10 +47,13 @@ export function CameraCapture({
   const [facingMode, setFacingMode] = useState<"user" | "environment">(
     "environment"
   );
+  const [flashEnabled, setFlashEnabled] = useState(false);
+  const [flashSupported, setFlashSupported] = useState(false);
 
   const startCamera = useCallback(async () => {
     setCameraState("requesting");
     setErrorMessage("");
+    setFlashSupported(false);
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -61,6 +66,15 @@ export function CameraCapture({
       });
 
       streamRef.current = stream;
+
+      // Check if flash/torch is supported
+      const videoTrack = stream.getVideoTracks()[0];
+      if (videoTrack) {
+        const capabilities = videoTrack.getCapabilities?.();
+        if (capabilities && "torch" in capabilities) {
+          setFlashSupported(true);
+        }
+      }
 
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
@@ -103,7 +117,25 @@ export function CameraCapture({
     if (videoRef.current) {
       videoRef.current.srcObject = null;
     }
+    setFlashEnabled(false);
   }, []);
+
+  const toggleFlash = useCallback(async () => {
+    if (!streamRef.current) return;
+
+    const videoTrack = streamRef.current.getVideoTracks()[0];
+    if (!videoTrack) return;
+
+    try {
+      const newFlashState = !flashEnabled;
+      await videoTrack.applyConstraints({
+        advanced: [{ torch: newFlashState } as MediaTrackConstraintSet],
+      });
+      setFlashEnabled(newFlashState);
+    } catch (error) {
+      console.error("Error toggling flash:", error);
+    }
+  }, [flashEnabled]);
 
   const capturePhoto = useCallback(() => {
     if (!videoRef.current || !canvasRef.current) return;
@@ -215,14 +247,44 @@ export function CameraCapture({
 
             {cameraState === "streaming" && (
               <>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={switchCamera}
-                  className="absolute top-2 right-2 bg-black/50 text-white hover:bg-black/70"
-                >
-                  <SwitchCamera className="h-4 w-4" />
-                </Button>
+                {/* Top controls */}
+                <div className="absolute top-2 right-2 flex gap-2">
+                  {/* Flash toggle */}
+                  {flashSupported && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={toggleFlash}
+                      className={cn(
+                        "bg-black/50 text-white hover:bg-black/70",
+                        flashEnabled && "bg-yellow-500/80 hover:bg-yellow-500"
+                      )}
+                    >
+                      {flashEnabled ? (
+                        <Zap className="h-4 w-4" />
+                      ) : (
+                        <ZapOff className="h-4 w-4" />
+                      )}
+                    </Button>
+                  )}
+                  {/* Switch camera */}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={switchCamera}
+                    className="bg-black/50 text-white hover:bg-black/70"
+                  >
+                    <SwitchCamera className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                {/* Flash indicator */}
+                {flashEnabled && (
+                  <div className="absolute top-2 left-2 bg-yellow-500 text-black text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                    <Zap className="h-3 w-3" />
+                    Flash ON
+                  </div>
+                )}
 
                 {/* Capture button overlay */}
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2">

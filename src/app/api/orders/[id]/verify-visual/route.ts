@@ -13,11 +13,20 @@ Your task is to examine these photos of a prepared food order and verify that al
 EXPECTED ORDER ITEMS:
 {items}
 
+IMPORTANT - PROMOTIONS AND COMBOS:
+The items listed above may be PROMOTIONS or COMBOS, not individual items. Each promotion can contain MULTIPLE physical items. For example:
+- "2x Tacos al Pastor" might be a promotion where EACH unit includes 3 physical tacos
+- So "2x Tacos al Pastor" = 6 physical tacos in the image
+- A "Combo Familiar" might include multiple dishes bundled together
+- Always consider that the quantity shown (e.g., "2x") refers to promotion units, not individual food pieces
+
+When verifying, count the PHYSICAL items and compare against what the promotion typically contains.
+
 ANALYSIS INSTRUCTIONS:
 1. Scan all the provided images systematically
 2. For each expected item:
    - Look for the correct type of food (taco, burrito, side, drink, etc.)
-   - Verify the quantity matches (e.g., if 2 tacos expected, count 2 tacos across all images)
+   - Consider that the listed quantity may refer to promotion units, each containing multiple physical items
    - Note if modifiers are visible when possible (extra cheese, no onion, etc.)
 
 3. Consider:
@@ -25,6 +34,7 @@ ANALYSIS INSTRUCTIONS:
    - Some items might be partially hidden
    - Similar items might look alike (different taco types)
    - Items may be split across multiple images
+   - Promotions typically contain MORE physical items than the quantity number suggests
 
 4. Be CONSERVATIVE in your assessment:
    - If you cannot clearly identify an item, mark it as NOT found
