@@ -3,7 +3,7 @@ import type { VisualVerificationResult } from "@/schemas/visual-verification";
 
 interface VerifyVisualParams {
   orderId: string;
-  image: string;
+  images: string[];
 }
 
 interface VerifyVisualResponse {
@@ -14,14 +14,14 @@ interface VerifyVisualResponse {
 
 const verifyOrderVisual = async ({
   orderId,
-  image,
+  images,
 }: VerifyVisualParams): Promise<VerifyVisualResponse> => {
   const response = await fetch(`/api/orders/${orderId}/verify-visual`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ image }),
+    body: JSON.stringify({ images }),
   });
 
   if (!response.ok) {

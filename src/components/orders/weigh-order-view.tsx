@@ -217,13 +217,13 @@ export function WeighOrderView({
   }, [selectedOrderId]);
 
   // Handler for visual verification
-  const handleVisualVerification = async (imageBase64: string) => {
+  const handleVisualVerification = async (images: string[]) => {
     if (!selectedOrderId) return;
 
     try {
       const response = await visualVerification.mutateAsync({
         orderId: selectedOrderId,
-        image: imageBase64,
+        images,
       });
 
       setVisualResult({

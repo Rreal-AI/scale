@@ -8,22 +8,23 @@ import { eq, and } from "drizzle-orm";
 
 const VISUAL_VERIFICATION_PROMPT = `You are an AI assistant specialized in verifying food orders by analyzing photos.
 
-Your task is to examine this photo of a prepared food order and verify that all expected items are present.
+Your task is to examine these photos of a prepared food order and verify that all expected items are present.
 
 EXPECTED ORDER ITEMS:
 {items}
 
 ANALYSIS INSTRUCTIONS:
-1. Scan the entire image systematically
+1. Scan all the provided images systematically
 2. For each expected item:
    - Look for the correct type of food (taco, burrito, side, drink, etc.)
-   - Verify the quantity matches (e.g., if 2 tacos expected, count 2 tacos)
+   - Verify the quantity matches (e.g., if 2 tacos expected, count 2 tacos across all images)
    - Note if modifiers are visible when possible (extra cheese, no onion, etc.)
 
 3. Consider:
    - Items may be in containers, bags, or wrapped
    - Some items might be partially hidden
    - Similar items might look alike (different taco types)
+   - Items may be split across multiple images
 
 4. Be CONSERVATIVE in your assessment:
    - If you cannot clearly identify an item, mark it as NOT found
@@ -48,10 +49,13 @@ export async function POST(
     const { id: orderId } = await params;
 
     const body = await request.json();
-    const { image } = body;
+    const { images } = body;
 
-    if (!image) {
-      return NextResponse.json({ error: "Image is required" }, { status: 400 });
+    if (!images || !Array.isArray(images) || images.length === 0) {
+      return NextResponse.json(
+        { error: "At least one image is required" },
+        { status: 400 }
+      );
     }
 
     const order = await db.query.orders.findFirst({
@@ -90,10 +94,17 @@ export async function POST(
 
     const prompt = VISUAL_VERIFICATION_PROMPT.replace("{items}", itemsList);
 
-    // Ensure image is a proper data URL
-    const imageData = image.startsWith("data:")
-      ? image
-      : `data:image/jpeg;base64,${image}`;
+    // Build content array with text and all images
+    const content: Array<
+      { type: "text"; text: string } | { type: "image"; image: string }
+    > = [{ type: "text", text: prompt }];
+
+    for (const image of images) {
+      const imageData = image.startsWith("data:")
+        ? image
+        : `data:image/jpeg;base64,${image}`;
+      content.push({ type: "image", image: imageData });
+    }
 
     const { object } = await generateObject({
       model: "google/gemini-3-flash",
@@ -101,10 +112,7 @@ export async function POST(
       messages: [
         {
           role: "user",
-          content: [
-            { type: "text", text: prompt },
-            { type: "image", image: imageData },
-          ],
+          content,
         },
       ],
     });
