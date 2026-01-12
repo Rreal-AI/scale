@@ -849,6 +849,53 @@ export function WeighOrderView({
                 </CardContent>
               </Card>
 
+              {/* Visual Verification Section */}
+              <Card>
+                <CardHeader className="p-4 pb-2">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Eye className="h-4 w-4" />
+                    Verificación Visual
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 pt-0">
+                  {(() => {
+                    const visualStatus = selectedOrder.visual_verification_status as
+                      | "pending" | "verified" | "missing_items" | "extra_items" | "uncertain" | null;
+                    const visualResultData = selectedOrder.visual_verification_result as VisualVerificationResult | null;
+
+                    if (visualStatus === "pending") {
+                      return (
+                        <div className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                          <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+                          <span className="text-sm text-blue-700">Procesando...</span>
+                        </div>
+                      );
+                    }
+
+                    if (visualStatus && visualResultData) {
+                      return (
+                        <VisualVerificationResultCard
+                          result={visualResultData}
+                          status={visualStatus}
+                          onRetry={() => setCameraOpen(true)}
+                        />
+                      );
+                    }
+
+                    return (
+                      <Button
+                        variant="outline"
+                        onClick={() => setCameraOpen(true)}
+                        className="w-full h-12 border-blue-300 text-blue-700"
+                      >
+                        <Camera className="h-4 w-4 mr-2" />
+                        Verificar con Foto
+                      </Button>
+                    );
+                  })()}
+                </CardContent>
+              </Card>
+
               {/* Weighing Section */}
               {selectedOrder.status === "pending_weight" && (
                 <Card>
@@ -905,53 +952,6 @@ export function WeighOrderView({
                   </CardContent>
                 </Card>
               )}
-
-              {/* Visual Verification Section */}
-              <Card>
-                <CardHeader className="p-4 pb-2">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <Eye className="h-4 w-4" />
-                    Verificación Visual
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-4 pt-0">
-                  {(() => {
-                    const visualStatus = selectedOrder.visual_verification_status as
-                      | "pending" | "verified" | "missing_items" | "extra_items" | "uncertain" | null;
-                    const visualResultData = selectedOrder.visual_verification_result as VisualVerificationResult | null;
-
-                    if (visualStatus === "pending") {
-                      return (
-                        <div className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                          <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
-                          <span className="text-sm text-blue-700">Procesando...</span>
-                        </div>
-                      );
-                    }
-
-                    if (visualStatus && visualResultData) {
-                      return (
-                        <VisualVerificationResultCard
-                          result={visualResultData}
-                          status={visualStatus}
-                          onRetry={() => setCameraOpen(true)}
-                        />
-                      );
-                    }
-
-                    return (
-                      <Button
-                        variant="outline"
-                        onClick={() => setCameraOpen(true)}
-                        className="w-full h-12 border-blue-300 text-blue-700"
-                      >
-                        <Camera className="h-4 w-4 mr-2" />
-                        Verificar con Foto
-                      </Button>
-                    );
-                  })()}
-                </CardContent>
-              </Card>
             </div>
           ) : (
             <div className="flex items-center justify-center h-full text-gray-500">

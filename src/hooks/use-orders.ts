@@ -192,6 +192,7 @@ export const useOrder = (id: string) => {
     queryKey: ["orders", orgId, id],
     queryFn: () => fetchOrder(id),
     enabled: !!orgId && !!id,
+    refetchInterval: 3000,
   });
 };
 
