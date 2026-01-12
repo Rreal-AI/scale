@@ -8,3 +8,4 @@ export * from "./categories";
 export * from "./organizations";
 export * from "./rules";
 export * from "./product-weight-samples";
+export * from "./order-events";

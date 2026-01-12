@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
-import { orders } from "@/db/schema";
+import { orders, orderEvents } from "@/db/schema";
 import { and, eq, lt, inArray, not } from "drizzle-orm";
 
 // GET /api/cron/archive-inactive-orders
@@ -42,12 +42,13 @@ export async function GET(request: NextRequest) {
 
     // Archive the orders
     const now = new Date();
+    const archiveReason = `Auto-archived due to inactivity (no activity since ${cutoffTime.toISOString()})`;
     const archivedOrders = await db
       .update(orders)
       .set({
         status: "archived",
         archived_at: now,
-        archived_reason: `Auto-archived due to inactivity (no activity since ${cutoffTime.toISOString()})`,
+        archived_reason: archiveReason,
         updated_at: now,
       })
       .where(
@@ -57,6 +58,22 @@ export async function GET(request: NextRequest) {
         )
       )
       .returning();
+
+    // Create audit events for auto-archived orders
+    if (archivedOrders.length > 0) {
+      await db.insert(orderEvents).values(
+        archivedOrders.map((order) => ({
+          order_id: order.id,
+          org_id: order.org_id,
+          event_type: "archived" as const,
+          event_data: {
+            reason: archiveReason,
+            auto_archived: true,
+          },
+          actor_id: null,
+        }))
+      );
+    }
 
     return NextResponse.json({
       message: "Orders archived successfully",

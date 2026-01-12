@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/db";
-import { orders } from "@/db/schema";
+import { orders, orderEvents } from "@/db/schema";
 import { and, eq, ilike, or, asc, desc, count, inArray, gte, lte } from "drizzle-orm";
 import { z } from "zod";
 
@@ -216,11 +216,37 @@ export async function POST(request: NextRequest) {
 
     const { ids } = parsed.data;
     const now = new Date();
+
+    // Get current status before update
+    const currentOrders = await db
+      .select({ id: orders.id, status: orders.status })
+      .from(orders)
+      .where(and(eq(orders.org_id, orgId), inArray(orders.id, ids)));
+
     const updated = await db
       .update(orders)
       .set({ status: "completed", updated_at: now })
       .where(and(eq(orders.org_id, orgId), inArray(orders.id, ids)))
       .returning();
+
+    // Create audit events for status changes
+    if (updated.length > 0) {
+      await db.insert(orderEvents).values(
+        updated.map((order) => {
+          const previousOrder = currentOrders.find((o) => o.id === order.id);
+          return {
+            order_id: order.id,
+            org_id: orgId,
+            event_type: "status_changed" as const,
+            event_data: {
+              from_status: previousOrder?.status || "unknown",
+              to_status: "completed",
+            },
+            actor_id: userId,
+          };
+        })
+      );
+    }
 
     return NextResponse.json({ updated, count: updated.length });
   } catch (error) {

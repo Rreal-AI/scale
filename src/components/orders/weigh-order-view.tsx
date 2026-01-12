@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useRealTimeOrders, useOrder, useRevertOrderStatus } from "@/hooks/use-orders";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { usePackaging } from "@/hooks/use-packaging";
@@ -61,7 +61,10 @@ interface Order {
   customer_address?: string;
   total_amount: number;
   expected_weight?: number;
+  actual_weight?: number;
+  visual_verification_status?: "pending" | "verified" | "missing_items" | "extra_items" | "uncertain" | null;
   created_at: string;
+  updated_at: string;
   structured_output?: {
     items?: Array<{
       name: string;
@@ -107,8 +110,8 @@ export function WeighOrderView({
     "all" | "delivery" | "takeout"
   >("all");
   const [selectedStatus, setSelectedStatus] = useState<
-    "all" | "pending_weight" | "weighed"
-  >("pending_weight");
+    "all" | "pending" | "checked" | "ready_for_lockers"
+  >("pending");
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "customer">(
     "newest"
   );
@@ -250,27 +253,14 @@ export function WeighOrderView({
     }
   };
 
-  // Fetch orders for sidebar
+  // Fetch orders for sidebar - get all pending_weight and weighed orders
   const { data: ordersData } = useRealTimeOrders({
     limit: 100,
     search: searchQuery || undefined,
     type: selectedType !== "all" ? selectedType : undefined,
-    status: selectedStatus !== "all" ? selectedStatus : undefined,
-    sort_by:
-      selectedStatus === "weighed"
-        ? "updated_at"
-        : sortBy === "customer"
-        ? "customer_name"
-        : "created_at",
+    // Don't filter by status in API - we filter locally for the new tab structure
+    sort_by: sortBy === "customer" ? "customer_name" : "created_at",
     sort_order: sortBy === "oldest" ? "asc" : "desc",
-  });
-
-  // Separate fetch to always know how many are ready for lockers
-  const { data: readyOrdersData } = useRealTimeOrders({
-    limit: 100,
-    status: "weighed",
-    sort_by: "updated_at",
-    sort_order: "desc",
   });
 
   // Fetch selected order details
@@ -285,37 +275,61 @@ export function WeighOrderView({
     }
   }, [selectedOrder]);
 
+  // Helper to check if order is "checked" (has weight OR visual verification)
+  const isOrderChecked = useCallback((order: Order): boolean => {
+    const hasWeight = (order.actual_weight || 0) > 0;
+    const hasVisualVerification = ['verified', 'missing_items', 'extra_items', 'uncertain']
+      .includes(order.visual_verification_status || '');
+    return hasWeight || hasVisualVerification;
+  }, []);
+
   const orders = ordersData?.orders || [];
-  const displayOrders = (() => {
-    if (selectedStatus === "weighed") {
-      return [...orders].sort(
-        (a, b) =>
-          new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+
+  // Filter orders based on selected tab
+  const displayOrders = useMemo(() => {
+    const filtered = orders.filter(order => {
+      switch (selectedStatus) {
+        case 'pending':
+          // Pending: pending_weight status AND not checked (no weight, no visual verification)
+          return order.status === 'pending_weight' && !isOrderChecked(order);
+        case 'checked':
+          // Checked: pending_weight status AND checked (has weight OR visual verification)
+          return order.status === 'pending_weight' && isOrderChecked(order);
+        case 'ready_for_lockers':
+          // Ready for Lockers: weighed status
+          return order.status === 'weighed';
+        case 'all':
+        default:
+          return order.status === 'pending_weight' || order.status === 'weighed';
+      }
+    });
+
+    // Sort based on tab
+    if (selectedStatus === 'ready_for_lockers') {
+      return [...filtered].sort(
+        (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
       );
     }
-    if (selectedStatus === "all") {
-      const weighedFirst = orders
-        .filter((o) => o.status === "weighed")
-        .sort(
-          (a, b) =>
-            new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
-        );
-      const pending = orders
-        .filter((o) => o.status === "pending_weight")
-        .sort(
-          (a, b) =>
-            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        );
-      const others = orders
-        .filter((o) => o.status !== "weighed" && o.status !== "pending_weight")
-        .sort(
-          (a, b) =>
-            new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
-        );
-      return [...weighedFirst, ...pending, ...others];
+    if (selectedStatus === 'all') {
+      // Ready first, then checked, then pending
+      const ready = filtered.filter(o => o.status === 'weighed')
+        .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
+      const checked = filtered.filter(o => o.status === 'pending_weight' && isOrderChecked(o))
+        .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
+      const pending = filtered.filter(o => o.status === 'pending_weight' && !isOrderChecked(o))
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      return [...ready, ...checked, ...pending];
     }
-    return orders;
-  })();
+    return filtered;
+  }, [orders, selectedStatus, isOrderChecked]);
+
+  // Count orders by tab for badges
+  const tabCounts = useMemo(() => {
+    const pending = orders.filter(o => o.status === 'pending_weight' && !isOrderChecked(o)).length;
+    const checked = orders.filter(o => o.status === 'pending_weight' && isOrderChecked(o)).length;
+    const ready = orders.filter(o => o.status === 'weighed').length;
+    return { pending, checked, ready };
+  }, [orders, isOrderChecked]);
 
   // Helper to check if order has weighing progress
   const hasWeighingProgress = (orderId: string): boolean => {
@@ -628,7 +642,7 @@ export function WeighOrderView({
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
-                placeholder="Buscar órdenes..."
+                placeholder="Search orders..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 h-10"
@@ -641,28 +655,41 @@ export function WeighOrderView({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setSelectedStatus("pending_weight")}
+              onClick={() => setSelectedStatus("pending")}
               className={cn(
                 "h-9 px-4 whitespace-nowrap",
-                selectedStatus === "pending_weight"
+                selectedStatus === "pending"
                   ? "bg-orange-100 text-orange-700 border-orange-300"
                   : ""
               )}
             >
-              Pending
+              Pending {tabCounts.pending > 0 && `(${tabCounts.pending})`}
             </Button>
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setSelectedStatus("weighed")}
+              onClick={() => setSelectedStatus("checked")}
               className={cn(
                 "h-9 px-4 whitespace-nowrap",
-                selectedStatus === "weighed"
+                selectedStatus === "checked"
+                  ? "bg-blue-100 text-blue-700 border-blue-300"
+                  : ""
+              )}
+            >
+              Checked {tabCounts.checked > 0 && `(${tabCounts.checked})`}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSelectedStatus("ready_for_lockers")}
+              className={cn(
+                "h-9 px-4 whitespace-nowrap",
+                selectedStatus === "ready_for_lockers"
                   ? "bg-green-100 text-green-700 border-green-300"
                   : ""
               )}
             >
-              Weighed
+              Ready {tabCounts.ready > 0 && `(${tabCounts.ready})`}
             </Button>
             <Button
               variant="outline"
@@ -675,7 +702,7 @@ export function WeighOrderView({
                   : ""
               )}
             >
-              Todos
+              All
             </Button>
           </div>
 
@@ -684,7 +711,7 @@ export function WeighOrderView({
             {displayOrders.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-gray-500 p-8">
                 <Package className="h-12 w-12 mb-3 opacity-50" />
-                <p>No hay órdenes</p>
+                <p>No orders</p>
               </div>
             ) : (
               displayOrders.map((order) => {
@@ -957,6 +984,26 @@ export function WeighOrderView({
                         Remove
                       </Button>
                     </div>
+                    {/* Ready for Lockers button */}
+                    {bagWeights.some(bag => bag.weight > 0) && (
+                      <Button
+                        onClick={async () => {
+                          try {
+                            await onOrderWeighed(
+                              selectedOrder.id,
+                              ouncesToGrams(totalWeight),
+                              "weighed"
+                            );
+                            resetWeighingState();
+                          } catch (e) {
+                            console.error(e);
+                          }
+                        }}
+                        className="w-full h-12 mt-3 bg-green-600 hover:bg-green-700 text-white font-semibold"
+                      >
+                        Ready for Lockers
+                      </Button>
+                    )}
                   </CardContent>
                 </Card>
               )}
@@ -1064,42 +1111,42 @@ export function WeighOrderView({
 
           {/* Quick Filters - Touch Optimized */}
           <div className="space-y-2">
-            <div className="flex gap-1">
+            <div className="flex gap-1 flex-wrap">
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setSelectedStatus("all")}
+                onClick={() => setSelectedStatus("pending")}
                 className={cn(
                   "h-8 px-3 text-xs font-medium",
-                  selectedStatus === "all" 
-                    ? "bg-gray-900 text-white border-gray-900" 
+                  selectedStatus === "pending"
+                    ? "bg-orange-100 text-orange-700 border-orange-300"
                     : "text-gray-600 border-gray-300 hover:bg-gray-50"
                 )}
               >
-                All
+                Pending {tabCounts.pending > 0 && `(${tabCounts.pending})`}
               </Button>
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setSelectedStatus("pending_weight")}
+                onClick={() => setSelectedStatus("checked")}
                 className={cn(
                   "h-8 px-3 text-xs font-medium",
-                  selectedStatus === "pending_weight" 
-                    ? "bg-gray-900 text-white border-gray-900" 
+                  selectedStatus === "checked"
+                    ? "bg-blue-100 text-blue-700 border-blue-300"
                     : "text-gray-600 border-gray-300 hover:bg-gray-50"
                 )}
               >
-                Pending
+                Checked {tabCounts.checked > 0 && `(${tabCounts.checked})`}
               </Button>
               <Button
-                variant={selectedStatus === "weighed" ? "default" : "outline"}
+                variant={selectedStatus === "ready_for_lockers" ? "default" : "outline"}
                 size="sm"
-                onClick={() => setSelectedStatus("weighed")}
+                onClick={() => setSelectedStatus("ready_for_lockers")}
                 className={cn(
                   "h-8 px-3 text-xs font-medium",
-                  selectedStatus === "weighed" ? "text-white" : ""
+                  selectedStatus === "ready_for_lockers" ? "text-white" : ""
                 )}
-                style={selectedStatus === "weighed" ? {
+                style={selectedStatus === "ready_for_lockers" ? {
                   backgroundColor: "#10b981", // emerald-500
                   borderColor: "#10b981"
                 } : {
@@ -1108,7 +1155,20 @@ export function WeighOrderView({
                   backgroundColor: "transparent"
                 }}
               >
-                Ready for Lockers
+                Ready {tabCounts.ready > 0 && `(${tabCounts.ready})`}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSelectedStatus("all")}
+                className={cn(
+                  "h-8 px-3 text-xs font-medium",
+                  selectedStatus === "all"
+                    ? "bg-gray-900 text-white border-gray-900"
+                    : "text-gray-600 border-gray-300 hover:bg-gray-50"
+                )}
+              >
+                All
               </Button>
             </div>
             <div className="flex gap-1">
@@ -1172,26 +1232,25 @@ export function WeighOrderView({
         {/* Orders List */}
         <div className="flex-1 overflow-y-auto">
           {/* Priority banner when there are Ready for Lockers */}
-          {readyOrdersData?.orders &&
-            readyOrdersData.orders.length > 0 &&
-            selectedStatus !== "weighed" && (
+          {tabCounts.ready > 0 &&
+            selectedStatus !== "ready_for_lockers" && (
               <div className="mb-2 p-3 bg-yellow-50 border border-yellow-200 rounded flex items-center justify-between">
                 <div className="text-sm text-yellow-800 font-medium">
-                  {readyOrdersData.orders.length} order
-                  {readyOrdersData.orders.length > 1 ? "s" : ""} ready for
+                  {tabCounts.ready} order
+                  {tabCounts.ready > 1 ? "s" : ""} ready for
                   lockers
                 </div>
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => setSelectedStatus("weighed")}
+                  onClick={() => setSelectedStatus("ready_for_lockers")}
                 >
                   View
                 </Button>
               </div>
             )}
           {/* Ready for Lockers batch bar */}
-          {selectedStatus === "weighed" && (
+          {selectedStatus === "ready_for_lockers" && (
             <div className="flex items-center justify-between p-2 mb-2 bg-blue-50 border border-blue-200 rounded">
               <div className="flex items-center gap-2">
                 <input
@@ -1255,7 +1314,7 @@ export function WeighOrderView({
               >
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    {selectedStatus === "weighed" && (
+                    {selectedStatus === "ready_for_lockers" && (
                       <input
                         type="checkbox"
                         className="h-4 w-4 mr-1"

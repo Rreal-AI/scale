@@ -5,7 +5,7 @@ import { PROMPT } from "@/lib/prompt";
 import { findByNormalizedProperty, normalizeText } from "@/lib/normalize";
 import { db } from "@/db";
 import { orders } from "@/db/schema/orders";
-import { orderItemModifiers, orderItems, modifiers as modifiersTable } from "@/db/schema";
+import { orderItemModifiers, orderItems, modifiers as modifiersTable, orderEvents } from "@/db/schema";
 import { Workflow } from "@/lib/workflow";
 import { eq, or } from "drizzle-orm";
 import { logger } from "@/lib/logger";
@@ -232,6 +232,21 @@ export const { POST } = serve<ProcessOrderPayload>(
             })
           );
         }
+
+        // Create audit event
+        await tx.insert(orderEvents).values({
+          order_id: newOrder.id,
+          org_id,
+          event_type: "created",
+          event_data: {
+            check_number: structuredOrder.check_number,
+            customer_name: structuredOrder.customer.name,
+            items_count: structuredOrder.items.length,
+            expected_weight: expectedWeight,
+            order_type: structuredOrder.type,
+          },
+          actor_id: null,
+        });
 
         return newOrder.id;
       });

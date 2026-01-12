@@ -3,6 +3,7 @@ import { serve } from "@upstash/workflow/nextjs";
 import { visualVerificationResultSchema } from "@/schemas/visual-verification";
 import { db } from "@/db";
 import { orders } from "@/db/schema/orders";
+import { orderEvents } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { Workflow } from "@/lib/workflow";
 import { logger } from "@/lib/logger";
@@ -151,6 +152,21 @@ export const { POST } = serve<VerifyVisualPayload>(
           updated_at: new Date(),
         })
         .where(and(eq(orders.id, orderId), eq(orders.org_id, orgId)));
+
+      // Create audit event for visual verification
+      await db.insert(orderEvents).values({
+        order_id: orderId,
+        org_id: orgId,
+        event_type: "visual_verified",
+        event_data: {
+          status,
+          confidence: verificationResult.confidence,
+          missing_items: verificationResult.missing_items,
+          extra_items: verificationResult.extra_items,
+          match: verificationResult.match,
+        },
+        actor_id: null,
+      });
 
       logger.info("Visual verification completed", {
         orderId,

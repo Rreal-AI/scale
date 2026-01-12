@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/db";
-import { orders } from "@/db/schema";
+import { orders, orderEvents } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
+import { createOrderEvent } from "@/lib/order-events";
 import { z } from "zod";
 
 // GET /api/orders/[id] - Obtener una order específica con todas las relaciones
@@ -170,6 +171,21 @@ export async function PUT(
         { status: 500 }
       );
     }
+
+    // Create audit event for weight verification
+    await createOrderEvent({
+      order_id: id,
+      org_id: orgId,
+      event_type: "weight_verified",
+      event_data: {
+        expected_weight,
+        actual_weight,
+        delta_weight,
+        is_reweigh: existingOrder.actual_weight !== null,
+        previous_actual_weight: existingOrder.actual_weight,
+      },
+      actor_id: userId,
+    });
 
     return NextResponse.json({
       order: updatedOrder,

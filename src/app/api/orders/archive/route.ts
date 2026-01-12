@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/db";
-import { orders } from "@/db/schema";
+import { orders, orderEvents } from "@/db/schema";
 import { and, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 
@@ -56,6 +56,22 @@ export async function POST(request: NextRequest) {
       })
       .where(and(eq(orders.org_id, orgId), inArray(orders.id, order_ids)))
       .returning();
+
+    // Create audit events for archived orders
+    if (archivedOrders.length > 0) {
+      await db.insert(orderEvents).values(
+        archivedOrders.map((order) => ({
+          order_id: order.id,
+          org_id: orgId,
+          event_type: "archived" as const,
+          event_data: {
+            reason: reason || "Manually archived",
+            auto_archived: false,
+          },
+          actor_id: userId,
+        }))
+      );
+    }
 
     return NextResponse.json({
       message: "Orders archived successfully",
@@ -130,6 +146,21 @@ export async function PUT(request: NextRequest) {
         )
       )
       .returning();
+
+    // Create audit events for unarchived orders
+    if (unarchivedOrders.length > 0) {
+      await db.insert(orderEvents).values(
+        unarchivedOrders.map((order) => ({
+          order_id: order.id,
+          org_id: orgId,
+          event_type: "unarchived" as const,
+          event_data: {
+            restored_to_status: restore_status,
+          },
+          actor_id: userId,
+        }))
+      );
+    }
 
     return NextResponse.json({
       message: "Orders unarchived successfully",

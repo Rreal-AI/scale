@@ -9,6 +9,7 @@ import {
   jsonb,
 } from "drizzle-orm/pg-core";
 import { orderItems } from "./order-items";
+import { orderEvents } from "./order-events";
 
 export const orderType = pgEnum("order_type", ["delivery", "takeout"]);
 
@@ -70,4 +71,5 @@ export const orders = pgTable("orders", {
 
 export const ordersRelations = relations(orders, ({ many }) => ({
   items: many(orderItems),
+  events: many(orderEvents),
 }));
