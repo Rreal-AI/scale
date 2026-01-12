@@ -219,8 +219,7 @@ export function WeighOrderView({
   }, [selectedOrderId, defaultPackaging?.id]);
 
   // Handler for quick camera from list (without entering detail)
-  const handleQuickCamera = useCallback((orderId: string, e: React.MouseEvent | React.TouchEvent) => {
-    e.stopPropagation(); // Don't open order detail
+  const handleQuickCamera = useCallback((orderId: string) => {
     setCameraOrderId(orderId);
     setCameraOpen(true);
   }, []);
@@ -727,8 +726,17 @@ export function WeighOrderView({
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={(e) => handleQuickCamera(order.id, e)}
-                        className="h-10 w-10 rounded-full bg-blue-50 hover:bg-blue-100"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          e.preventDefault();
+                          handleQuickCamera(order.id);
+                        }}
+                        onTouchEnd={(e) => {
+                          e.stopPropagation();
+                          e.preventDefault();
+                          handleQuickCamera(order.id);
+                        }}
+                        className="h-10 w-10 rounded-full bg-blue-50 hover:bg-blue-100 touch-manipulation"
                       >
                         <Camera className="h-5 w-5 text-blue-600" />
                       </Button>
