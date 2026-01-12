@@ -45,6 +45,27 @@ ANALYSIS INSTRUCTIONS:
 
 5. Note any items visible that are NOT in the expected order (potential extras)
 
+6. WRONG ORDER DETECTION - CRITICAL:
+   Set wrong_order to TRUE if the photo appears to be from a DIFFERENT ORDER entirely.
+
+   This is NOT about missing modifiers or slight variations - it's about the CORE ITEMS being wrong.
+
+   Signs of wrong order:
+   - The main food items in the photo are fundamentally different from what was ordered
+   - Example: Order says "2x Burrito" but you see tacos, quesadillas, or nachos
+   - Example: Order says "3x Tacos al Pastor" but you see burritos and enchiladas
+   - The photo shows food from the same restaurant/cuisine but clearly NOT the items ordered
+
+   When to mark wrong_order = TRUE:
+   - Less than 30% of the MAIN items match (not counting sides/drinks)
+   - The primary food types don't match (burrito vs taco vs quesadilla vs bowl)
+   - You can clearly see this is a different customer's order
+
+   When to mark wrong_order = FALSE:
+   - Items match but quantities might be off
+   - Items match but modifiers might be different
+   - Some items are missing but the ones present DO match the order
+
 Provide your analysis with confidence scores for each item and overall assessment.`;
 
 interface VerifyVisualPayload {
@@ -129,14 +150,16 @@ export const { POST } = serve<VerifyVisualPayload>(
     );
 
     // Determine status
-    const status: "verified" | "missing_items" | "extra_items" | "uncertain" =
-      verificationResult.match && verificationResult.confidence >= 70
-        ? "verified"
-        : verificationResult.missing_items.length > 0
-          ? "missing_items"
-          : verificationResult.extra_items.length > 0
-            ? "extra_items"
-            : "uncertain";
+    const status: "verified" | "missing_items" | "extra_items" | "uncertain" | "wrong_image" =
+      verificationResult.wrong_order
+        ? "wrong_image"
+        : verificationResult.match && verificationResult.confidence >= 70
+          ? "verified"
+          : verificationResult.missing_items.length > 0
+            ? "missing_items"
+            : verificationResult.extra_items.length > 0
+              ? "extra_items"
+              : "uncertain";
 
     // Update order with verification result (including images)
     await context.run("Update order", async () => {
@@ -164,6 +187,7 @@ export const { POST } = serve<VerifyVisualPayload>(
           missing_items: verificationResult.missing_items,
           extra_items: verificationResult.extra_items,
           match: verificationResult.match,
+          wrong_order: verificationResult.wrong_order,
         },
         actor_id: null,
       });

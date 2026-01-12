@@ -1,0 +1,1 @@
+ALTER TYPE "public"."visual_verification_status" ADD VALUE 'wrong_image';

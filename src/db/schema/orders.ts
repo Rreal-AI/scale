@@ -27,6 +27,7 @@ export const visualVerificationStatus = pgEnum("visual_verification_status", [
   "missing_items", // Items faltantes detectados
   "extra_items", // Items extra detectados
   "uncertain", // No se pudo determinar con certeza
+  "wrong_image", // La foto es de una orden completamente diferente
 ]);
 
 export const orders = pgTable("orders", {

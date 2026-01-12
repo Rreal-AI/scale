@@ -62,7 +62,7 @@ interface Order {
   total_amount: number;
   expected_weight?: number;
   actual_weight?: number;
-  visual_verification_status?: "pending" | "verified" | "missing_items" | "extra_items" | "uncertain" | null;
+  visual_verification_status?: "pending" | "verified" | "missing_items" | "extra_items" | "uncertain" | "wrong_image" | null;
   created_at: string;
   updated_at: string;
   structured_output?: {
@@ -278,7 +278,7 @@ export function WeighOrderView({
   // Helper to check if order is "checked" (has weight OR visual verification)
   const isOrderChecked = useCallback((order: Order): boolean => {
     const hasWeight = (order.actual_weight || 0) > 0;
-    const hasVisualVerification = ['verified', 'missing_items', 'extra_items', 'uncertain']
+    const hasVisualVerification = ['verified', 'missing_items', 'extra_items', 'uncertain', 'wrong_image']
       .includes(order.visual_verification_status || '');
     return hasWeight || hasVisualVerification;
   }, []);
@@ -717,7 +717,7 @@ export function WeighOrderView({
               displayOrders.map((order) => {
                 const { time, isUrgent } = getDueTime(order.created_at, order.status);
                 const visualStatus = order.visual_verification_status as
-                  | "pending" | "verified" | "missing_items" | "extra_items" | "uncertain" | null;
+                  | "pending" | "verified" | "missing_items" | "extra_items" | "uncertain" | "wrong_image" | null;
                 return (
                   <div
                     key={order.id}
@@ -745,7 +745,7 @@ export function WeighOrderView({
                         {visualStatus === "verified" && (
                           <CheckCircle2 className="h-4 w-4 text-green-500" />
                         )}
-                        {(visualStatus === "missing_items" || visualStatus === "extra_items") && (
+                        {(visualStatus === "missing_items" || visualStatus === "extra_items" || visualStatus === "wrong_image") && (
                           <AlertTriangle className="h-4 w-4 text-red-500" />
                         )}
                       </div>
@@ -895,7 +895,7 @@ export function WeighOrderView({
                 <CardContent className="p-4 pt-0">
                   {(() => {
                     const visualStatus = selectedOrder.visual_verification_status as
-                      | "pending" | "verified" | "missing_items" | "extra_items" | "uncertain" | null;
+                      | "pending" | "verified" | "missing_items" | "extra_items" | "uncertain" | "wrong_image" | null;
                     const visualResultData = selectedOrder.visual_verification_result as VisualVerificationResult | null;
 
                     if (visualStatus === "pending") {
@@ -1695,6 +1695,7 @@ export function WeighOrderView({
                               | "missing_items"
                               | "extra_items"
                               | "uncertain"
+                              | "wrong_image"
                               | null;
                             const visualResultData = selectedOrder.visual_verification_result as VisualVerificationResult | null;
 

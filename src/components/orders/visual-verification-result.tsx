@@ -19,7 +19,7 @@ import type { VisualVerificationResult } from "@/schemas/visual-verification";
 
 interface VisualVerificationResultProps {
   result: VisualVerificationResult;
-  status: "verified" | "missing_items" | "extra_items" | "uncertain";
+  status: "verified" | "missing_items" | "extra_items" | "uncertain" | "wrong_image";
   onRetry?: () => void;
   onDismiss?: () => void;
   className?: string;
@@ -57,6 +57,14 @@ const statusConfig = {
     borderColor: "border-yellow-200",
     title: "Uncertain Verification",
     emoji: "question",
+  },
+  wrong_image: {
+    icon: XCircle,
+    color: "text-red-700",
+    bgColor: "bg-red-50",
+    borderColor: "border-red-300",
+    title: "Wrong Order Photo",
+    emoji: "x",
   },
 };
 
@@ -166,6 +174,19 @@ export function VisualVerificationResultCard({
                   <li key={index}>{item}</li>
                 ))}
               </ul>
+            </div>
+          )}
+
+          {result.wrong_order && (
+            <div className="bg-red-100 border-2 border-red-400 rounded-lg p-4">
+              <h4 className="font-bold text-red-800 mb-2 flex items-center gap-2">
+                <XCircle className="h-5 w-5" />
+                WRONG ORDER PHOTO
+              </h4>
+              <p className="text-sm text-red-700">
+                The photo appears to be from a completely different order.
+                The items visible do NOT match the expected order items.
+              </p>
             </div>
           )}
 

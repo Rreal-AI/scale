@@ -120,6 +120,13 @@
       "when": 1768232350971,
       "tag": "0016_common_the_enforcers",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1768244520058,
+      "tag": "0017_chilly_joseph",
+      "breakpoints": true
     }
   ]
 }

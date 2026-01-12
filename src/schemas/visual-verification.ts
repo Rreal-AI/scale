@@ -28,6 +28,9 @@ export const visualVerificationResultSchema = z.object({
   extra_items: z
     .array(z.string())
     .describe("Names of items found in the image that were not in the order"),
+  wrong_order: z
+    .boolean()
+    .describe("True if the image appears to be of a completely different order. This means the items visible in the photo do NOT match the expected order items - even if they are from the same restaurant or cuisine type. For example: order expects '2x Burrito' but photo shows tacos and quesadillas instead."),
   notes: z
     .string()
     .optional()
