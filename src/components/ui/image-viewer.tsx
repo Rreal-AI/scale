@@ -274,7 +274,7 @@ export function ImageViewer({
         >
           <img
             src={images[currentIndex]}
-            alt={`Imagen ${currentIndex + 1}`}
+            alt={`Image ${currentIndex + 1}`}
             className="max-w-full max-h-full object-contain select-none"
             style={{
               transform: `translate(${position.x}px, ${position.y}px) scale(${scale}) rotate(${rotation}deg)`,
@@ -332,7 +332,7 @@ export function ImageViewer({
               >
                 <img
                   src={img}
-                  alt={`Miniatura ${index + 1}`}
+                  alt={`Thumbnail ${index + 1}`}
                   className="w-full h-full object-cover"
                 />
               </button>

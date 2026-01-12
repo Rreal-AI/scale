@@ -89,22 +89,22 @@ export function CameraCapture({
         switch (error.name) {
           case "NotAllowedError":
             setErrorMessage(
-              "Permiso de camara denegado. Por favor habilita el acceso a la camara en la configuracion del navegador."
+              "Camera permission denied. Please enable camera access in browser settings."
             );
             break;
           case "NotFoundError":
-            setErrorMessage("No se encontro una camara en este dispositivo.");
+            setErrorMessage("No camera found on this device.");
             break;
           case "NotReadableError":
-            setErrorMessage("La camara esta siendo usada por otra aplicacion.");
+            setErrorMessage("Camera is being used by another application.");
             break;
           default:
             setErrorMessage(
-              "Error al acceder a la camara. Por favor intenta de nuevo."
+              "Error accessing camera. Please try again."
             );
         }
       } else {
-        setErrorMessage("Error inesperado al acceder a la camara.");
+        setErrorMessage("Unexpected error accessing camera.");
       }
     }
   }, [facingMode]);
@@ -200,11 +200,11 @@ export function CameraCapture({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Camera className="h-5 w-5" />
-            Verificacion Visual del Pedido
+            Visual Order Verification
           </DialogTitle>
           <DialogDescription>
-            Toma fotos del pedido preparado para verificar que todos los items
-            esten presentes. Puedes capturar multiples imagenes.
+            Take photos of the prepared order to verify that all items
+            are present. You can capture multiple images.
           </DialogDescription>
         </DialogHeader>
 
@@ -223,7 +223,7 @@ export function CameraCapture({
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-center text-white">
                   <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
-                  <p>Accediendo a la camara...</p>
+                  <p>Accessing camera...</p>
                 </div>
               </div>
             )}
@@ -239,7 +239,7 @@ export function CameraCapture({
                     onClick={startCamera}
                     className="mt-4"
                   >
-                    Reintentar
+                    Retry
                   </Button>
                 </div>
               </div>
@@ -304,14 +304,14 @@ export function CameraCapture({
           {capturedImages.length > 0 && (
             <div className="w-32 flex flex-col gap-2">
               <p className="text-xs text-gray-500 font-medium">
-                Fotos ({capturedImages.length})
+                Photos ({capturedImages.length})
               </p>
               <div className="flex flex-col gap-2 overflow-y-auto max-h-64">
                 {capturedImages.map((img, index) => (
                   <div key={index} className="relative group">
                     <img
                       src={img}
-                      alt={`Captura ${index + 1}`}
+                      alt={`Capture ${index + 1}`}
                       className="w-full aspect-[4/3] object-cover rounded-md border-2 border-gray-200"
                     />
                     <button
@@ -335,8 +335,8 @@ export function CameraCapture({
         <DialogFooter className="flex-row gap-2 sm:justify-between">
           <div className="text-sm text-gray-500">
             {capturedImages.length === 0
-              ? "Captura al menos una foto"
-              : `${capturedImages.length} foto${capturedImages.length > 1 ? "s" : ""} capturada${capturedImages.length > 1 ? "s" : ""}`}
+              ? "Capture at least one photo"
+              : `${capturedImages.length} photo${capturedImages.length > 1 ? "s" : ""} captured`}
           </div>
           <div className="flex gap-2">
             <Button
@@ -344,7 +344,7 @@ export function CameraCapture({
               onClick={() => onOpenChange(false)}
               disabled={isProcessing}
             >
-              Cancelar
+              Cancel
             </Button>
             <Button
               onClick={confirmPhotos}
@@ -358,12 +358,12 @@ export function CameraCapture({
               {isProcessing ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Analizando...
+                  Analyzing...
                 </>
               ) : (
                 <>
                   <Check className="h-4 w-4 mr-2" />
-                  Verificar ({capturedImages.length})
+                  Verify ({capturedImages.length})
                 </>
               )}
             </Button>

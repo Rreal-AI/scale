@@ -231,7 +231,7 @@ export function WeighOrderView({
 
     // Close modal immediately
     setCameraOpen(false);
-    toast.info("Verificacion visual iniciada. Procesando en segundo plano...");
+    toast.info("Visual verification started. Processing in background...");
 
     // Clear cameraOrderId if it was a quick camera action
     if (cameraOrderId) {
@@ -245,7 +245,7 @@ export function WeighOrderView({
         images,
       });
     } catch (error) {
-      toast.error("Error al iniciar verificacion visual");
+      toast.error("Error starting visual verification");
       console.error(error);
     }
   };
@@ -649,7 +649,7 @@ export function WeighOrderView({
                   : ""
               )}
             >
-              Pendientes
+              Pending
             </Button>
             <Button
               variant="outline"
@@ -662,7 +662,7 @@ export function WeighOrderView({
                   : ""
               )}
             >
-              Pesados
+              Weighed
             </Button>
             <Button
               variant="outline"
@@ -752,7 +752,7 @@ export function WeighOrderView({
                             order.status === "weighed" && "bg-green-100 text-green-700 border-green-300"
                           )}
                         >
-                          {order.status === "pending_weight" ? "Pendiente" : "Pesado"}
+                          {order.status === "pending_weight" ? "Pending" : "Weighed"}
                         </Badge>
                         <span className="font-medium">{formatPrice(order.total_amount)}</span>
                       </div>
@@ -821,7 +821,7 @@ export function WeighOrderView({
                         selectedOrder.status === "weighed" && "bg-green-100 text-green-700"
                       )}
                     >
-                      {selectedOrder.status === "pending_weight" ? "Pendiente" : "Pesado"}
+                      {selectedOrder.status === "pending_weight" ? "Pending" : "Weighed"}
                     </Badge>
                   </div>
                   {selectedOrder.customer_address && (
@@ -837,7 +837,7 @@ export function WeighOrderView({
               {/* Order Items */}
               <Card>
                 <CardHeader className="p-4 pb-2">
-                  <CardTitle className="text-base">Items del Pedido</CardTitle>
+                  <CardTitle className="text-base">Order Items</CardTitle>
                 </CardHeader>
                 <CardContent className="p-4 pt-0">
                   {(selectedOrder.structured_output as Order["structured_output"])?.items?.map((item, idx) => (
@@ -862,7 +862,7 @@ export function WeighOrderView({
                 <CardHeader className="p-4 pb-2">
                   <CardTitle className="text-base flex items-center gap-2">
                     <Eye className="h-4 w-4" />
-                    Verificación Visual
+                    Visual Verification
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-4 pt-0">
@@ -875,7 +875,7 @@ export function WeighOrderView({
                       return (
                         <div className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                           <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
-                          <span className="text-sm text-blue-700">Procesando...</span>
+                          <span className="text-sm text-blue-700">Processing...</span>
                         </div>
                       );
                     }
@@ -897,7 +897,7 @@ export function WeighOrderView({
                         className="w-full h-12 border-blue-300 text-blue-700"
                       >
                         <Camera className="h-4 w-4 mr-2" />
-                        Verificar con Foto
+                        Verify with Photo
                       </Button>
                     );
                   })()}
@@ -910,13 +910,13 @@ export function WeighOrderView({
                   <CardHeader className="p-4 pb-2">
                     <CardTitle className="text-base flex items-center gap-2">
                       <Scale className="h-4 w-4" />
-                      Pesaje
+                      Weighing
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="p-4 pt-0 space-y-3">
                     {bagWeights.map((bag, index) => (
                       <div key={bag.id} className="flex items-center gap-3">
-                        <span className="text-sm font-medium w-16">Bolsa {index + 1}</span>
+                        <span className="text-sm font-medium w-16">Bag {index + 1}</span>
                         <Button
                           variant="outline"
                           className="flex-1 h-12 text-lg justify-start"
@@ -930,7 +930,7 @@ export function WeighOrderView({
                               {gramsToOunces(bag.weight).toFixed(2)} oz
                             </span>
                           ) : (
-                            <span className="text-gray-400">Pesar...</span>
+                            <span className="text-gray-400">Weigh...</span>
                           )}
                         </Button>
                       </div>
@@ -944,7 +944,7 @@ export function WeighOrderView({
                         className="flex-1"
                       >
                         <Plus className="h-4 w-4 mr-1" />
-                        Bolsa
+                        Bag
                       </Button>
                       <Button
                         variant="outline"
@@ -954,7 +954,7 @@ export function WeighOrderView({
                         className="flex-1"
                       >
                         <Minus className="h-4 w-4 mr-1" />
-                        Quitar
+                        Remove
                       </Button>
                     </div>
                   </CardContent>
@@ -963,7 +963,7 @@ export function WeighOrderView({
             </div>
           ) : (
             <div className="flex items-center justify-center h-full text-gray-500">
-              Selecciona una orden
+              Select an order
             </div>
           )}
         </div>
@@ -978,7 +978,7 @@ export function WeighOrderView({
             className="flex-1 mr-2 h-12"
           >
             <ChevronLeft className="h-5 w-5 mr-1" />
-            Anterior
+            Previous
           </Button>
           <Button
             variant="outline"
@@ -987,7 +987,7 @@ export function WeighOrderView({
             disabled={!canGoNext}
             className="flex-1 ml-2 h-12"
           >
-            Siguiente
+            Next
             <ChevronRight className="h-5 w-5 ml-1" />
           </Button>
         </div>
@@ -1644,7 +1644,7 @@ export function WeighOrderView({
                                 <div className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                                   <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
                                   <span className="text-sm text-blue-700">
-                                    Procesando verificacion visual...
+                                    Processing visual verification...
                                   </span>
                                 </div>
                               );
@@ -1667,7 +1667,7 @@ export function WeighOrderView({
                                 className="w-full border-blue-300 text-blue-700 hover:bg-blue-50"
                               >
                                 <Camera className="h-4 w-4 mr-2" />
-                                Verificar con Foto
+                                Verify with Photo
                               </Button>
                             );
                           })()}

@@ -31,7 +31,7 @@ const statusConfig = {
     color: "text-green-700",
     bgColor: "bg-green-50",
     borderColor: "border-green-200",
-    title: "Pedido Verificado",
+    title: "Order Verified",
     emoji: "check",
   },
   missing_items: {
@@ -39,7 +39,7 @@ const statusConfig = {
     color: "text-red-700",
     bgColor: "bg-red-50",
     borderColor: "border-red-200",
-    title: "Items Faltantes Detectados",
+    title: "Missing Items Detected",
     emoji: "warning",
   },
   extra_items: {
@@ -47,7 +47,7 @@ const statusConfig = {
     color: "text-orange-700",
     bgColor: "bg-orange-50",
     borderColor: "border-orange-200",
-    title: "Items Extra Detectados",
+    title: "Extra Items Detected",
     emoji: "search",
   },
   uncertain: {
@@ -55,7 +55,7 @@ const statusConfig = {
     color: "text-yellow-700",
     bgColor: "bg-yellow-50",
     borderColor: "border-yellow-200",
-    title: "Verificacion Incierta",
+    title: "Uncertain Verification",
     emoji: "question",
   },
 };
@@ -113,7 +113,7 @@ export function VisualVerificationResultCard({
               </h3>
               <div className="flex items-center gap-2 mt-1">
                 <Badge variant="outline" className="text-xs">
-                  Confianza: {result.confidence}%
+                  Confidence: {result.confidence}%
                 </Badge>
               </div>
             </div>
@@ -146,7 +146,7 @@ export function VisualVerificationResultCard({
           {result.missing_items.length > 0 && (
             <div className="bg-red-100 border border-red-300 rounded-lg p-3">
               <h4 className="font-medium text-red-800 mb-1">
-                Items Posiblemente Faltantes:
+                Possibly Missing Items:
               </h4>
               <ul className="text-sm text-red-700 list-disc list-inside">
                 {result.missing_items.map((item, index) => (
@@ -159,7 +159,7 @@ export function VisualVerificationResultCard({
           {result.extra_items.length > 0 && (
             <div className="bg-orange-100 border border-orange-300 rounded-lg p-3">
               <h4 className="font-medium text-orange-800 mb-1">
-                Items Extra Detectados:
+                Extra Items Detected:
               </h4>
               <ul className="text-sm text-orange-700 list-disc list-inside">
                 {result.extra_items.map((item, index) => (
@@ -178,7 +178,7 @@ export function VisualVerificationResultCard({
             <div className="space-y-2">
               <h4 className="text-sm font-medium text-gray-700 flex items-center gap-2">
                 <ImageIcon className="h-4 w-4" />
-                Fotos de verificacion ({result.images.length})
+                Verification photos ({result.images.length})
               </h4>
               <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1">
                 {result.images.map((img, index) => (
@@ -189,7 +189,7 @@ export function VisualVerificationResultCard({
                   >
                     <img
                       src={img}
-                      alt={`Foto ${index + 1}`}
+                      alt={`Photo ${index + 1}`}
                       className="w-full h-full object-cover"
                     />
                   </button>
@@ -201,7 +201,7 @@ export function VisualVerificationResultCard({
           {onRetry && (
             <Button variant="outline" onClick={onRetry} className="w-full">
               <Camera className="h-4 w-4 mr-2" />
-              Tomar Otra Foto
+              Take Another Photo
             </Button>
           )}
         </div>
