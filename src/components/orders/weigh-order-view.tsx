@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRealTimeOrders, useOrder, useRevertOrderStatus } from "@/hooks/use-orders";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { usePackaging } from "@/hooks/use-packaging";
 import { useOrganization } from "@/hooks/use-organization";
 import { useCreateWeightSample } from "@/hooks/use-product-weight-samples";
@@ -29,6 +30,9 @@ import {
   X,
   Camera,
   Eye,
+  ChevronLeft,
+  ChevronRight,
+  Menu,
 } from "lucide-react";
 import { CameraCapture } from "./camera-capture";
 import { VisualVerificationResultCard } from "./visual-verification-result";
@@ -46,6 +50,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 
 interface Order {
   id: string;
@@ -146,7 +151,13 @@ export function WeighOrderView({
 
   // Visual verification state
   const [cameraOpen, setCameraOpen] = useState(false);
+  const [cameraOrderId, setCameraOrderId] = useState<string | null>(null);
   const visualVerification = useVisualVerification();
+
+  // Mobile state
+  const isMobile = useIsMobile();
+  const [mobileView, setMobileView] = useState<"list" | "detail">("list");
+  const touchStartX = useRef<number | null>(null);
 
   // Auto-save weighing progress
   const saveWeighingProgress = (orderId: string, bagWeights: BagWeight[], bagPackaging: Record<string, PackagingSelection[]>, bagCount: number) => {
@@ -207,17 +218,31 @@ export function WeighOrderView({
     }
   }, [selectedOrderId, defaultPackaging?.id]);
 
+  // Handler for quick camera from list (without entering detail)
+  const handleQuickCamera = useCallback((orderId: string, e: React.MouseEvent | React.TouchEvent) => {
+    e.stopPropagation(); // Don't open order detail
+    setCameraOrderId(orderId);
+    setCameraOpen(true);
+  }, []);
+
   // Handler for visual verification - closes modal immediately, processes in background
   const handleVisualVerification = async (images: string[]) => {
-    if (!selectedOrderId) return;
+    const targetOrderId = cameraOrderId || selectedOrderId;
+    if (!targetOrderId) return;
 
     // Close modal immediately
     setCameraOpen(false);
     toast.info("Verificacion visual iniciada. Procesando en segundo plano...");
 
+    // Clear cameraOrderId if it was a quick camera action
+    if (cameraOrderId) {
+      setCameraOrderId(null);
+      // Stay in list view (don't switch to detail)
+    }
+
     try {
       await visualVerification.mutateAsync({
-        orderId: selectedOrderId,
+        orderId: targetOrderId,
         images,
       });
     } catch (error) {
@@ -307,6 +332,54 @@ export function WeighOrderView({
       return false;
     }
   };
+
+  // Mobile navigation functions
+  const currentOrderIndex = displayOrders.findIndex(o => o.id === selectedOrderId);
+  const canGoNext = currentOrderIndex < displayOrders.length - 1;
+  const canGoPrev = currentOrderIndex > 0;
+
+  const goToNextOrder = useCallback(() => {
+    if (canGoNext) {
+      onOrderSelect(displayOrders[currentOrderIndex + 1].id);
+    }
+  }, [canGoNext, currentOrderIndex, displayOrders, onOrderSelect]);
+
+  const goToPrevOrder = useCallback(() => {
+    if (canGoPrev) {
+      onOrderSelect(displayOrders[currentOrderIndex - 1].id);
+    }
+  }, [canGoPrev, currentOrderIndex, displayOrders, onOrderSelect]);
+
+  // Handle mobile order selection
+  const handleMobileOrderSelect = useCallback((orderId: string) => {
+    onOrderSelect(orderId);
+    setMobileView("detail");
+  }, [onOrderSelect]);
+
+  // Handle swipe gestures for mobile
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  }, []);
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+
+    const touchEndX = e.changedTouches[0].clientX;
+    const diff = touchStartX.current - touchEndX;
+    const threshold = 50; // minimum swipe distance
+
+    if (Math.abs(diff) > threshold) {
+      if (diff > 0) {
+        // Swipe left - next order
+        goToNextOrder();
+      } else {
+        // Swipe right - previous order
+        goToPrevOrder();
+      }
+    }
+
+    touchStartX.current = null;
+  }, [goToNextOrder, goToPrevOrder]);
 
   const toggleSelectReady = (orderId: string) => {
     setSelectedReadyIds((prev) => {
@@ -536,6 +609,422 @@ export function WeighOrderView({
     }
   };
 
+  // Mobile Layout
+  if (isMobile) {
+    // Mobile List View
+    if (mobileView === "list") {
+      return (
+        <div className="flex flex-col h-screen bg-gray-50">
+          {/* Mobile Header */}
+          <div className="flex items-center justify-between p-4 bg-white border-b border-gray-200">
+            <SidebarTrigger className="p-2" />
+            <h1 className="text-lg font-semibold">Órdenes</h1>
+            <Button variant="ghost" size="icon" className="p-2">
+              <Search className="h-5 w-5" />
+            </Button>
+          </div>
+
+          {/* Search */}
+          <div className="p-3 bg-white border-b border-gray-100">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Buscar órdenes..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 h-10"
+              />
+            </div>
+          </div>
+
+          {/* Filters */}
+          <div className="flex gap-2 p-3 bg-white border-b border-gray-100 overflow-x-auto">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSelectedStatus("pending_weight")}
+              className={cn(
+                "h-9 px-4 whitespace-nowrap",
+                selectedStatus === "pending_weight"
+                  ? "bg-orange-100 text-orange-700 border-orange-300"
+                  : ""
+              )}
+            >
+              Pendientes
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSelectedStatus("weighed")}
+              className={cn(
+                "h-9 px-4 whitespace-nowrap",
+                selectedStatus === "weighed"
+                  ? "bg-green-100 text-green-700 border-green-300"
+                  : ""
+              )}
+            >
+              Pesados
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSelectedStatus("all")}
+              className={cn(
+                "h-9 px-4 whitespace-nowrap",
+                selectedStatus === "all"
+                  ? "bg-gray-900 text-white border-gray-900"
+                  : ""
+              )}
+            >
+              Todos
+            </Button>
+          </div>
+
+          {/* Orders List */}
+          <div className="flex-1 overflow-y-auto">
+            {displayOrders.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-full text-gray-500 p-8">
+                <Package className="h-12 w-12 mb-3 opacity-50" />
+                <p>No hay órdenes</p>
+              </div>
+            ) : (
+              displayOrders.map((order) => {
+                const { time, isUrgent } = getDueTime(order.created_at, order.status);
+                const visualStatus = order.visual_verification_status as
+                  | "pending" | "verified" | "missing_items" | "extra_items" | "uncertain" | null;
+                return (
+                  <div
+                    key={order.id}
+                    onClick={() => handleMobileOrderSelect(order.id)}
+                    className={cn(
+                      "p-4 border-b border-gray-100 cursor-pointer active:bg-gray-100",
+                      order.id === selectedOrderId && "bg-blue-50"
+                    )}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold">#{order.check_number}</span>
+                        {order.type === "delivery" ? (
+                          <Truck className="h-4 w-4 text-blue-500" />
+                        ) : (
+                          <Package className="h-4 w-4 text-green-500" />
+                        )}
+                        {hasWeighingProgress(order.id) && (
+                          <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse" />
+                        )}
+                        {/* Visual verification status indicator */}
+                        {visualStatus === "pending" && (
+                          <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
+                        )}
+                        {visualStatus === "verified" && (
+                          <CheckCircle2 className="h-4 w-4 text-green-500" />
+                        )}
+                        {(visualStatus === "missing_items" || visualStatus === "extra_items") && (
+                          <AlertTriangle className="h-4 w-4 text-red-500" />
+                        )}
+                      </div>
+                      {/* Quick camera button */}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={(e) => handleQuickCamera(order.id, e)}
+                        className="h-10 w-10 rounded-full bg-blue-50 hover:bg-blue-100"
+                      >
+                        <Camera className="h-5 w-5 text-blue-600" />
+                      </Button>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600 truncate max-w-[50%]">{order.customer_name}</span>
+                      <div className="flex items-center gap-2">
+                        <Badge
+                          variant="outline"
+                          className={cn(
+                            "text-xs",
+                            order.status === "pending_weight" && "bg-orange-100 text-orange-700 border-orange-300",
+                            order.status === "weighed" && "bg-green-100 text-green-700 border-green-300"
+                          )}
+                        >
+                          {order.status === "pending_weight" ? "Pendiente" : "Pesado"}
+                        </Badge>
+                        <span className="font-medium">{formatPrice(order.total_amount)}</span>
+                      </div>
+                    </div>
+                    {order.status === "pending_weight" && (
+                      <div className={cn(
+                        "text-xs mt-1",
+                        isUrgent ? "text-red-600 font-medium" : "text-gray-500"
+                      )}>
+                        {time}
+                      </div>
+                    )}
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // Mobile Detail View
+    return (
+      <div
+        className="flex flex-col h-screen bg-gray-50"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
+        {/* Mobile Detail Header */}
+        <div className="flex items-center justify-between p-3 bg-white border-b border-gray-200">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setMobileView("list")}
+            className="flex items-center gap-1 text-blue-600"
+          >
+            <ChevronLeft className="h-5 w-5" />
+            Atrás
+          </Button>
+          <div className="flex items-center gap-2">
+            <span className="font-semibold">#{selectedOrder?.check_number}</span>
+            {selectedOrder?.type === "delivery" ? (
+              <Truck className="h-4 w-4 text-blue-500" />
+            ) : (
+              <Package className="h-4 w-4 text-green-500" />
+            )}
+          </div>
+          <div className="text-sm text-gray-500">
+            {currentOrderIndex + 1}/{displayOrders.length}
+          </div>
+        </div>
+
+        {/* Mobile Detail Content - Scrollable */}
+        <div className="flex-1 overflow-y-auto p-4">
+          {selectedOrder ? (
+            <div className="space-y-4">
+              {/* Customer Info Card */}
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-semibold">{selectedOrder.customer_name}</h3>
+                    <Badge
+                      variant="outline"
+                      className={cn(
+                        selectedOrder.status === "pending_weight" && "bg-orange-100 text-orange-700",
+                        selectedOrder.status === "weighed" && "bg-green-100 text-green-700"
+                      )}
+                    >
+                      {selectedOrder.status === "pending_weight" ? "Pendiente" : "Pesado"}
+                    </Badge>
+                  </div>
+                  {selectedOrder.customer_address && (
+                    <p className="text-sm text-gray-600">{selectedOrder.customer_address}</p>
+                  )}
+                  <div className="flex justify-between items-center mt-3 pt-3 border-t">
+                    <span className="text-gray-600">Total</span>
+                    <span className="text-lg font-bold">{formatPrice(selectedOrder.total_amount)}</span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Order Items */}
+              <Card>
+                <CardHeader className="p-4 pb-2">
+                  <CardTitle className="text-base">Items del Pedido</CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 pt-0">
+                  {(selectedOrder.structured_output as Order["structured_output"])?.items?.map((item, idx) => (
+                    <div key={idx} className="flex justify-between py-2 border-b last:border-0">
+                      <div>
+                        <span className="font-medium">{item.quantity}x</span>{" "}
+                        <span>{item.name}</span>
+                        {item.modifiers && item.modifiers.length > 0 && (
+                          <div className="text-xs text-gray-500 mt-0.5">
+                            {item.modifiers.map(m => m.name).join(", ")}
+                          </div>
+                        )}
+                      </div>
+                      <span className="text-gray-600">{formatPrice(item.price * 100)}</span>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+
+              {/* Weighing Section */}
+              {selectedOrder.status === "pending_weight" && (
+                <Card>
+                  <CardHeader className="p-4 pb-2">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <Scale className="h-4 w-4" />
+                      Pesaje
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-4 pt-0 space-y-3">
+                    {bagWeights.map((bag, index) => (
+                      <div key={bag.id} className="flex items-center gap-3">
+                        <span className="text-sm font-medium w-16">Bolsa {index + 1}</span>
+                        <Button
+                          variant="outline"
+                          className="flex-1 h-12 text-lg justify-start"
+                          onClick={() => {
+                            setSelectedBagForWeighing({ id: bag.id, number: index + 1 });
+                            setWeightModalOpen(true);
+                          }}
+                        >
+                          {bag.weight > 0 ? (
+                            <span className="text-green-600 font-semibold">
+                              {gramsToOunces(bag.weight).toFixed(2)} oz
+                            </span>
+                          ) : (
+                            <span className="text-gray-400">Pesar...</span>
+                          )}
+                        </Button>
+                      </div>
+                    ))}
+                    <div className="flex gap-2 pt-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={addBag}
+                        disabled={bagCount >= 10}
+                        className="flex-1"
+                      >
+                        <Plus className="h-4 w-4 mr-1" />
+                        Bolsa
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={removeBag}
+                        disabled={bagCount <= 1}
+                        className="flex-1"
+                      >
+                        <Minus className="h-4 w-4 mr-1" />
+                        Quitar
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Visual Verification Section */}
+              <Card>
+                <CardHeader className="p-4 pb-2">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Eye className="h-4 w-4" />
+                    Verificación Visual
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 pt-0">
+                  {(() => {
+                    const visualStatus = selectedOrder.visual_verification_status as
+                      | "pending" | "verified" | "missing_items" | "extra_items" | "uncertain" | null;
+                    const visualResultData = selectedOrder.visual_verification_result as VisualVerificationResult | null;
+
+                    if (visualStatus === "pending") {
+                      return (
+                        <div className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                          <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+                          <span className="text-sm text-blue-700">Procesando...</span>
+                        </div>
+                      );
+                    }
+
+                    if (visualStatus && visualResultData) {
+                      return (
+                        <VisualVerificationResultCard
+                          result={visualResultData}
+                          status={visualStatus}
+                          onRetry={() => setCameraOpen(true)}
+                        />
+                      );
+                    }
+
+                    return (
+                      <Button
+                        variant="outline"
+                        onClick={() => setCameraOpen(true)}
+                        className="w-full h-12 border-blue-300 text-blue-700"
+                      >
+                        <Camera className="h-4 w-4 mr-2" />
+                        Verificar con Foto
+                      </Button>
+                    );
+                  })()}
+                </CardContent>
+              </Card>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center h-full text-gray-500">
+              Selecciona una orden
+            </div>
+          )}
+        </div>
+
+        {/* Mobile Navigation Footer */}
+        <div className="flex items-center justify-between p-3 bg-white border-t border-gray-200 safe-area-inset-bottom">
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={goToPrevOrder}
+            disabled={!canGoPrev}
+            className="flex-1 mr-2 h-12"
+          >
+            <ChevronLeft className="h-5 w-5 mr-1" />
+            Anterior
+          </Button>
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={goToNextOrder}
+            disabled={!canGoNext}
+            className="flex-1 ml-2 h-12"
+          >
+            Siguiente
+            <ChevronRight className="h-5 w-5 ml-1" />
+          </Button>
+        </div>
+
+        {/* Weight Input Modal */}
+        <WeightInputModal
+          open={weightModalOpen}
+          onOpenChange={(open) => {
+            if (!open) {
+              setWeightModalOpen(false);
+              setSelectedBagForWeighing(null);
+            }
+          }}
+          onWeightConfirm={(weightOz: number) => {
+            if (selectedBagForWeighing) {
+              updateBagWeight(selectedBagForWeighing.id, ouncesToGrams(weightOz));
+            }
+            setWeightModalOpen(false);
+            setSelectedBagForWeighing(null);
+          }}
+          bagNumber={selectedBagForWeighing?.number || 1}
+          currentWeight={
+            selectedBagForWeighing
+              ? gramsToOunces(
+                  bagWeights.find((b) => b.id === selectedBagForWeighing.id)?.weight || 0
+                )
+              : 0
+          }
+        />
+
+        {/* Camera Capture Modal */}
+        <CameraCapture
+          open={cameraOpen}
+          onOpenChange={(open) => {
+            setCameraOpen(open);
+            if (!open) setCameraOrderId(null);
+          }}
+          onCapture={handleVisualVerification}
+          isProcessing={visualVerification.isPending}
+        />
+      </div>
+    );
+  }
+
+  // Desktop Layout
   return (
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar - Orders List - Tablet Optimized */}
@@ -1663,7 +2152,10 @@ export function WeighOrderView({
       {/* Camera Capture Modal for Visual Verification */}
       <CameraCapture
         open={cameraOpen}
-        onOpenChange={setCameraOpen}
+        onOpenChange={(open) => {
+          setCameraOpen(open);
+          if (!open) setCameraOrderId(null);
+        }}
         onCapture={handleVisualVerification}
         isProcessing={visualVerification.isPending}
       />
