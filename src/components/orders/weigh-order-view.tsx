@@ -3,36 +3,24 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useRealTimeOrders, useOrder, useRevertOrderStatus } from "@/hooks/use-orders";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { usePackaging } from "@/hooks/use-packaging";
-import { useOrganization } from "@/hooks/use-organization";
-import { useCreateWeightSample } from "@/hooks/use-product-weight-samples";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { WeightInputModal } from "./weight-input-modal";
 import { formatPrice } from "@/lib/format";
-import { gramsToOunces, ouncesToGrams } from "@/lib/weight-conversion";
-import { analyzeOrderWeight } from "@/lib/weight-analysis";
 import {
   ArrowLeft,
   Search,
-  Scale,
   Package,
   Truck,
   CheckCircle2,
   AlertTriangle,
-  Plus,
-  Minus,
   Undo2,
   Loader2,
-  X,
   Camera,
   Eye,
   ChevronLeft,
   ChevronRight,
-  Menu,
 } from "lucide-react";
 import { CameraCapture } from "./camera-capture";
 import { VisualVerificationResultCard } from "./visual-verification-result";
@@ -89,15 +77,6 @@ interface WeighOrderViewProps {
   ) => void;
 }
 
-interface BagWeight {
-  id: string;
-  weight: number;
-}
-
-interface PackagingSelection {
-  packagingId: string;
-  quantity: number;
-}
 
 export function WeighOrderView({
   selectedOrderId,
@@ -119,38 +98,11 @@ export function WeighOrderView({
     new Set()
   );
   
-  // Trigger for re-rendering order list when weighing progress changes
-  const [weighingProgressTrigger, setWeighingProgressTrigger] = useState<number>(0);
-
-  // Fetch packaging options from database
-  const { data: packagingData } = usePackaging({ limit: 100 });
-  const packagingOptions = packagingData?.packaging ?? [];
-
-  // Fetch organization settings for weight tolerance
-  const { data: orgData } = useOrganization();
-  const toleranceGrams = orgData?.order_weight_delta_tolerance ?? 100;
-  const toleranceOz = gramsToOunces(toleranceGrams);
-
-  // Weighing state
-  const [bagCount, setBagCount] = useState<number>(1);
-  const [bagWeights, setBagWeights] = useState<BagWeight[]>([
-    { id: "bag-1", weight: 0 },
-  ]);
-  // Store packaging selections (multiple per bag with quantity)
-  const [bagPackaging, setBagPackaging] = useState<Record<string, PackagingSelection[]>>({});
-  const [weightModalOpen, setWeightModalOpen] = useState(false);
-  const [selectedBagForWeighing, setSelectedBagForWeighing] = useState<{
-    id: string;
-    number: number;
-  } | null>(null);
+  // Dialogs state
   const [revertDialogOpen, setRevertDialogOpen] = useState(false);
-  const [overrideDialogOpen, setOverrideDialogOpen] = useState(false);
 
   // Revert order status hook
   const revertOrderStatus = useRevertOrderStatus();
-
-  // Weight sample hook
-  const createWeightSample = useCreateWeightSample();
 
   // Visual verification state
   const [cameraOpen, setCameraOpen] = useState(false);
@@ -162,64 +114,11 @@ export function WeighOrderView({
   const [mobileView, setMobileView] = useState<"list" | "detail">("list");
   const touchStartX = useRef<number | null>(null);
 
-  // Auto-save weighing progress
-  const saveWeighingProgress = (orderId: string, bagWeights: BagWeight[], bagPackaging: Record<string, PackagingSelection[]>, bagCount: number) => {
-    const progress = {
-      orderId,
-      bagWeights,
-      bagPackaging,
-      bagCount,
-      timestamp: Date.now()
-    };
-    localStorage.setItem(`weighing-progress-${orderId}`, JSON.stringify(progress));
-    // Trigger re-render to update orange indicators in the list
-    setWeighingProgressTrigger(prev => prev + 1);
-  };
+  // Swipe to Ready state
+  const [swipeOrderId, setSwipeOrderId] = useState<string | null>(null);
+  const [swipeOffset, setSwipeOffset] = useState(0);
+  const swipeStartX = useRef<number | null>(null);
 
-  const loadWeighingProgress = (orderId: string) => {
-    try {
-      const saved = localStorage.getItem(`weighing-progress-${orderId}`);
-      if (saved) {
-        const progress = JSON.parse(saved);
-        // Only load if it's from the last 24 hours
-        if (Date.now() - progress.timestamp < 24 * 60 * 60 * 1000) {
-          return progress;
-        }
-      }
-    } catch (error) {
-      console.error("Error loading weighing progress:", error);
-    }
-    return null;
-  };
-
-  const clearWeighingProgress = (orderId: string) => {
-    localStorage.removeItem(`weighing-progress-${orderId}`);
-    // Trigger re-render to update orange indicators in the list
-    setWeighingProgressTrigger(prev => prev + 1);
-  };
-
-  // Find default packaging from database
-  const defaultPackaging = packagingOptions.find(p => p.is_default);
-
-  // Load weighing progress when order changes
-  useEffect(() => {
-    if (selectedOrderId) {
-      const savedProgress = loadWeighingProgress(selectedOrderId);
-      if (savedProgress) {
-        setBagWeights(savedProgress.bagWeights);
-        setBagPackaging(savedProgress.bagPackaging);
-        setBagCount(savedProgress.bagCount);
-        console.log("Restored weighing progress for order", selectedOrderId);
-      } else {
-        // Reset to default if no saved progress
-        setBagWeights([{ id: "bag-1", weight: 0 }]);
-        // Pre-select default packaging if one exists
-        const defaultPkgId = defaultPackaging?.id || "";
-        setBagPackaging(defaultPkgId ? { "bag-1": [{ packagingId: defaultPkgId, quantity: 1 }] } : {});
-        setBagCount(1);
-      }
-    }
-  }, [selectedOrderId, defaultPackaging?.id]);
 
   // Handler for quick camera from list (without entering detail)
   const handleQuickCamera = useCallback((orderId: string) => {
@@ -282,6 +181,18 @@ export function WeighOrderView({
       .includes(order.visual_verification_status || '');
     return hasWeight || hasVisualVerification;
   }, []);
+
+  // Auto-abrir cámara cuando se selecciona una orden PENDING (desktop)
+  useEffect(() => {
+    if (!isMobile && selectedOrderId && selectedOrder) {
+      // Solo abrir si la orden no tiene verificación visual
+      if (!isOrderChecked(selectedOrder as Order)) {
+        // Pequeño delay para que la UI se renderice primero
+        const timer = setTimeout(() => setCameraOpen(true), 100);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [selectedOrderId, selectedOrder, isMobile, isOrderChecked]);
 
   // Helper to get verification style (badge and border colors)
   const getVerificationStyle = (status: string | null | undefined) => {
@@ -369,21 +280,6 @@ export function WeighOrderView({
     return { pending, checked, ready };
   }, [orders, isOrderChecked]);
 
-  // Helper to check if order has weighing progress
-  const hasWeighingProgress = (orderId: string): boolean => {
-    try {
-      const saved = localStorage.getItem(`weighing-progress-${orderId}`);
-      if (!saved) return false;
-      const progress = JSON.parse(saved);
-      // Check if progress is recent (within 24 hours) and has actual weight data
-      if (Date.now() - progress.timestamp > 24 * 60 * 60 * 1000) return false;
-      // Check if any bag has weight > 0
-      return progress.bagWeights?.some((bag: BagWeight) => bag.weight > 0) || false;
-    } catch {
-      return false;
-    }
-  };
-
   // Mobile navigation functions
   const currentOrderIndex = displayOrders.findIndex(o => o.id === selectedOrderId);
   const canGoNext = currentOrderIndex < displayOrders.length - 1;
@@ -405,7 +301,14 @@ export function WeighOrderView({
   const handleMobileOrderSelect = useCallback((orderId: string) => {
     onOrderSelect(orderId);
     setMobileView("detail");
-  }, [onOrderSelect]);
+
+    // Auto-abrir cámara si la orden no tiene verificación visual
+    const order = orders.find(o => o.id === orderId);
+    if (order && !isOrderChecked(order)) {
+      // Pequeño delay para que la UI se renderice primero
+      setTimeout(() => setCameraOpen(true), 100);
+    }
+  }, [onOrderSelect, orders, isOrderChecked]);
 
   // Handle swipe gestures for mobile
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
@@ -432,6 +335,44 @@ export function WeighOrderView({
     touchStartX.current = null;
   }, [goToNextOrder, goToPrevOrder]);
 
+  // Swipe handlers for cards to mark as Ready
+  const handleCardSwipeStart = useCallback((e: React.TouchEvent, orderId: string, canSwipe: boolean) => {
+    if (!canSwipe) return;
+    e.stopPropagation();
+    swipeStartX.current = e.touches[0].clientX;
+    setSwipeOrderId(orderId);
+  }, []);
+
+  const handleCardSwipeMove = useCallback((e: React.TouchEvent, orderId: string) => {
+    if (swipeOrderId !== orderId || swipeStartX.current === null) return;
+    e.stopPropagation();
+    const diff = swipeStartX.current - e.touches[0].clientX;
+    // Solo permitir swipe a la izquierda
+    if (diff > 0) {
+      setSwipeOffset(Math.min(diff, 100));
+    }
+  }, [swipeOrderId]);
+
+  const handleCardSwipeEnd = useCallback(async (orderId: string) => {
+    if (swipeOrderId !== orderId) return;
+
+    // Si el swipe fue suficiente, marcar como Ready
+    if (swipeOffset > 60) {
+      try {
+        await onOrderWeighed(orderId, 0, "weighed");
+        toast.success("Order marked as Ready for Lockers");
+      } catch (e) {
+        console.error(e);
+        toast.error("Failed to mark order as ready");
+      }
+    }
+
+    // Reset swipe state
+    setSwipeOffset(0);
+    setSwipeOrderId(null);
+    swipeStartX.current = null;
+  }, [swipeOrderId, swipeOffset, onOrderWeighed]);
+
   const toggleSelectReady = (orderId: string) => {
     setSelectedReadyIds((prev) => {
       const next = new Set(prev);
@@ -450,165 +391,6 @@ export function WeighOrderView({
   };
 
   const clearReadySelection = () => setSelectedReadyIds(new Set());
-
-  // Add bag
-  const addBag = () => {
-    if (bagCount < 10) {
-      const newBagCount = bagCount + 1;
-      setBagCount(newBagCount);
-      const id = `bag-${newBagCount}`;
-      setBagWeights((prev) => {
-        const updated = [...prev, { id, weight: 0 }];
-        // Auto-save progress
-        if (selectedOrderId) {
-          saveWeighingProgress(selectedOrderId, updated, bagPackaging, newBagCount);
-        }
-        return updated;
-      });
-      // Pre-select default packaging for new bags
-      if (defaultPackaging?.id) {
-        setBagPackaging((prev) => ({ ...prev, [id]: [{ packagingId: defaultPackaging.id, quantity: 1 }] }));
-      }
-    }
-  };
-
-  // Remove bag
-  const removeBag = () => {
-    if (bagCount > 1) {
-      const newBagCount = bagCount - 1;
-      setBagCount(newBagCount);
-      setBagWeights((prev) => {
-        const updated = prev.slice(0, newBagCount);
-        // Auto-save progress
-        if (selectedOrderId) {
-          saveWeighingProgress(selectedOrderId, updated, bagPackaging, newBagCount);
-        }
-        return updated;
-      });
-    }
-  };
-
-  // Handle opening weight modal
-  const handleOpenWeightModal = (bagId: string, bagNumber: number) => {
-    setSelectedBagForWeighing({ id: bagId, number: bagNumber });
-    setWeightModalOpen(true);
-  };
-
-  // Handle weight confirmation from modal
-  const handleWeightConfirm = (weight: number) => {
-    if (selectedBagForWeighing) {
-      updateBagWeight(selectedBagForWeighing.id, weight);
-      
-      // Auto-advance to next bag if available
-      const currentBagIndex = bagWeights.findIndex(bag => bag.id === selectedBagForWeighing.id);
-      const nextBagIndex = currentBagIndex + 1;
-      
-      if (nextBagIndex < bagWeights.length) {
-        // Move to next bag
-        const nextBag = bagWeights[nextBagIndex];
-        setSelectedBagForWeighing({ 
-          id: nextBag.id, 
-          number: nextBagIndex + 1 
-        });
-        // Keep modal open for next bag
-      } else {
-        // No more bags, close modal
-        setWeightModalOpen(false);
-        setSelectedBagForWeighing(null);
-      }
-    }
-  };
-
-  // Update individual bag weight
-  const updateBagWeight = (bagId: string, weight: number) => {
-    setBagWeights((prev) => {
-      const updated = prev.map((bag) => (bag.id === bagId ? { ...bag, weight } : bag));
-      // Auto-save progress
-      if (selectedOrderId) {
-        saveWeighingProgress(selectedOrderId, updated, bagPackaging, bagCount);
-      }
-      return updated;
-    });
-  };
-
-  // Calculate total weight including packaging (from database)
-  const totalWeight = Math.round(
-    bagWeights.reduce((sum, bag) => {
-      const bagWeight = bag.weight;
-      // Sum all packaging selections for this bag
-      const packagingSelections = bagPackaging[bag.id] || [];
-      const totalPackagingWeightOz = packagingSelections.reduce((pkgSum, selection) => {
-        const packagingItem = packagingOptions.find(p => p.id === selection.packagingId);
-        if (packagingItem) {
-          return pkgSum + gramsToOunces(packagingItem.weight) * selection.quantity;
-        }
-        return pkgSum;
-      }, 0);
-      return sum + bagWeight + totalPackagingWeightOz;
-    }, 0) * 100
-  ) / 100; // Round to 2 decimal places to fix floating point precision
-
-  // Handle complete weighing or re-weigh
-  const handleWeighAction = () => {
-    if (!selectedOrderId || totalWeight === 0) return;
-
-    const expectedWeightOz = selectedOrder?.expected_weight
-      ? gramsToOunces(selectedOrder.expected_weight)
-      : 0;
-
-    // Only analyze if we have expected weight
-    if (expectedWeightOz > 0) {
-      const structuredOutput = selectedOrder?.structured_output as {
-        items?: Array<{
-          name: string;
-          quantity: number;
-          price: number;
-          modifiers?: Array<{ name: string; price: number }>;
-        }>;
-      } | null;
-      const analysis = analyzeOrderWeight(
-        totalWeight,
-        expectedWeightOz,
-        structuredOutput?.items || [],
-        toleranceOz
-      );
-
-      if (analysis.status === "underweight") {
-        // Don't complete - just reset for re-weighing
-        resetWeighingState();
-        return;
-      }
-    }
-
-    // Complete weighing (for perfect/overweight orders or orders without expected weight)
-    const weightInGrams = ouncesToGrams(totalWeight);
-    onOrderWeighed(selectedOrderId, weightInGrams);
-
-    // Auto-advance to next pending order
-    const nextPendingOrder = orders.find(
-      (order) =>
-        order.status === "pending_weight" && order.id !== selectedOrderId
-    );
-
-    if (nextPendingOrder) {
-      onOrderSelect(nextPendingOrder.id);
-    }
-
-    resetWeighingState();
-  };
-
-  // Reset weighing state
-  const resetWeighingState = () => {
-    setBagCount(1);
-    setBagWeights([{ id: "bag-1", weight: 0 }]);
-    // Reset to default packaging if one exists
-    const defaultPkgId = defaultPackaging?.id || "";
-    setBagPackaging(defaultPkgId ? { "bag-1": [{ packagingId: defaultPkgId, quantity: 1 }] } : {});
-    // Clear saved progress when resetting
-    if (selectedOrderId) {
-      clearWeighingProgress(selectedOrderId);
-    }
-  };
 
   const getOrderItems = (order: Order) => {
     const items = order.structured_output?.items || [];
@@ -755,16 +537,39 @@ export function WeighOrderView({
               displayOrders.map((order) => {
                 const visualStatus = order.visual_verification_status as
                   | "pending" | "verified" | "missing_items" | "extra_items" | "uncertain" | "wrong_image" | null;
+                const canSwipe = visualStatus === "verified";
+                const isBeingSwiped = swipeOrderId === order.id;
+
                 return (
-                  <div
-                    key={order.id}
-                    onClick={() => handleMobileOrderSelect(order.id)}
-                    className={cn(
-                      "p-4 border-b border-gray-100 cursor-pointer active:bg-gray-100",
-                      order.id === selectedOrderId && "bg-blue-50",
-                      getVerificationStyle(order.visual_verification_status)?.borderClass
+                  <div key={order.id} className="relative overflow-hidden">
+                    {/* Swipe background - green check */}
+                    {canSwipe && (
+                      <div
+                        className="absolute inset-0 bg-green-500 flex items-center justify-end pr-6"
+                        style={{ opacity: isBeingSwiped ? Math.min(swipeOffset / 60, 1) : 0 }}
+                      >
+                        <div className="flex items-center gap-2 text-white font-semibold">
+                          <CheckCircle2 className="h-6 w-6" />
+                          <span>Ready</span>
+                        </div>
+                      </div>
                     )}
-                  >
+                    {/* Card content */}
+                    <div
+                      onClick={() => !isBeingSwiped && handleMobileOrderSelect(order.id)}
+                      onTouchStart={(e) => handleCardSwipeStart(e, order.id, canSwipe)}
+                      onTouchMove={(e) => handleCardSwipeMove(e, order.id)}
+                      onTouchEnd={() => handleCardSwipeEnd(order.id)}
+                      style={{
+                        transform: isBeingSwiped ? `translateX(-${swipeOffset}px)` : 'translateX(0)',
+                        transition: isBeingSwiped ? 'none' : 'transform 0.2s ease-out',
+                      }}
+                      className={cn(
+                        "p-4 border-b border-gray-100 cursor-pointer active:bg-gray-100 bg-white relative",
+                        order.id === selectedOrderId && "bg-blue-50",
+                        getVerificationStyle(order.visual_verification_status)?.borderClass
+                      )}
+                    >
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
                         <span className="font-semibold">#{order.check_number}</span>
@@ -772,9 +577,6 @@ export function WeighOrderView({
                           <Truck className="h-4 w-4 text-blue-500" />
                         ) : (
                           <Package className="h-4 w-4 text-green-500" />
-                        )}
-                        {hasWeighingProgress(order.id) && (
-                          <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse" />
                         )}
                         {/* Visual verification status indicator */}
                         {visualStatus === "pending" && (
@@ -837,6 +639,7 @@ export function WeighOrderView({
                         })()}
                         <span className="font-medium">{formatPrice(order.total_amount)}</span>
                       </div>
+                    </div>
                     </div>
                   </div>
                 );
@@ -957,7 +760,7 @@ export function WeighOrderView({
                       return (
                         <VisualVerificationResultCard
                           result={visualResultData}
-                          status={visualStatus}
+                          status={visualStatus as "verified" | "missing_items" | "extra_items" | "uncertain" | "wrong_image"}
                           onRetry={() => setCameraOpen(true)}
                         />
                       );
@@ -976,83 +779,6 @@ export function WeighOrderView({
                   })()}
                 </CardContent>
               </Card>
-
-              {/* Weighing Section */}
-              {selectedOrder.status === "pending_weight" && (
-                <Card>
-                  <CardHeader className="p-4 pb-2">
-                    <CardTitle className="text-base flex items-center gap-2">
-                      <Scale className="h-4 w-4" />
-                      Weighing
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-4 pt-0 space-y-3">
-                    {bagWeights.map((bag, index) => (
-                      <div key={bag.id} className="flex items-center gap-3">
-                        <span className="text-sm font-medium w-16">Bag {index + 1}</span>
-                        <Button
-                          variant="outline"
-                          className="flex-1 h-12 text-lg justify-start"
-                          onClick={() => {
-                            setSelectedBagForWeighing({ id: bag.id, number: index + 1 });
-                            setWeightModalOpen(true);
-                          }}
-                        >
-                          {bag.weight > 0 ? (
-                            <span className="text-green-600 font-semibold">
-                              {gramsToOunces(bag.weight).toFixed(2)} oz
-                            </span>
-                          ) : (
-                            <span className="text-gray-400">Weigh...</span>
-                          )}
-                        </Button>
-                      </div>
-                    ))}
-                    <div className="flex gap-2 pt-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={addBag}
-                        disabled={bagCount >= 10}
-                        className="flex-1"
-                      >
-                        <Plus className="h-4 w-4 mr-1" />
-                        Bag
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={removeBag}
-                        disabled={bagCount <= 1}
-                        className="flex-1"
-                      >
-                        <Minus className="h-4 w-4 mr-1" />
-                        Remove
-                      </Button>
-                    </div>
-                    {/* Ready for Lockers button */}
-                    {bagWeights.some(bag => bag.weight > 0) && (
-                      <Button
-                        onClick={async () => {
-                          try {
-                            await onOrderWeighed(
-                              selectedOrder.id,
-                              ouncesToGrams(totalWeight),
-                              "weighed"
-                            );
-                            resetWeighingState();
-                          } catch (e) {
-                            console.error(e);
-                          }
-                        }}
-                        className="w-full h-12 mt-3 bg-green-600 hover:bg-green-700 text-white font-semibold"
-                      >
-                        Ready for Lockers
-                      </Button>
-                    )}
-                  </CardContent>
-                </Card>
-              )}
             </div>
           ) : (
             <div className="flex items-center justify-center h-full text-gray-500">
@@ -1084,32 +810,6 @@ export function WeighOrderView({
             <ChevronRight className="h-5 w-5 ml-1" />
           </Button>
         </div>
-
-        {/* Weight Input Modal */}
-        <WeightInputModal
-          open={weightModalOpen}
-          onOpenChange={(open) => {
-            if (!open) {
-              setWeightModalOpen(false);
-              setSelectedBagForWeighing(null);
-            }
-          }}
-          onWeightConfirm={(weightOz: number) => {
-            if (selectedBagForWeighing) {
-              updateBagWeight(selectedBagForWeighing.id, ouncesToGrams(weightOz));
-            }
-            setWeightModalOpen(false);
-            setSelectedBagForWeighing(null);
-          }}
-          bagNumber={selectedBagForWeighing?.number || 1}
-          currentWeight={
-            selectedBagForWeighing
-              ? gramsToOunces(
-                  bagWeights.find((b) => b.id === selectedBagForWeighing.id)?.weight || 0
-                )
-              : 0
-          }
-        />
 
         {/* Camera Capture Modal */}
         <CameraCapture
@@ -1377,13 +1077,6 @@ export function WeighOrderView({
                     )}
                   </div>
                   <div className="flex items-center gap-1">
-                    {/* Draft Indicator - Shows when order has weighing progress saved */}
-                    {order.status === "pending_weight" && hasWeighingProgress(order.id) && (
-                      <div 
-                        className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"
-                        title="Weighing in progress"
-                      />
-                    )}
                     {(() => {
                       const verificationStyle = getVerificationStyle(order.visual_verification_status);
                       if (verificationStyle) {
@@ -1509,225 +1202,24 @@ export function WeighOrderView({
                   </div>
                 </div>
 
-                {/* Expected Weight and Total Weight - MOVED HERE */}
-                <div className="ml-6 space-y-4">
-                  {/* Expected Weight */}
-                  <Card className="w-64">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm">Expected Weight</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold text-blue-900">
-                        {selectedOrder.expected_weight && selectedOrder.expected_weight > 0
-                          ? `${gramsToOunces(selectedOrder.expected_weight).toFixed(2)} oz`
-                          : "Not calculated"}
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Total Weight */}
-                  <Card className="w-64">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm">Total Weight</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold text-gray-900">
-                        {totalWeight.toFixed(2)} oz
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
               </div>
             </div>
 
-            {/* Main Content - Fixed Height Weight Verification */}
+            {/* Main Content - Visual Verification */}
             <div className="flex-1 flex flex-col bg-gray-50">
-              {/* Weight Verification - Fixed Height with Conditional Scroll */}
+              {/* Visual Verification Section */}
               {selectedOrder.status === "pending_weight" && (
                 <div className="flex-1 flex flex-col min-h-0">
                   <div className="p-6">
                     <div className="max-w-2xl mx-auto">
                       <Card className="h-full flex flex-col">
-                      <CardHeader>
-                        <div className="flex items-center justify-between">
+                        <CardHeader>
                           <CardTitle className="flex items-center gap-2 text-xl">
-                            <Scale className="h-6 w-6" />
-                            Weight Verification
+                            <Eye className="h-6 w-6" />
+                            Visual Verification
                           </CardTitle>
-                          <div className="flex items-center gap-3">
-                            <Button
-                              variant="outline"
-                              onClick={removeBag}
-                              disabled={bagCount <= 1}
-                              className="w-12 h-12 p-0 border-2 border-gray-300 hover:border-red-300 hover:bg-red-50"
-                            >
-                              <Minus className="h-6 w-6" />
-                            </Button>
-                            <div className="text-lg font-bold px-6 py-3 bg-gray-100 rounded-xl border-2 border-gray-200 min-w-[120px] text-center">
-                              {bagCount} bag{bagCount > 1 ? "s" : ""}
-                            </div>
-                            <Button
-                              variant="outline"
-                              onClick={addBag}
-                              disabled={bagCount >= 10}
-                              className="w-12 h-12 p-0 border-2 border-gray-300 hover:border-green-300 hover:bg-green-50"
-                            >
-                              <Plus className="h-6 w-6" />
-                            </Button>
-                          </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="flex-1 overflow-y-auto space-y-6">
-
-                        {/* Bag Weight Inputs - Clean Layout */}
-                        <div className="grid gap-4">
-                          {bagWeights.map((bag, index) => (
-                            <div
-                              key={bag.id}
-                              className="border rounded-lg p-3 space-y-3"
-                            >
-                              <div className="flex items-center gap-4">
-                                <div className="text-lg font-medium text-gray-700 w-20">
-                                  Bag {index + 1}
-                                </div>
-                                <Button
-                                variant="outline"
-                                className={cn(
-                                  "flex-1 h-16 text-lg justify-center transition-all border-2",
-                                  bag.weight > 0
-                                    ? "bg-green-50 border-green-200 text-green-700"
-                                    : "border-dashed border-gray-300 text-gray-500 hover:border-gray-400"
-                                )}
-                                onClick={() =>
-                                  handleOpenWeightModal(bag.id, index + 1)
-                                }
-                              >
-                                {bag.weight > 0
-                                  ? `${bag.weight} oz`
-                                  : "Tap to weigh"}
-                              </Button>
-                              {bag.weight > 0 && (
-                                <Button
-                                  variant="outline"
-                                  onClick={() => updateBagWeight(bag.id, 0)}
-                                  className="h-16 w-16 p-0 text-gray-500 hover:text-red-500 hover:border-red-200 border-2"
-                                >
-                                  ×
-                                </Button>
-                              )}
-                              </div>
-
-                              {/* Packaging selections for this bag */}
-                              <div className="space-y-2 ml-24">
-                                {(bagPackaging[bag.id] || []).map((selection, selIndex) => (
-                                  <div key={selIndex} className="flex items-center gap-2">
-                                    <select
-                                      className="h-9 border rounded px-2 text-sm text-gray-700 flex-1"
-                                      value={selection.packagingId}
-                                      onChange={(e) => {
-                                        setBagPackaging((prev) => {
-                                          const current = [...(prev[bag.id] || [])];
-                                          current[selIndex] = { ...current[selIndex], packagingId: e.target.value };
-                                          const updated = { ...prev, [bag.id]: current };
-                                          if (selectedOrderId) {
-                                            saveWeighingProgress(selectedOrderId, bagWeights, updated, bagCount);
-                                          }
-                                          return updated;
-                                        });
-                                      }}
-                                    >
-                                      <option value="">Select packaging</option>
-                                      {packagingOptions.map((pkg) => (
-                                        <option key={pkg.id} value={pkg.id}>
-                                          {pkg.name} ({gramsToOunces(pkg.weight).toFixed(2)} oz)
-                                        </option>
-                                      ))}
-                                    </select>
-
-                                    {/* Quantity input */}
-                                    <div className="flex items-center gap-1">
-                                      <span className="text-xs text-gray-500">x</span>
-                                      <input
-                                        type="number"
-                                        min="1"
-                                        max="10"
-                                        className="w-14 h-9 border rounded px-2 text-sm text-center"
-                                        value={selection.quantity}
-                                        onChange={(e) => {
-                                          const qty = Math.max(1, Math.min(10, parseInt(e.target.value) || 1));
-                                          setBagPackaging((prev) => {
-                                            const current = [...(prev[bag.id] || [])];
-                                            current[selIndex] = { ...current[selIndex], quantity: qty };
-                                            const updated = { ...prev, [bag.id]: current };
-                                            if (selectedOrderId) {
-                                              saveWeighingProgress(selectedOrderId, bagWeights, updated, bagCount);
-                                            }
-                                            return updated;
-                                          });
-                                        }}
-                                      />
-                                    </div>
-
-                                    {/* Remove button */}
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      className="h-9 w-9 text-gray-400 hover:text-red-500"
-                                      onClick={() => {
-                                        setBagPackaging((prev) => {
-                                          const current = [...(prev[bag.id] || [])];
-                                          current.splice(selIndex, 1);
-                                          const updated = { ...prev, [bag.id]: current };
-                                          if (selectedOrderId) {
-                                            saveWeighingProgress(selectedOrderId, bagWeights, updated, bagCount);
-                                          }
-                                          return updated;
-                                        });
-                                      }}
-                                    >
-                                      <X className="h-4 w-4" />
-                                    </Button>
-                                  </div>
-                                ))}
-
-                                {/* Add packaging button */}
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="w-full text-gray-600"
-                                  onClick={() => {
-                                    setBagPackaging((prev) => {
-                                      const current = prev[bag.id] || [];
-                                      const updated = {
-                                        ...prev,
-                                        [bag.id]: [...current, { packagingId: "", quantity: 1 }],
-                                      };
-                                      if (selectedOrderId) {
-                                        saveWeighingProgress(selectedOrderId, bagWeights, updated, bagCount);
-                                      }
-                                      return updated;
-                                    });
-                                  }}
-                                >
-                                  <Plus className="h-4 w-4 mr-1" />
-                                  Add Packaging
-                                </Button>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-
-                        <Separator />
-
-                        {/* Visual Verification Section */}
-                        <div className="space-y-4">
-                          <div className="flex items-center justify-between">
-                            <h4 className="font-medium text-gray-700 flex items-center gap-2">
-                              <Eye className="h-4 w-4" />
-                              Verificacion Visual (AI)
-                            </h4>
-                          </div>
-
+                        </CardHeader>
+                        <CardContent className="flex-1 overflow-y-auto space-y-6">
                           {(() => {
                             const visualStatus = selectedOrder.visual_verification_status as
                               | "pending"
@@ -1741,9 +1233,9 @@ export function WeighOrderView({
 
                             if (visualStatus === "pending") {
                               return (
-                                <div className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                                  <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
-                                  <span className="text-sm text-blue-700">
+                                <div className="flex items-center gap-2 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                                  <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
+                                  <span className="text-blue-700">
                                     Processing visual verification...
                                   </span>
                                 </div>
@@ -1761,334 +1253,60 @@ export function WeighOrderView({
                             }
 
                             return (
-                              <Button
-                                variant="outline"
-                                onClick={() => setCameraOpen(true)}
-                                className="w-full border-blue-300 text-blue-700 hover:bg-blue-50"
-                              >
-                                <Camera className="h-4 w-4 mr-2" />
-                                Verify with Photo
-                              </Button>
+                              <div className="text-center py-8">
+                                <Camera className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                                <p className="text-gray-600 mb-4">
+                                  Take a photo to verify the order
+                                </p>
+                                <Button
+                                  onClick={() => setCameraOpen(true)}
+                                  className="bg-blue-600 hover:bg-blue-700 text-white px-8"
+                                >
+                                  <Camera className="h-4 w-4 mr-2" />
+                                  Open Camera
+                                </Button>
+                              </div>
                             );
                           })()}
-                        </div>
-
-                        <Separator />
-
-                        {/* Total Weight Display with Analysis - only show after user has weighed something */}
-                        {bagWeights.some(bag => bag.weight > 0) && (() => {
-                          const expectedWeightOz = selectedOrder.expected_weight
-                            ? gramsToOunces(selectedOrder.expected_weight)
-                            : 0;
-                          // Skip analysis if no expected weight - just allow completion
-                          const structuredOutput =
-                            selectedOrder.structured_output as {
-                              items?: Array<{
-                                name: string;
-                                quantity: number;
-                                price: number;
-                                modifiers?: Array<{
-                                  name: string;
-                                  price: number;
-                                }>;
-                              }>;
-                            } | null;
-                          const analysis =
-                            totalWeight > 0 && expectedWeightOz > 0
-                              ? analyzeOrderWeight(
-                                  totalWeight,
-                                  expectedWeightOz,
-                                  structuredOutput?.items || [],
-                                  toleranceOz
-                                )
-                              : null;
-
-                          const getStatusColor = () => {
-                            if (!analysis) return "bg-gray-50 border-gray-200";
-                            switch (analysis.status) {
-                              case "perfect":
-                                return "bg-green-50 border-green-200";
-                              case "underweight":
-                                return "bg-red-50 border-red-300";
-                              case "overweight":
-                                return "bg-orange-50 border-orange-200";
-                            }
-                          };
-
-                          return (
-                            <div
-                              className={cn(
-                                "rounded-xl p-6 border-2",
-                                getStatusColor()
-                              )}
-                            >
-                              <div className="flex justify-between items-center">
-                                <span className="text-xl font-medium text-gray-700">
-                                  Total Weight:
-                                </span>
-                                <span className="text-3xl font-bold text-gray-900">
-                                  {totalWeight} oz
-                                </span>
-                              </div>
-                              {/* Expected weight is now shown before input */}
-
-                              {/* Immediate Analysis Feedback - only show after user has weighed something */}
-                              {totalWeight > 0 && bagWeights.some(bag => bag.weight > 0) && (
-                                <div className="mt-4 pt-4 border-t border-gray-200">
-                                  {analysis ? (
-                                    <>
-                                      {analysis.status === "perfect" && (
-                                        <div className="flex items-center gap-2 text-green-700">
-                                          <CheckCircle2 className="h-5 w-5" />
-                                          <span className="font-medium">
-                                            ✅ Ready for delivery
-                                          </span>
-                                        </div>
-                                      )}
-
-                                      {analysis.status === "underweight" && (
-                                        <div className="space-y-2">
-                                          <div className="flex items-center gap-2 text-red-700">
-                                            <AlertTriangle className="h-5 w-5" />
-                                            <span className="font-bold">
-                                              ⚠️ MISSING ITEMS
-                                            </span>
-                                          </div>
-                                          <div className="bg-red-100 border border-red-300 rounded-lg p-3">
-                                            <p className="text-red-800 font-medium text-sm">
-                                              {analysis.message}
-                                            </p>
-                                          </div>
-                                        </div>
-                                      )}
-
-                                      {analysis.status === "overweight" && (
-                                        <div className="space-y-2">
-                                          <div className="flex items-center gap-2 text-orange-700">
-                                            <AlertTriangle className="h-5 w-5" />
-                                            <span className="font-medium">
-                                              Extra weight detected
-                                            </span>
-                                          </div>
-                                          <div className="bg-orange-100 border border-orange-300 rounded-lg p-3">
-                                            <p className="text-orange-800 font-medium text-sm">
-                                              {analysis.message}
-                                            </p>
-                                          </div>
-                                        </div>
-                                      )}
-                                    </>
-                                  ) : (
-                                    // No expected weight - just show ready to complete
-                                    <div className="flex items-center gap-2 text-blue-700">
-                                      <CheckCircle2 className="h-5 w-5" />
-                                      <span className="font-medium">
-                                        Weight recorded - Ready to complete
-                                      </span>
-                                    </div>
-                                  )}
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })()}
-
-                        {/* Action Button - Changes based on weight analysis */}
-                        {(() => {
-                          const expectedWeightOz = selectedOrder.expected_weight
-                            ? gramsToOunces(selectedOrder.expected_weight)
-                            : 0;
-
-                          // Only analyze if we have expected weight
-                          const structuredOutput =
-                            selectedOrder.structured_output as {
-                              items?: Array<{
-                                name: string;
-                                quantity: number;
-                                price: number;
-                                modifiers?: Array<{
-                                  name: string;
-                                  price: number;
-                                }>;
-                              }>;
-                            } | null;
-                          const analysis =
-                            totalWeight > 0 && expectedWeightOz > 0
-                              ? analyzeOrderWeight(
-                                  totalWeight,
-                                  expectedWeightOz,
-                                  structuredOutput?.items || [],
-                                  toleranceOz
-                                )
-                              : null;
-
-                          // Check if user has actually weighed any bag (not just packaging weight)
-                          const hasActualWeight = bagWeights.some(bag => bag.weight > 0);
-
-                          // If underweight AND user has actually weighed something, show re-weigh button with override option
-                          if (analysis?.status === "underweight" && hasActualWeight) {
-                            // Prepare weight sample data for all orders
-                            const orderItemsUnderweight = (selectedOrder as { items?: Array<{ product_id: string; quantity: number; name: string }> }).items || [];
-                            const isSingleProductUnderweight = orderItemsUnderweight.length === 1 && orderItemsUnderweight[0].quantity === 1;
-                            const singleProductIdUnderweight = isSingleProductUnderweight ? orderItemsUnderweight[0].product_id : undefined;
-                            const itemCountUnderweight = orderItemsUnderweight.reduce((sum, item) => sum + item.quantity, 0);
-                            const itemsSummaryUnderweight = orderItemsUnderweight.map(item => `${item.quantity}x ${item.name}`).join(", ");
-
-                            return (
-                              <div className="space-y-4">
-                                {/* Main action - Reweigh */}
-                                <Button
-                                  onClick={handleWeighAction}
-                                  disabled={totalWeight === 0}
-                                  className="w-full h-16 text-xl font-semibold bg-amber-600 hover:bg-amber-700 disabled:bg-gray-300"
-                                >
-                                  Re-weigh Order
-                                </Button>
-
-                                {/* Secondary action - Override (smaller, below) */}
-                                <div className="text-center">
-                                  <button
-                                    type="button"
-                                    className="text-sm text-gray-500 hover:text-gray-700 underline"
-                                    onClick={() => setOverrideDialogOpen(true)}
-                                  >
-                                    Override and mark as Ready for Lockers
-                                  </button>
-                                </div>
-
-                                {/* Save as Sample button - available for ALL orders */}
-                                <Button
-                                  variant="outline"
-                                  onClick={async () => {
-                                    try {
-                                      await createWeightSample.mutateAsync({
-                                        product_id: singleProductIdUnderweight,
-                                        order_id: selectedOrder.id,
-                                        weight: Math.round(ouncesToGrams(totalWeight)),
-                                        item_count: itemCountUnderweight,
-                                        is_single_product: isSingleProductUnderweight,
-                                        check_number: selectedOrder.check_number,
-                                        items_summary: itemsSummaryUnderweight,
-                                      });
-                                      toast.success("Weight sample saved for calibration");
-                                    } catch (e) {
-                                      console.error(e);
-                                      toast.error("Failed to save weight sample");
-                                    }
-                                  }}
-                                  disabled={createWeightSample.isPending}
-                                  className="w-full text-blue-600 border-blue-300 hover:bg-blue-50"
-                                >
-                                  {createWeightSample.isPending ? (
-                                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                  ) : (
-                                    <Scale className="h-4 w-4 mr-2" />
-                                  )}
-                                  Save as Weight Sample
-                                </Button>
-                              </div>
-                            );
-                          }
-
-                          // Default: Ready for lockers (works for no expected weight too)
-                          // Disabled if no actual weight has been recorded
-
-                          // Prepare weight sample data for all orders
-                          const orderItems = (selectedOrder as { items?: Array<{ product_id: string; quantity: number; name: string }> }).items || [];
-                          const isSingleProductOrder = orderItems.length === 1 && orderItems[0].quantity === 1;
-                          const singleProductId = isSingleProductOrder ? orderItems[0].product_id : undefined;
-                          const itemCount = orderItems.reduce((sum, item) => sum + item.quantity, 0);
-                          const itemsSummary = orderItems.map(item => `${item.quantity}x ${item.name}`).join(", ");
-
-                          return (
-                            <div className="space-y-3">
-                              <Button
-                                onClick={async () => {
-                                  try {
-                                    await onOrderWeighed(
-                                      selectedOrder.id,
-                                      ouncesToGrams(totalWeight),
-                                      "weighed"
-                                    );
-                                    resetWeighingState();
-                                  } catch (e) {
-                                    console.error(e);
-                                  }
-                                }}
-                                disabled={!hasActualWeight}
-                                className="w-full h-16 text-xl font-semibold bg-green-600 hover:bg-green-700 disabled:bg-gray-300"
-                              >
-                                Ready for Lockers
-                              </Button>
-
-                              {/* Save as Sample button - available for ALL orders */}
-                              {hasActualWeight && (
-                                <Button
-                                  variant="outline"
-                                  onClick={async () => {
-                                    try {
-                                      await createWeightSample.mutateAsync({
-                                        product_id: singleProductId,
-                                        order_id: selectedOrder.id,
-                                        weight: Math.round(ouncesToGrams(totalWeight)),
-                                        item_count: itemCount,
-                                        is_single_product: isSingleProductOrder,
-                                        check_number: selectedOrder.check_number,
-                                        items_summary: itemsSummary,
-                                      });
-                                      toast.success("Weight sample saved for calibration");
-                                    } catch (e) {
-                                      console.error(e);
-                                      toast.error("Failed to save weight sample");
-                                    }
-                                  }}
-                                  disabled={createWeightSample.isPending}
-                                  className="w-full text-blue-600 border-blue-300 hover:bg-blue-50"
-                                >
-                                  {createWeightSample.isPending ? (
-                                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                  ) : (
-                                    <Scale className="h-4 w-4 mr-2" />
-                                  )}
-                                  Save as Weight Sample
-                                </Button>
-                              )}
-                            </div>
-                          );
-                        })()}
-                      </CardContent>
+                        </CardContent>
                       </Card>
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* No weighing needed - Order already weighed or completed */}
+              {/* Order already processed */}
               {selectedOrder.status !== "pending_weight" && (
                 <div className="flex-1 flex items-center justify-center">
-                  <div className="text-center">
-                    <Scale className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <div className="text-center p-6">
+                    <CheckCircle2 className="h-12 w-12 text-green-500 mx-auto mb-4" />
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      Order Already Processed
+                      Order Verified
                     </h3>
                     <p className="text-gray-500 mb-4">
                       {selectedOrder.status === "weighed"
                         ? "This order is ready for lockers"
                         : "This order has been completed"}
                     </p>
-                    {(selectedOrder.status === "weighed" ||
-                      selectedOrder.status === "completed") && (
-                      <Button
-                        variant="outline"
-                        className="border-amber-500 text-amber-600 hover:bg-amber-50"
-                        onClick={() => setRevertDialogOpen(true)}
-                      >
-                        <Undo2 className="h-4 w-4 mr-2" />
-                        {selectedOrder.status === "weighed"
-                          ? "Revert to Pending"
-                          : "Revert to Ready for Lockers"}
-                      </Button>
-                    )}
+                    {/* Show verification result if available */}
+                    {(() => {
+                      const visualStatus = selectedOrder.visual_verification_status as
+                        | "pending" | "verified" | "missing_items" | "extra_items" | "uncertain" | "wrong_image" | null;
+                      const visualResultData = selectedOrder.visual_verification_result as VisualVerificationResult | null;
+
+                      if (visualStatus && visualStatus !== "pending" && visualResultData) {
+                        return (
+                          <div className="max-w-md mx-auto mt-4">
+                            <VisualVerificationResultCard
+                              result={visualResultData}
+                              status={visualStatus}
+                              onRetry={() => setCameraOpen(true)}
+                            />
+                          </div>
+                        );
+                      }
+                      return null;
+                    })()}
                   </div>
                 </div>
               )}
@@ -2097,32 +1315,17 @@ export function WeighOrderView({
         ) : (
           <div className="flex-1 flex items-center justify-center bg-gray-50">
             <div className="text-center">
-              <Scale className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <Camera className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Select an order to weigh
+                Select an order to verify
               </h3>
               <p className="text-gray-500">
-                Choose an order from the list to start the weighing process
+                Choose an order from the list to start the verification process
               </p>
             </div>
           </div>
         )}
       </div>
-
-      {/* Weight Input Modal */}
-      <WeightInputModal
-        open={weightModalOpen}
-        onOpenChange={setWeightModalOpen}
-        bagNumber={selectedBagForWeighing?.number || 1}
-        currentWeight={
-          selectedBagForWeighing
-            ? bagWeights.find((b) => b.id === selectedBagForWeighing.id)
-                ?.weight || 0
-            : 0
-        }
-        onWeightConfirm={handleWeightConfirm}
-        totalBags={bagCount}
-      />
 
       {/* Revert Order Status Confirmation Dialog */}
       <AlertDialog open={revertDialogOpen} onOpenChange={setRevertDialogOpen}>
@@ -2175,11 +1378,6 @@ export function WeighOrderView({
                   await revertOrderStatus.mutateAsync(selectedOrderId);
                   toast.success("Order status reverted successfully");
                   setRevertDialogOpen(false);
-                  // Clear local weighing state when reverting
-                  if (selectedOrder?.status === "weighed") {
-                    clearWeighingProgress(selectedOrderId);
-                    resetWeighingState();
-                  }
                 } catch (error) {
                   toast.error(
                     error instanceof Error
@@ -2195,63 +1393,6 @@ export function WeighOrderView({
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               )}
               Confirm Revert
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* Override Underweight Order Confirmation Dialog */}
-      <AlertDialog open={overrideDialogOpen} onOpenChange={setOverrideDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-500/10">
-                <AlertTriangle className="h-5 w-5 text-red-600" />
-              </div>
-              <div>
-                <AlertDialogTitle>Override Weight Check</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This order appears to be missing items
-                </AlertDialogDescription>
-              </div>
-            </div>
-          </AlertDialogHeader>
-
-          <div className="my-4 rounded-lg border border-red-200 p-4 bg-red-50">
-            <p className="text-sm text-red-800">
-              The actual weight is significantly below the expected weight. This may indicate missing items in the order.
-            </p>
-          </div>
-
-          <AlertDialogDescription>
-            Are you sure you want to mark this order as <strong>Ready for Lockers</strong> anyway?
-          </AlertDialogDescription>
-
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={async () => {
-                if (!selectedOrderId) return;
-                try {
-                  await onOrderWeighed(
-                    selectedOrderId,
-                    ouncesToGrams(totalWeight),
-                    "weighed"
-                  );
-                  resetWeighingState();
-                  setOverrideDialogOpen(false);
-                  toast.success("Order marked as Ready for Lockers (override)");
-                } catch (error) {
-                  toast.error(
-                    error instanceof Error
-                      ? error.message
-                      : "Failed to override order"
-                  );
-                }
-              }}
-              className="bg-red-600 text-white hover:bg-red-700"
-            >
-              Confirm Override
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
