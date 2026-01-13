@@ -199,7 +199,7 @@ export function WeighOrderView({
     switch (status) {
       case 'verified':
         return {
-          label: 'Aprobado',
+          label: 'Approved',
           badgeClass: 'text-green-700 bg-green-100 border-green-300',
           borderClass: 'border-l-4 border-l-green-500'
         };
@@ -211,19 +211,19 @@ export function WeighOrderView({
         };
       case 'missing_items':
         return {
-          label: 'Faltan items',
+          label: 'Missing items',
           badgeClass: 'text-red-700 bg-red-100 border-red-300',
           borderClass: 'border-l-4 border-l-red-500'
         };
       case 'extra_items':
         return {
-          label: 'Items de más',
+          label: 'Extra items',
           badgeClass: 'text-yellow-700 bg-yellow-100 border-yellow-300',
           borderClass: 'border-l-4 border-l-yellow-500'
         };
       case 'uncertain':
         return {
-          label: 'Incierto',
+          label: 'Uncertain',
           badgeClass: 'text-gray-700 bg-gray-100 border-gray-300',
           borderClass: 'border-l-4 border-l-gray-500'
         };
