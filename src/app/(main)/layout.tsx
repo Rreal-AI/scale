@@ -11,7 +11,7 @@ export default function MainLayout({
     <SidebarProvider defaultOpen={true}>
       <AppSidebar />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-3 px-4 border-b border-gray-200">
+        <header className="hidden md:flex h-16 shrink-0 items-center gap-3 px-4 border-b border-gray-200">
           <SidebarTrigger className="-ml-1" />
           <div className="h-6 w-px bg-gray-300" />
           <HeaderContent />

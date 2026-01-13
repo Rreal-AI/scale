@@ -455,10 +455,8 @@ export function WeighOrderView({
           {/* Mobile Header */}
           <div className="flex items-center justify-between p-4 bg-white border-b border-gray-200">
             <SidebarTrigger className="p-2" />
-            <h1 className="text-lg font-semibold">Órdenes</h1>
-            <Button variant="ghost" size="icon" className="p-2">
-              <Search className="h-5 w-5" />
-            </Button>
+            <h1 className="text-lg font-semibold">Orders</h1>
+            <div className="w-10" />
           </div>
 
           {/* Search */}
