@@ -62,6 +62,8 @@ export function CameraCapture({
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  // Store orderId when modal opens (before it can change externally)
+  const activeOrderIdRef = useRef<string | null>(null);
 
   const [cameraState, setCameraState] = useState<CameraState>("idle");
   const [capturedImages, setCapturedImages] = useState<string[]>([]);
@@ -183,18 +185,18 @@ export function CameraCapture({
 
   const confirmPhotos = useCallback(() => {
     if (capturedImages.length > 0) {
-      if (orderId) clearDraft(orderId);
+      if (activeOrderIdRef.current) clearDraft(activeOrderIdRef.current);
       stopCamera();
       onCapture(capturedImages);
     }
-  }, [capturedImages, onCapture, stopCamera, orderId]);
+  }, [capturedImages, onCapture, stopCamera]);
 
   // Explicit cancel - clears draft
   const handleCancel = useCallback(() => {
-    if (orderId) clearDraft(orderId);
+    if (activeOrderIdRef.current) clearDraft(activeOrderIdRef.current);
     setCapturedImages([]);
     onOpenChange(false);
-  }, [orderId, onOpenChange]);
+  }, [onOpenChange]);
 
   const switchCamera = useCallback(() => {
     stopCamera();
@@ -207,19 +209,26 @@ export function CameraCapture({
     }
   }, [open, cameraState, startCamera]);
 
+  // Capture orderId when modal opens (before it can change externally)
+  useEffect(() => {
+    if (open && orderId) {
+      activeOrderIdRef.current = orderId;
+    }
+  }, [open, orderId]);
+
   // Save draft when closing modal (without explicit cancel)
   useEffect(() => {
     if (!open) {
-      // Save draft if there are captured images
-      if (orderId && capturedImages.length > 0) {
-        saveDraft(orderId, capturedImages);
+      // Save draft if there are captured images (use ref for stable orderId)
+      if (activeOrderIdRef.current && capturedImages.length > 0) {
+        saveDraft(activeOrderIdRef.current, capturedImages);
       }
       stopCamera();
       setCameraState("idle");
       // Don't clear capturedImages here - they're saved as draft
       setErrorMessage("");
     }
-  }, [open, stopCamera, orderId, capturedImages]);
+  }, [open, stopCamera, capturedImages]);
 
   // Load draft when opening modal
   useEffect(() => {
