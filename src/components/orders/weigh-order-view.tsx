@@ -283,6 +283,44 @@ export function WeighOrderView({
     return hasWeight || hasVisualVerification;
   }, []);
 
+  // Helper to get verification style (badge and border colors)
+  const getVerificationStyle = (status: string | null | undefined) => {
+    switch (status) {
+      case 'verified':
+        return {
+          label: 'Aprobado',
+          badgeClass: 'text-green-700 bg-green-100 border-green-300',
+          borderClass: 'border-l-4 border-l-green-500'
+        };
+      case 'wrong_image':
+        return {
+          label: 'Wrong photo',
+          badgeClass: 'text-orange-700 bg-orange-100 border-orange-300',
+          borderClass: 'border-l-4 border-l-orange-500'
+        };
+      case 'missing_items':
+        return {
+          label: 'Faltan items',
+          badgeClass: 'text-red-700 bg-red-100 border-red-300',
+          borderClass: 'border-l-4 border-l-red-500'
+        };
+      case 'extra_items':
+        return {
+          label: 'Items de más',
+          badgeClass: 'text-yellow-700 bg-yellow-100 border-yellow-300',
+          borderClass: 'border-l-4 border-l-yellow-500'
+        };
+      case 'uncertain':
+        return {
+          label: 'Incierto',
+          badgeClass: 'text-gray-700 bg-gray-100 border-gray-300',
+          borderClass: 'border-l-4 border-l-gray-500'
+        };
+      default:
+        return null;
+    }
+  };
+
   const orders = ordersData?.orders || [];
 
   // Filter orders based on selected tab
@@ -715,7 +753,6 @@ export function WeighOrderView({
               </div>
             ) : (
               displayOrders.map((order) => {
-                const { time, isUrgent } = getDueTime(order.created_at, order.status);
                 const visualStatus = order.visual_verification_status as
                   | "pending" | "verified" | "missing_items" | "extra_items" | "uncertain" | "wrong_image" | null;
                 return (
@@ -724,7 +761,8 @@ export function WeighOrderView({
                     onClick={() => handleMobileOrderSelect(order.id)}
                     className={cn(
                       "p-4 border-b border-gray-100 cursor-pointer active:bg-gray-100",
-                      order.id === selectedOrderId && "bg-blue-50"
+                      order.id === selectedOrderId && "bg-blue-50",
+                      getVerificationStyle(order.visual_verification_status)?.borderClass
                     )}
                   >
                     <div className="flex items-center justify-between mb-2">
@@ -771,27 +809,35 @@ export function WeighOrderView({
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-gray-600 truncate max-w-[50%]">{order.customer_name}</span>
                       <div className="flex items-center gap-2">
-                        <Badge
-                          variant="outline"
-                          className={cn(
-                            "text-xs",
-                            order.status === "pending_weight" && "bg-orange-100 text-orange-700 border-orange-300",
-                            order.status === "weighed" && "bg-green-100 text-green-700 border-green-300"
-                          )}
-                        >
-                          {order.status === "pending_weight" ? "Pending" : "Weighed"}
-                        </Badge>
+                        {(() => {
+                          const verificationStyle = getVerificationStyle(order.visual_verification_status);
+                          if (verificationStyle) {
+                            return (
+                              <Badge variant="outline" className={cn("text-xs", verificationStyle.badgeClass)}>
+                                {verificationStyle.label}
+                              </Badge>
+                            );
+                          }
+                          // Solo mostrar Awaiting si no tiene verificación
+                          if (order.status === "pending_weight") {
+                            return (
+                              <Badge variant="outline" className="text-xs bg-gray-100 text-gray-700 border-gray-300">
+                                Awaiting
+                              </Badge>
+                            );
+                          }
+                          if (order.status === "weighed") {
+                            return (
+                              <Badge variant="outline" className="text-xs bg-green-100 text-green-700 border-green-300">
+                                Weighed
+                              </Badge>
+                            );
+                          }
+                          return null;
+                        })()}
                         <span className="font-medium">{formatPrice(order.total_amount)}</span>
                       </div>
                     </div>
-                    {order.status === "pending_weight" && (
-                      <div className={cn(
-                        "text-xs mt-1",
-                        isUrgent ? "text-red-600 font-medium" : "text-gray-500"
-                      )}>
-                        {time}
-                      </div>
-                    )}
                   </div>
                 );
               })
@@ -1292,10 +1338,6 @@ export function WeighOrderView({
           )}
 
           {displayOrders.map((order) => {
-            const { time: dueTime, isUrgent } = getDueTime(
-              order.created_at,
-              order.status
-            );
             const isSelected = selectedOrderId === order.id;
 
             return (
@@ -1305,9 +1347,7 @@ export function WeighOrderView({
                 className={cn(
                   "p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors active:bg-gray-100",
                   isSelected && "bg-blue-50 border-blue-200",
-                  isUrgent &&
-                    order.status === "pending_weight" &&
-                    "border-l-4 border-l-red-400",
+                  getVerificationStyle(order.visual_verification_status)?.borderClass,
                   order.status === "completed" &&
                     "bg-green-50 border-green-100 opacity-75"
                 )}
@@ -1344,22 +1384,25 @@ export function WeighOrderView({
                         title="Weighing in progress"
                       />
                     )}
-                    {isUrgent && order.status === "pending_weight" && (
-                      <Badge
-                        variant="destructive"
-                        className="text-xs px-1 py-0"
-                      >
-                        {dueTime}
-                      </Badge>
-                    )}
-                    {order.status === "pending_weight" && (
-                      <Badge 
-                        variant="outline" 
-                        className="text-xs px-1 py-0 text-gray-600 border-gray-300 bg-gray-50"
-                      >
-                        Awaiting
-                      </Badge>
-                    )}
+                    {(() => {
+                      const verificationStyle = getVerificationStyle(order.visual_verification_status);
+                      if (verificationStyle) {
+                        return (
+                          <Badge variant="outline" className={cn("text-xs px-1 py-0", verificationStyle.badgeClass)}>
+                            {verificationStyle.label}
+                          </Badge>
+                        );
+                      }
+                      // Solo mostrar Awaiting si no tiene verificación
+                      if (order.status === "pending_weight") {
+                        return (
+                          <Badge variant="outline" className="text-xs px-1 py-0 text-gray-600 border-gray-300 bg-gray-50">
+                            Awaiting
+                          </Badge>
+                        );
+                      }
+                      return null;
+                    })()}
                     {order.status === "weighed" && (
                       <Badge
                         variant="outline"
@@ -1391,9 +1434,6 @@ export function WeighOrderView({
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">
                     {formatPrice(order.total_amount)}
-                  </span>
-                  <span className="text-xs text-gray-500">
-                    {!isUrgent && dueTime}
                   </span>
                 </div>
               </div>
