@@ -89,7 +89,7 @@ export function WeighOrderView({
     "all" | "delivery" | "takeout"
   >("all");
   const [selectedStatus, setSelectedStatus] = useState<
-    "all" | "pending" | "checked" | "ready_for_lockers"
+    "all" | "pending" | "flagged" | "ready_for_lockers"
   >("pending");
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "customer">(
     "newest"
@@ -119,6 +119,33 @@ export function WeighOrderView({
   const [swipeOffset, setSwipeOffset] = useState(0);
   const swipeStartX = useRef<number | null>(null);
 
+  // Track previous order states for auto-actions
+  const prevOrderStatesRef = useRef<Map<string, string | null>>(new Map());
+
+  // Alert sound function for negative verification results
+  const playAlertSound = useCallback(() => {
+    try {
+      const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      const audioContext = new AudioContextClass();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      oscillator.frequency.value = 800;
+      oscillator.type = 'square';
+      gainNode.gain.value = 0.3;
+
+      oscillator.start();
+      setTimeout(() => {
+        oscillator.stop();
+        audioContext.close();
+      }, 200);
+    } catch (e) {
+      console.error('Could not play alert sound:', e);
+    }
+  }, []);
 
   // Handler for quick camera from list (without entering detail)
   const handleQuickCamera = useCallback((orderId: string) => {
@@ -238,6 +265,33 @@ export function WeighOrderView({
 
   const orders = ordersData?.orders || [];
 
+  // Auto-Ready for approved orders + Sound alert for negative results
+  useEffect(() => {
+    const prevStates = prevOrderStatesRef.current;
+
+    orders.forEach(order => {
+      const prevStatus = prevStates.get(order.id);
+      const currentStatus = order.visual_verification_status as string | null | undefined;
+
+      // Only act if status changed (and it's not the initial load)
+      if (prevStatus !== undefined && prevStatus !== currentStatus && currentStatus) {
+        // Auto-mark as Ready if Approved
+        if (currentStatus === 'verified') {
+          onOrderWeighed(order.id, 0, "weighed");
+          toast.success(`Order #${order.check_number} approved and ready`);
+        }
+
+        // Sound alert for negative results
+        if (currentStatus === 'missing_items' || currentStatus === 'wrong_image') {
+          playAlertSound();
+          toast.error(`Order #${order.check_number}: ${currentStatus === 'missing_items' ? 'Missing items' : 'Wrong photo'}`);
+        }
+      }
+
+      prevStates.set(order.id, currentStatus ?? null);
+    });
+  }, [orders, onOrderWeighed, playAlertSound]);
+
   // Filter orders based on selected tab
   const displayOrders = useMemo(() => {
     const filtered = orders.filter(order => {
@@ -245,8 +299,8 @@ export function WeighOrderView({
         case 'pending':
           // Pending: pending_weight status AND not checked (no weight, no visual verification)
           return order.status === 'pending_weight' && !isOrderChecked(order);
-        case 'checked':
-          // Checked: pending_weight status AND checked (has weight OR visual verification)
+        case 'flagged':
+          // Flagged: pending_weight status AND checked (has weight OR visual verification)
           return order.status === 'pending_weight' && isOrderChecked(order);
         case 'ready_for_lockers':
           // Ready for Lockers: weighed status
@@ -279,9 +333,9 @@ export function WeighOrderView({
   // Count orders by tab for badges
   const tabCounts = useMemo(() => {
     const pending = orders.filter(o => o.status === 'pending_weight' && !isOrderChecked(o)).length;
-    const checked = orders.filter(o => o.status === 'pending_weight' && isOrderChecked(o)).length;
+    const flagged = orders.filter(o => o.status === 'pending_weight' && isOrderChecked(o)).length;
     const ready = orders.filter(o => o.status === 'weighed').length;
-    return { pending, checked, ready };
+    return { pending, flagged, ready };
   }, [orders, isOrderChecked]);
 
   // Mobile navigation functions
@@ -490,15 +544,15 @@ export function WeighOrderView({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setSelectedStatus("checked")}
+              onClick={() => setSelectedStatus("flagged")}
               className={cn(
                 "h-9 px-4 whitespace-nowrap",
-                selectedStatus === "checked"
+                selectedStatus === "flagged"
                   ? "bg-blue-100 text-blue-700 border-blue-300"
                   : ""
               )}
             >
-              Checked {tabCounts.checked > 0 && `(${tabCounts.checked})`}
+              Flagged {tabCounts.flagged > 0 && `(${tabCounts.flagged})`}
             </Button>
             <Button
               variant="outline"
@@ -876,15 +930,15 @@ export function WeighOrderView({
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setSelectedStatus("checked")}
+                onClick={() => setSelectedStatus("flagged")}
                 className={cn(
                   "h-8 px-3 text-xs font-medium",
-                  selectedStatus === "checked"
+                  selectedStatus === "flagged"
                     ? "bg-blue-100 text-blue-700 border-blue-300"
                     : "text-gray-600 border-gray-300 hover:bg-gray-50"
                 )}
               >
-                Checked {tabCounts.checked > 0 && `(${tabCounts.checked})`}
+                Flagged {tabCounts.flagged > 0 && `(${tabCounts.flagged})`}
               </Button>
               <Button
                 variant={selectedStatus === "ready_for_lockers" ? "default" : "outline"}
