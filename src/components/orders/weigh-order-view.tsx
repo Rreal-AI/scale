@@ -208,7 +208,7 @@ export function WeighOrderView({
   // Helper to check if order is "checked" (has weight OR visual verification)
   const isOrderChecked = useCallback((order: Order): boolean => {
     const hasWeight = (order.actual_weight || 0) > 0;
-    const hasVisualVerification = ['verified', 'missing_items', 'extra_items', 'uncertain', 'wrong_image']
+    const hasVisualVerification = ['pending', 'verified', 'missing_items', 'extra_items', 'uncertain', 'wrong_image']
       .includes(order.visual_verification_status || '');
     return hasWeight || hasVisualVerification;
   }, []);
@@ -1457,6 +1457,7 @@ export function WeighOrderView({
       {/* Camera Capture Modal for Visual Verification */}
       <CameraCapture
         open={cameraOpen}
+        orderId={cameraOrderId || selectedOrderId || undefined}
         onOpenChange={(open) => {
           setCameraOpen(open);
           if (!open) setCameraOrderId(null);

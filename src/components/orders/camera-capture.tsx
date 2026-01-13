@@ -24,15 +24,37 @@ import { cn } from "@/lib/utils";
 
 interface CameraCaptureProps {
   open: boolean;
+  orderId?: string;
   onOpenChange: (open: boolean) => void;
   onCapture: (images: string[]) => void;
   isProcessing?: boolean;
 }
 
+// Draft management functions
+const saveDraft = (orderId: string, images: string[]) => {
+  if (images.length > 0) {
+    localStorage.setItem(`camera-draft-${orderId}`, JSON.stringify(images));
+  }
+};
+
+const loadDraft = (orderId: string): string[] => {
+  try {
+    const saved = localStorage.getItem(`camera-draft-${orderId}`);
+    return saved ? JSON.parse(saved) : [];
+  } catch {
+    return [];
+  }
+};
+
+const clearDraft = (orderId: string) => {
+  localStorage.removeItem(`camera-draft-${orderId}`);
+};
+
 type CameraState = "idle" | "requesting" | "streaming" | "error";
 
 export function CameraCapture({
   open,
+  orderId,
   onOpenChange,
   onCapture,
   isProcessing = false,
@@ -161,10 +183,18 @@ export function CameraCapture({
 
   const confirmPhotos = useCallback(() => {
     if (capturedImages.length > 0) {
+      if (orderId) clearDraft(orderId);
       stopCamera();
       onCapture(capturedImages);
     }
-  }, [capturedImages, onCapture, stopCamera]);
+  }, [capturedImages, onCapture, stopCamera, orderId]);
+
+  // Explicit cancel - clears draft
+  const handleCancel = useCallback(() => {
+    if (orderId) clearDraft(orderId);
+    setCapturedImages([]);
+    onOpenChange(false);
+  }, [orderId, onOpenChange]);
 
   const switchCamera = useCallback(() => {
     stopCamera();
@@ -177,14 +207,31 @@ export function CameraCapture({
     }
   }, [open, cameraState, startCamera]);
 
+  // Save draft when closing modal (without explicit cancel)
   useEffect(() => {
     if (!open) {
+      // Save draft if there are captured images
+      if (orderId && capturedImages.length > 0) {
+        saveDraft(orderId, capturedImages);
+      }
       stopCamera();
       setCameraState("idle");
-      setCapturedImages([]);
+      // Don't clear capturedImages here - they're saved as draft
       setErrorMessage("");
     }
-  }, [open, stopCamera]);
+  }, [open, stopCamera, orderId, capturedImages]);
+
+  // Load draft when opening modal
+  useEffect(() => {
+    if (open && orderId) {
+      const draft = loadDraft(orderId);
+      if (draft.length > 0) {
+        setCapturedImages(draft);
+      } else {
+        setCapturedImages([]);
+      }
+    }
+  }, [open, orderId]);
 
   useEffect(() => {
     if (cameraState === "streaming") {
@@ -341,7 +388,7 @@ export function CameraCapture({
           <div className="flex gap-2">
             <Button
               variant="outline"
-              onClick={() => onOpenChange(false)}
+              onClick={handleCancel}
               disabled={isProcessing}
             >
               Cancel
