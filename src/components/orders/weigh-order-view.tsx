@@ -135,10 +135,14 @@ export function WeighOrderView({
     setCameraOpen(false);
     toast.info("Visual verification started. Processing in background...");
 
+    // Volver al listado en mobile después de verificar
+    if (isMobile) {
+      setMobileView("list");
+    }
+
     // Clear cameraOrderId if it was a quick camera action
     if (cameraOrderId) {
       setCameraOrderId(null);
-      // Stay in list view (don't switch to detail)
     }
 
     try {
