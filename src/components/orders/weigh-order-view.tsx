@@ -213,6 +213,12 @@ export function WeighOrderView({
     return hasWeight || hasVisualVerification;
   }, []);
 
+  // Helper to check if order has a PROBLEMATIC verification status (for Flagged tab)
+  const isOrderFlagged = useCallback((order: Order): boolean => {
+    return ['missing_items', 'extra_items', 'uncertain', 'wrong_image']
+      .includes(order.visual_verification_status || '');
+  }, []);
+
   // Auto-abrir cámara cuando se selecciona una orden PENDING (desktop)
   useEffect(() => {
     if (!isMobile && selectedOrderId && selectedOrder) {
@@ -297,11 +303,12 @@ export function WeighOrderView({
     const filtered = orders.filter(order => {
       switch (selectedStatus) {
         case 'pending':
-          // Pending: pending_weight status AND not checked (no weight, no visual verification)
-          return order.status === 'pending_weight' && !isOrderChecked(order);
+          // Pending: orders without verification OR with pending verification (still processing)
+          return order.status === 'pending_weight' &&
+            (!order.visual_verification_status || order.visual_verification_status === 'pending');
         case 'flagged':
-          // Flagged: pending_weight status AND checked (has weight OR visual verification)
-          return order.status === 'pending_weight' && isOrderChecked(order);
+          // Flagged: ONLY orders with problematic verification (NOT verified or pending)
+          return order.status === 'pending_weight' && isOrderFlagged(order);
         case 'ready_for_lockers':
           // Ready for Lockers: weighed status
           return order.status === 'weighed';
@@ -328,15 +335,18 @@ export function WeighOrderView({
       return [...ready, ...checked, ...pending];
     }
     return filtered;
-  }, [orders, selectedStatus, isOrderChecked]);
+  }, [orders, selectedStatus, isOrderChecked, isOrderFlagged]);
 
   // Count orders by tab for badges
   const tabCounts = useMemo(() => {
-    const pending = orders.filter(o => o.status === 'pending_weight' && !isOrderChecked(o)).length;
-    const flagged = orders.filter(o => o.status === 'pending_weight' && isOrderChecked(o)).length;
+    const pending = orders.filter(o =>
+      o.status === 'pending_weight' &&
+      (!o.visual_verification_status || o.visual_verification_status === 'pending')
+    ).length;
+    const flagged = orders.filter(o => o.status === 'pending_weight' && isOrderFlagged(o)).length;
     const ready = orders.filter(o => o.status === 'weighed').length;
     return { pending, flagged, ready };
-  }, [orders, isOrderChecked]);
+  }, [orders, isOrderFlagged]);
 
   // Mobile navigation functions
   const currentOrderIndex = displayOrders.findIndex(o => o.id === selectedOrderId);
