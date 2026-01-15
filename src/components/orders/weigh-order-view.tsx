@@ -155,6 +155,15 @@ export function WeighOrderView({
     setCameraOpen(true);
   }, []);
 
+  // Handler for "Take Another Photo" - clears draft and opens camera fresh
+  const handleRetryVerification = useCallback(() => {
+    // Clear any existing draft for this order so we start fresh
+    if (selectedOrderId) {
+      localStorage.removeItem(`camera-draft-${selectedOrderId}`);
+    }
+    setCameraOpen(true);
+  }, [selectedOrderId]);
+
   // Handler for visual verification - closes modal immediately, processes in background
   const handleVisualVerification = async (images: string[]) => {
     const targetOrderId = cameraOrderId || selectedOrderId;
@@ -237,6 +246,12 @@ export function WeighOrderView({
   // Helper to get verification style (badge and border colors)
   const getVerificationStyle = (status: string | null | undefined) => {
     switch (status) {
+      case 'pending':
+        return {
+          label: 'Processing...',
+          badgeClass: 'text-blue-700 bg-blue-100 border-blue-300 animate-pulse',
+          borderClass: 'border-l-4 border-l-blue-500'
+        };
       case 'verified':
         return {
           label: 'Approved',
@@ -832,7 +847,7 @@ export function WeighOrderView({
                           result={visualResultData}
                           status={visualStatus as "verified" | "missing_items" | "extra_items" | "uncertain" | "wrong_image"}
                           processingTimeSeconds={getProcessingTimeSeconds(selectedOrder as Order)}
-                          onRetry={() => setCameraOpen(true)}
+                          onRetry={handleRetryVerification}
                         />
                       );
                     }
@@ -1307,7 +1322,7 @@ export function WeighOrderView({
                                   result={visualResultData}
                                   status={visualStatus}
                                   processingTimeSeconds={getProcessingTimeSeconds(selectedOrder as Order)}
-                                  onRetry={() => setCameraOpen(true)}
+                                  onRetry={handleRetryVerification}
                                 />
                               );
                             }
@@ -1361,7 +1376,7 @@ export function WeighOrderView({
                               result={visualResultData}
                               status={visualStatus}
                               processingTimeSeconds={getProcessingTimeSeconds(selectedOrder as Order)}
-                              onRetry={() => setCameraOpen(true)}
+                              onRetry={handleRetryVerification}
                             />
                           </div>
                         );
