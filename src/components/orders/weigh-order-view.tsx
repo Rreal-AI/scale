@@ -51,6 +51,8 @@ interface Order {
   expected_weight?: number;
   actual_weight?: number;
   visual_verification_status?: "pending" | "verified" | "missing_items" | "extra_items" | "uncertain" | "wrong_image" | null;
+  visual_verification_result?: Record<string, unknown>;
+  visual_verified_at?: string;
   created_at: string;
   updated_at: string;
   structured_output?: {
