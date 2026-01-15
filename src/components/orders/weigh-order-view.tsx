@@ -89,7 +89,7 @@ export function WeighOrderView({
     "all" | "delivery" | "takeout"
   >("all");
   const [selectedStatus, setSelectedStatus] = useState<
-    "all" | "pending" | "flagged" | "ready_for_lockers"
+    "all" | "pending" | "ready_for_lockers"
   >("pending");
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "customer">(
     "newest"
@@ -222,14 +222,15 @@ export function WeighOrderView({
   // Auto-abrir cámara cuando se selecciona una orden PENDING (desktop)
   useEffect(() => {
     if (!isMobile && selectedOrderId && selectedOrder) {
-      // Solo abrir si la orden no tiene verificación visual
-      if (!isOrderChecked(selectedOrder as Order)) {
+      // Solo abrir si la orden no tiene verificación visual Y no está flagged
+      // (si está flagged, queremos que el usuario vea los errores primero)
+      if (!isOrderChecked(selectedOrder as Order) && !isOrderFlagged(selectedOrder as Order)) {
         // Pequeño delay para que la UI se renderice primero
         const timer = setTimeout(() => setCameraOpen(true), 100);
         return () => clearTimeout(timer);
       }
     }
-  }, [selectedOrderId, selectedOrder, isMobile, isOrderChecked]);
+  }, [selectedOrderId, selectedOrder, isMobile, isOrderChecked, isOrderFlagged]);
 
   // Helper to get verification style (badge and border colors)
   const getVerificationStyle = (status: string | null | undefined) => {
@@ -313,12 +314,8 @@ export function WeighOrderView({
     const filtered = orders.filter(order => {
       switch (selectedStatus) {
         case 'pending':
-          // Pending: orders without verification OR with pending verification (still processing)
-          return order.status === 'pending_weight' &&
-            (!order.visual_verification_status || order.visual_verification_status === 'pending');
-        case 'flagged':
-          // Flagged: ONLY orders with problematic verification (NOT verified or pending)
-          return order.status === 'pending_weight' && isOrderFlagged(order);
+          // Pending: ALL orders with pending_weight status (including flagged ones)
+          return order.status === 'pending_weight';
         case 'ready_for_lockers':
           // Ready for Lockers: weighed status
           return order.status === 'weighed';
@@ -329,6 +326,16 @@ export function WeighOrderView({
     });
 
     // Sort based on tab
+    if (selectedStatus === 'pending') {
+      // Flagged orders first, then by created_at
+      return [...filtered].sort((a, b) => {
+        const aFlagged = isOrderFlagged(a);
+        const bFlagged = isOrderFlagged(b);
+        if (aFlagged && !bFlagged) return -1;
+        if (!aFlagged && bFlagged) return 1;
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      });
+    }
     if (selectedStatus === 'ready_for_lockers') {
       return [...filtered].sort(
         (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
@@ -349,14 +356,10 @@ export function WeighOrderView({
 
   // Count orders by tab for badges
   const tabCounts = useMemo(() => {
-    const pending = orders.filter(o =>
-      o.status === 'pending_weight' &&
-      (!o.visual_verification_status || o.visual_verification_status === 'pending')
-    ).length;
-    const flagged = orders.filter(o => o.status === 'pending_weight' && isOrderFlagged(o)).length;
+    const pending = orders.filter(o => o.status === 'pending_weight').length;
     const ready = orders.filter(o => o.status === 'weighed').length;
-    return { pending, flagged, ready };
-  }, [orders, isOrderFlagged]);
+    return { pending, ready };
+  }, [orders]);
 
   // Mobile navigation functions
   const currentOrderIndex = displayOrders.findIndex(o => o.id === selectedOrderId);
@@ -380,13 +383,14 @@ export function WeighOrderView({
     onOrderSelect(orderId);
     setMobileView("detail");
 
-    // Auto-abrir cámara si la orden no tiene verificación visual
+    // Auto-abrir cámara si la orden no tiene verificación visual Y no está flagged
+    // (si está flagged, queremos que el usuario vea los errores primero)
     const order = orders.find(o => o.id === orderId);
-    if (order && !isOrderChecked(order)) {
+    if (order && !isOrderChecked(order) && !isOrderFlagged(order)) {
       // Pequeño delay para que la UI se renderice primero
       setTimeout(() => setCameraOpen(true), 100);
     }
-  }, [onOrderSelect, orders, isOrderChecked]);
+  }, [onOrderSelect, orders, isOrderChecked, isOrderFlagged]);
 
   // Handle swipe gestures for mobile
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
@@ -564,19 +568,6 @@ export function WeighOrderView({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setSelectedStatus("flagged")}
-              className={cn(
-                "h-9 px-4 whitespace-nowrap",
-                selectedStatus === "flagged"
-                  ? "bg-blue-100 text-blue-700 border-blue-300"
-                  : ""
-              )}
-            >
-              Flagged {tabCounts.flagged > 0 && `(${tabCounts.flagged})`}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
               onClick={() => setSelectedStatus("ready_for_lockers")}
               className={cn(
                 "h-9 px-4 whitespace-nowrap",
@@ -641,9 +632,10 @@ export function WeighOrderView({
                         transition: isBeingSwiped ? 'none' : 'transform 0.2s ease-out',
                       }}
                       className={cn(
-                        "p-4 border-b border-gray-100 cursor-pointer active:bg-gray-100 bg-white relative",
+                        "p-4 border-b border-gray-100 cursor-pointer active:bg-gray-100 relative",
                         order.id === selectedOrderId && "bg-blue-50",
-                        getVerificationStyle(order.visual_verification_status)?.borderClass
+                        isOrderFlagged(order) ? "bg-red-50 border-l-4 border-l-red-500" : "bg-white",
+                        !isOrderFlagged(order) && getVerificationStyle(order.visual_verification_status)?.borderClass
                       )}
                     >
                     <div className="flex items-center justify-between mb-2">
@@ -949,19 +941,6 @@ export function WeighOrderView({
                 Pending {tabCounts.pending > 0 && `(${tabCounts.pending})`}
               </Button>
               <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setSelectedStatus("flagged")}
-                className={cn(
-                  "h-8 px-3 text-xs font-medium",
-                  selectedStatus === "flagged"
-                    ? "bg-blue-100 text-blue-700 border-blue-300"
-                    : "text-gray-600 border-gray-300 hover:bg-gray-50"
-                )}
-              >
-                Flagged {tabCounts.flagged > 0 && `(${tabCounts.flagged})`}
-              </Button>
-              <Button
                 variant={selectedStatus === "ready_for_lockers" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setSelectedStatus("ready_for_lockers")}
@@ -1124,7 +1103,8 @@ export function WeighOrderView({
                 className={cn(
                   "p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors active:bg-gray-100",
                   isSelected && "bg-blue-50 border-blue-200",
-                  getVerificationStyle(order.visual_verification_status)?.borderClass,
+                  isOrderFlagged(order) && "bg-red-50 border-l-4 border-l-red-500",
+                  !isOrderFlagged(order) && getVerificationStyle(order.visual_verification_status)?.borderClass,
                   order.status === "completed" &&
                     "bg-green-50 border-green-100 opacity-75"
                 )}
