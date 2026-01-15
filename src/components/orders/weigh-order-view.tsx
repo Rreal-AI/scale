@@ -269,6 +269,16 @@ export function WeighOrderView({
     }
   };
 
+  // Helper to calculate visual verification processing time in seconds
+  const getProcessingTimeSeconds = (order: Order): number | undefined => {
+    if (!order.visual_verified_at || !order.updated_at) return undefined;
+    const start = new Date(order.updated_at).getTime();
+    const end = new Date(order.visual_verified_at).getTime();
+    const durationMs = end - start;
+    if (durationMs < 0) return undefined;
+    return durationMs / 1000;
+  };
+
   const orders = ordersData?.orders || [];
 
   // Auto-Ready for approved orders + Sound alert for negative results
@@ -827,6 +837,7 @@ export function WeighOrderView({
                         <VisualVerificationResultCard
                           result={visualResultData}
                           status={visualStatus as "verified" | "missing_items" | "extra_items" | "uncertain" | "wrong_image"}
+                          processingTimeSeconds={getProcessingTimeSeconds(selectedOrder as Order)}
                           onRetry={() => setCameraOpen(true)}
                         />
                       );
@@ -1313,6 +1324,7 @@ export function WeighOrderView({
                                 <VisualVerificationResultCard
                                   result={visualResultData}
                                   status={visualStatus}
+                                  processingTimeSeconds={getProcessingTimeSeconds(selectedOrder as Order)}
                                   onRetry={() => setCameraOpen(true)}
                                 />
                               );
@@ -1366,6 +1378,7 @@ export function WeighOrderView({
                             <VisualVerificationResultCard
                               result={visualResultData}
                               status={visualStatus}
+                              processingTimeSeconds={getProcessingTimeSeconds(selectedOrder as Order)}
                               onRetry={() => setCameraOpen(true)}
                             />
                           </div>

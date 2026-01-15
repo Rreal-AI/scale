@@ -20,6 +20,7 @@ import type { VisualVerificationResult } from "@/schemas/visual-verification";
 interface VisualVerificationResultProps {
   result: VisualVerificationResult;
   status: "verified" | "missing_items" | "extra_items" | "uncertain" | "wrong_image";
+  processingTimeSeconds?: number;
   onRetry?: () => void;
   onDismiss?: () => void;
   className?: string;
@@ -71,6 +72,7 @@ const statusConfig = {
 export function VisualVerificationResultCard({
   result,
   status,
+  processingTimeSeconds,
   onRetry,
   onDismiss,
   className,
@@ -123,6 +125,11 @@ export function VisualVerificationResultCard({
                 <Badge variant="outline" className="text-xs">
                   Confidence: {result.confidence}%
                 </Badge>
+                {processingTimeSeconds !== undefined && processingTimeSeconds > 0 && (
+                  <Badge variant="outline" className="text-xs text-gray-500">
+                    {processingTimeSeconds.toFixed(1)}s
+                  </Badge>
+                )}
               </div>
             </div>
           </div>
