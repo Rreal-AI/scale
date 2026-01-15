@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface VerifyVisualParams {
   orderId: string;
@@ -32,7 +32,13 @@ const verifyOrderVisual = async ({
 };
 
 export const useVisualVerification = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: verifyOrderVisual,
+    onSuccess: () => {
+      // Invalidate orders queries immediately to show "Processing" badge
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+    },
   });
 };

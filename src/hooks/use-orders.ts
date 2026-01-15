@@ -73,6 +73,7 @@ interface Order {
     | "uncertain";
   visual_verification_result?: Record<string, unknown>;
   visual_verified_at?: string;
+  visual_verification_started_at?: string;
   archived_at?: string;
   archived_reason?: string;
   created_at: string;

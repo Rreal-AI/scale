@@ -53,6 +53,7 @@ interface Order {
   visual_verification_status?: "pending" | "verified" | "missing_items" | "extra_items" | "uncertain" | "wrong_image" | null;
   visual_verification_result?: Record<string, unknown>;
   visual_verified_at?: string;
+  visual_verification_started_at?: string;
   created_at: string;
   updated_at: string;
   structured_output?: {
@@ -289,8 +290,8 @@ export function WeighOrderView({
 
   // Helper to calculate visual verification processing time in seconds
   const getProcessingTimeSeconds = (order: Order): number | undefined => {
-    if (!order.visual_verified_at || !order.updated_at) return undefined;
-    const start = new Date(order.updated_at).getTime();
+    if (!order.visual_verified_at || !order.visual_verification_started_at) return undefined;
+    const start = new Date(order.visual_verification_started_at).getTime();
     const end = new Date(order.visual_verified_at).getTime();
     const durationMs = end - start;
     if (durationMs < 0) return undefined;

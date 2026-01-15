@@ -1,0 +1,1 @@
+ALTER TABLE "orders" ADD COLUMN "visual_verification_started_at" timestamp;

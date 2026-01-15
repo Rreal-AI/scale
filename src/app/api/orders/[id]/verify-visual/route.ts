@@ -36,11 +36,12 @@ export async function POST(
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
 
-    // Set status to pending immediately
+    // Set status to pending immediately and record start time
     await db
       .update(orders)
       .set({
         visual_verification_status: "pending",
+        visual_verification_started_at: new Date(),
         updated_at: new Date(),
       })
       .where(and(eq(orders.id, orderId), eq(orders.org_id, orgId)));

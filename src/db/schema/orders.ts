@@ -63,6 +63,7 @@ export const orders = pgTable("orders", {
   ),
   visual_verification_result: jsonb("visual_verification_result"),
   visual_verified_at: timestamp("visual_verified_at"),
+  visual_verification_started_at: timestamp("visual_verification_started_at"),
 
   archived_at: timestamp("archived_at"),
   archived_reason: text("archived_reason"),
