@@ -21,10 +21,15 @@ import {
   Eye,
   ChevronLeft,
   ChevronRight,
+  CheckSquare,
+  X,
 } from "lucide-react";
 import { CameraCapture } from "./camera-capture";
 import { VisualVerificationResultCard } from "./visual-verification-result";
+import { BulkActionsToolbar } from "./bulk-actions-toolbar";
 import { useVisualVerification } from "@/hooks/use-visual-verification";
+import { useOrderSelection } from "@/hooks/use-order-selection";
+import { Checkbox } from "@/components/ui/checkbox";
 import type { VisualVerificationResult } from "@/schemas/visual-verification";
 import {
   AlertDialog,
@@ -311,6 +316,21 @@ export function WeighOrderView({
 
   const orders = ordersData?.orders || [];
 
+  // Selection mode state and hook
+  const [selectionMode, setSelectionMode] = useState(false);
+  const {
+    selectedOrderIds,
+    selectedCount,
+    isSelected,
+    isAllSelected,
+    isSomeSelected,
+    isSelectAllGlobal,
+    toggleSelection,
+    selectAll,
+    deselectAll,
+    getBulkDeleteParams,
+  } = useOrderSelection(orders);
+
   // Auto-Ready for approved orders + Sound alert for negative results
   useEffect(() => {
     const prevStates = prevOrderStatesRef.current;
@@ -562,7 +582,22 @@ export function WeighOrderView({
           <div className="flex items-center justify-between p-4 bg-white border-b border-gray-200">
             <SidebarTrigger className="p-2" />
             <h1 className="text-lg font-semibold">Orders</h1>
-            <div className="w-10" />
+            <Button
+              variant={selectionMode ? "default" : "ghost"}
+              size="icon"
+              onClick={() => {
+                if (selectionMode) {
+                  deselectAll();
+                }
+                setSelectionMode(!selectionMode);
+              }}
+              className={cn(
+                "h-10 w-10",
+                selectionMode && "bg-gray-900 text-white"
+              )}
+            >
+              {selectionMode ? <X className="h-5 w-5" /> : <CheckSquare className="h-5 w-5" />}
+            </Button>
           </div>
 
           {/* Search */}
@@ -621,6 +656,26 @@ export function WeighOrderView({
             </Button>
           </div>
 
+          {/* Selection Bar - Mobile */}
+          {selectionMode && (
+            <div className="flex items-center gap-3 px-4 py-2 bg-gray-50 border-b border-gray-200">
+              <Checkbox
+                checked={isAllSelected}
+                onCheckedChange={() => {
+                  if (isAllSelected || isSomeSelected) {
+                    deselectAll();
+                  } else {
+                    selectAll();
+                  }
+                }}
+                className="border-gray-400"
+              />
+              <span className="text-sm text-gray-600">
+                {selectedCount > 0 ? `${selectedCount} selected` : "Select all"}
+              </span>
+            </div>
+          )}
+
           {/* Orders List */}
           <div className="flex-1 overflow-y-auto">
             {displayOrders.length === 0 ? (
@@ -651,23 +706,39 @@ export function WeighOrderView({
                     )}
                     {/* Card content */}
                     <div
-                      onClick={() => !isBeingSwiped && handleMobileOrderSelect(order.id)}
-                      onTouchStart={(e) => handleCardSwipeStart(e, order.id, canSwipe)}
-                      onTouchMove={(e) => handleCardSwipeMove(e, order.id)}
-                      onTouchEnd={() => handleCardSwipeEnd(order.id)}
+                      onClick={() => {
+                        if (selectionMode) {
+                          toggleSelection(order.id);
+                        } else if (!isBeingSwiped) {
+                          handleMobileOrderSelect(order.id);
+                        }
+                      }}
+                      onTouchStart={(e) => !selectionMode && handleCardSwipeStart(e, order.id, canSwipe)}
+                      onTouchMove={(e) => !selectionMode && handleCardSwipeMove(e, order.id)}
+                      onTouchEnd={() => !selectionMode && handleCardSwipeEnd(order.id)}
                       style={{
-                        transform: isBeingSwiped ? `translateX(-${swipeOffset}px)` : 'translateX(0)',
-                        transition: isBeingSwiped ? 'none' : 'transform 0.2s ease-out',
+                        transform: isBeingSwiped && !selectionMode ? `translateX(-${swipeOffset}px)` : 'translateX(0)',
+                        transition: isBeingSwiped && !selectionMode ? 'none' : 'transform 0.2s ease-out',
                       }}
                       className={cn(
                         "p-4 border-b border-gray-100 cursor-pointer active:bg-gray-100 relative",
-                        order.id === selectedOrderId && "bg-blue-50",
+                        order.id === selectedOrderId && !selectionMode && "bg-blue-50",
+                        selectionMode && isSelected(order.id) && "bg-blue-50",
                         isOrderFlagged(order) ? "bg-red-50 border-l-4 border-l-red-500" : "bg-white",
                         !isOrderFlagged(order) && getVerificationStyle(order.visual_verification_status)?.borderClass
                       )}
                     >
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
+                        {/* Selection checkbox */}
+                        {selectionMode && (
+                          <Checkbox
+                            checked={isSelected(order.id)}
+                            onCheckedChange={() => toggleSelection(order.id)}
+                            onClick={(e) => e.stopPropagation()}
+                            className="border-gray-400"
+                          />
+                        )}
                         <span className="font-semibold">#{order.check_number}</span>
                         {order.type === "delivery" ? (
                           <Truck className="h-4 w-4 text-blue-500" />
@@ -742,6 +813,20 @@ export function WeighOrderView({
               })
             )}
           </div>
+
+          {/* Bulk Actions Toolbar - Mobile */}
+          {selectionMode && (
+            <BulkActionsToolbar
+              selectedCount={selectedCount}
+              selectedOrderIds={Array.from(selectedOrderIds)}
+              onDeselectAll={() => {
+                deselectAll();
+                setSelectionMode(false);
+              }}
+              isSelectAllGlobal={isSelectAllGlobal}
+              getBulkDeleteParams={getBulkDeleteParams}
+            />
+          )}
         </div>
       );
     }
@@ -1055,7 +1140,55 @@ export function WeighOrderView({
                 <Package className="h-3 w-3 mr-1" />
                 Pickup
               </Button>
+
+              {/* Selection Mode Toggle */}
+              <Button
+                variant={selectionMode ? "default" : "outline"}
+                size="sm"
+                onClick={() => {
+                  if (selectionMode) {
+                    deselectAll();
+                  }
+                  setSelectionMode(!selectionMode);
+                }}
+                className={cn(
+                  "h-8 px-3 text-xs font-medium ml-auto",
+                  selectionMode && "bg-gray-900 text-white"
+                )}
+              >
+                {selectionMode ? (
+                  <>
+                    <X className="h-3 w-3 mr-1" />
+                    Cancel
+                  </>
+                ) : (
+                  <>
+                    <CheckSquare className="h-3 w-3 mr-1" />
+                    Select
+                  </>
+                )}
+              </Button>
             </div>
+
+            {/* Selection Bar - shown when selection mode is active */}
+            {selectionMode && (
+              <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-md border border-gray-200">
+                <Checkbox
+                  checked={isAllSelected}
+                  onCheckedChange={() => {
+                    if (isAllSelected || isSomeSelected) {
+                      deselectAll();
+                    } else {
+                      selectAll();
+                    }
+                  }}
+                  className="border-gray-400"
+                />
+                <span className="text-xs text-gray-600">
+                  {selectedCount > 0 ? `${selectedCount} selected` : "Select all"}
+                </span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -1122,15 +1255,22 @@ export function WeighOrderView({
           )}
 
           {displayOrders.map((order) => {
-            const isSelected = selectedOrderId === order.id;
+            const isOrderSelected = selectedOrderId === order.id;
 
             return (
               <div
                 key={order.id}
-                onClick={() => onOrderSelect(order.id)}
+                onClick={() => {
+                  if (selectionMode) {
+                    toggleSelection(order.id);
+                  } else {
+                    onOrderSelect(order.id);
+                  }
+                }}
                 className={cn(
                   "p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors active:bg-gray-100",
-                  isSelected && "bg-blue-50 border-blue-200",
+                  isOrderSelected && !selectionMode && "bg-blue-50 border-blue-200",
+                  selectionMode && isSelected(order.id) && "bg-blue-50 border-blue-200",
                   isOrderFlagged(order) && "bg-red-50 border-l-4 border-l-red-500",
                   !isOrderFlagged(order) && getVerificationStyle(order.visual_verification_status)?.borderClass,
                   order.status === "completed" &&
@@ -1139,7 +1279,16 @@ export function WeighOrderView({
               >
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    {selectedStatus === "ready_for_lockers" && (
+                    {/* Selection checkbox */}
+                    {selectionMode && (
+                      <Checkbox
+                        checked={isSelected(order.id)}
+                        onCheckedChange={() => toggleSelection(order.id)}
+                        onClick={(e) => e.stopPropagation()}
+                        className="border-gray-400"
+                      />
+                    )}
+                    {selectedStatus === "ready_for_lockers" && !selectionMode && (
                       <input
                         type="checkbox"
                         className="h-4 w-4 mr-1"
@@ -1496,6 +1645,20 @@ export function WeighOrderView({
         onCapture={handleVisualVerification}
         isProcessing={visualVerification.isPending}
       />
+
+      {/* Bulk Actions Toolbar - Desktop */}
+      {selectionMode && (
+        <BulkActionsToolbar
+          selectedCount={selectedCount}
+          selectedOrderIds={Array.from(selectedOrderIds)}
+          onDeselectAll={() => {
+            deselectAll();
+            setSelectionMode(false);
+          }}
+          isSelectAllGlobal={isSelectAllGlobal}
+          getBulkDeleteParams={getBulkDeleteParams}
+        />
+      )}
     </div>
   );
 }
