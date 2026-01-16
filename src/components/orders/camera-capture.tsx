@@ -64,6 +64,9 @@ export function CameraCapture({
   const streamRef = useRef<MediaStream | null>(null);
   // Store orderId when modal opens (before it can change externally)
   const activeOrderIdRef = useRef<string | null>(null);
+  // Ref to track mounted state and cleanup timeout
+  const isMountedRef = useRef(true);
+  const flashTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [cameraState, setCameraState] = useState<CameraState>("idle");
   const [capturedImages, setCapturedImages] = useState<string[]>([]);
@@ -97,11 +100,22 @@ export function CameraCapture({
       // Check torch support AFTER video is playing (non-blocking)
       const videoTrack = stream.getVideoTracks()[0];
       if (videoTrack) {
+        // Clear any existing timeout
+        if (flashTimeoutRef.current) {
+          clearTimeout(flashTimeoutRef.current);
+        }
         // Use setTimeout to avoid blocking the main thread
-        setTimeout(() => {
-          const capabilities = videoTrack.getCapabilities?.();
-          if (capabilities && "torch" in capabilities) {
-            setFlashSupported(true);
+        flashTimeoutRef.current = setTimeout(() => {
+          // Only update state if component is still mounted
+          if (isMountedRef.current && streamRef.current) {
+            try {
+              const capabilities = videoTrack.getCapabilities?.();
+              if (capabilities && "torch" in capabilities) {
+                setFlashSupported(true);
+              }
+            } catch {
+              // Track may have been stopped, ignore
+            }
           }
         }, 100);
       }
@@ -134,6 +148,11 @@ export function CameraCapture({
   }, [facingMode]);
 
   const stopCamera = useCallback(() => {
+    // Clear flash detection timeout
+    if (flashTimeoutRef.current) {
+      clearTimeout(flashTimeoutRef.current);
+      flashTimeoutRef.current = null;
+    }
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
@@ -142,6 +161,18 @@ export function CameraCapture({
       videoRef.current.srcObject = null;
     }
     setFlashEnabled(false);
+  }, []);
+
+  // Track mounted state for cleanup
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+      // Cleanup timeout on unmount
+      if (flashTimeoutRef.current) {
+        clearTimeout(flashTimeoutRef.current);
+      }
+    };
   }, []);
 
   const toggleFlash = useCallback(async () => {
