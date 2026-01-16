@@ -36,8 +36,46 @@ export const useVisualVerification = () => {
 
   return useMutation({
     mutationFn: verifyOrderVisual,
+    onMutate: async ({ orderId }) => {
+      // Cancel any outgoing refetches to avoid overwriting optimistic update
+      await queryClient.cancelQueries({ queryKey: ["orders"] });
+
+      // Optimistically update order status to "pending" immediately
+      queryClient.setQueriesData(
+        { queryKey: ["orders"] },
+        (oldData: unknown) => {
+          if (!oldData || typeof oldData !== "object") return oldData;
+
+          // Handle orders list response
+          if ("orders" in oldData && Array.isArray((oldData as { orders: unknown[] }).orders)) {
+            const data = oldData as { orders: Array<{ id: string; visual_verification_status?: string }> };
+            return {
+              ...data,
+              orders: data.orders.map((order) =>
+                order.id === orderId
+                  ? { ...order, visual_verification_status: "pending" }
+                  : order
+              ),
+            };
+          }
+
+          // Handle single order response
+          if ("order" in oldData) {
+            const data = oldData as { order: { id: string; visual_verification_status?: string } };
+            if (data.order?.id === orderId) {
+              return {
+                ...data,
+                order: { ...data.order, visual_verification_status: "pending" },
+              };
+            }
+          }
+
+          return oldData;
+        }
+      );
+    },
     onSuccess: () => {
-      // Invalidate orders queries immediately to show "Processing" badge
+      // Invalidate to sync with server state
       queryClient.invalidateQueries({ queryKey: ["orders"] });
     },
   });

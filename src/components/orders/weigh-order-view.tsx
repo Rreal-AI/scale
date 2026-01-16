@@ -174,11 +174,6 @@ export function WeighOrderView({
     setCameraOpen(false);
     toast.info("Visual verification started. Processing in background...");
 
-    // Volver al listado en mobile después de verificar
-    if (isMobile) {
-      setMobileView("list");
-    }
-
     // Clear cameraOrderId if it was a quick camera action
     if (cameraOrderId) {
       setCameraOrderId(null);
@@ -195,8 +190,12 @@ export function WeighOrderView({
     }
   };
 
+  // Track if any order is currently processing visual verification
+  const [hasProcessingOrder, setHasProcessingOrder] = useState(false);
+
   // Fetch orders for sidebar - get all pending_weight and weighed orders
   // Pause refetch while camera is open to improve performance
+  // Use fast polling (1s) when orders are processing
   const { data: ordersData } = useRealTimeOrders(
     {
       limit: 100,
@@ -206,15 +205,22 @@ export function WeighOrderView({
       sort_by: sortBy === "customer" ? "customer_name" : "created_at",
       sort_order: sortBy === "oldest" ? "asc" : "desc",
     },
-    { refetchEnabled: !cameraOpen }
+    { refetchEnabled: !cameraOpen, fastPolling: hasProcessingOrder }
   );
 
   // Fetch selected order details
   const { data: selectedOrderData } = useOrder(
     selectedOrderId || "",
-    { refetchEnabled: !cameraOpen }
+    { refetchEnabled: !cameraOpen, fastPolling: hasProcessingOrder }
   );
   const selectedOrder = selectedOrderData?.order;
+
+  // Update hasProcessingOrder when orders change
+  useEffect(() => {
+    const orders = ordersData?.orders || [];
+    const hasPending = orders.some(o => o.visual_verification_status === "pending");
+    setHasProcessingOrder(hasPending);
+  }, [ordersData?.orders]);
 
   // Debug expected weight
   useEffect(() => {

@@ -177,31 +177,37 @@ export const useOrders = (params: GetOrdersParams = {}) => {
 
 export const useRealTimeOrders = (
   params: GetOrdersParams = {},
-  options: { refetchEnabled?: boolean } = {}
+  options: { refetchEnabled?: boolean; fastPolling?: boolean } = {}
 ) => {
   const { orgId } = useAuth();
-  const { refetchEnabled = true } = options;
+  const { refetchEnabled = true, fastPolling = false } = options;
+
+  // Use 1s polling when fastPolling is enabled (e.g., when orders are processing)
+  const interval = fastPolling ? 1000 : 3000;
 
   return useQuery({
     queryKey: ["orders", orgId, params],
     queryFn: () => fetchOrders(params),
     enabled: !!orgId,
-    refetchInterval: refetchEnabled ? 3000 : false,
+    refetchInterval: refetchEnabled ? interval : false,
   });
 };
 
 export const useOrder = (
   id: string,
-  options: { refetchEnabled?: boolean } = {}
+  options: { refetchEnabled?: boolean; fastPolling?: boolean } = {}
 ) => {
   const { orgId } = useAuth();
-  const { refetchEnabled = true } = options;
+  const { refetchEnabled = true, fastPolling = false } = options;
+
+  // Use 1s polling when fastPolling is enabled (e.g., when order is processing)
+  const interval = fastPolling ? 1000 : 3000;
 
   return useQuery({
     queryKey: ["orders", orgId, id],
     queryFn: () => fetchOrder(id),
     enabled: !!orgId && !!id,
-    refetchInterval: refetchEnabled ? 3000 : false,
+    refetchInterval: refetchEnabled ? interval : false,
   });
 };
 

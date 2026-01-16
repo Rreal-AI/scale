@@ -80,30 +80,30 @@ export function CameraCapture({
     setFlashSupported(false);
 
     try {
+      // Simplified constraints for faster camera initialization on mobile
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: facingMode,
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-        },
+        video: { facingMode },
         audio: false,
       });
 
       streamRef.current = stream;
 
-      // Check if flash/torch is supported
-      const videoTrack = stream.getVideoTracks()[0];
-      if (videoTrack) {
-        const capabilities = videoTrack.getCapabilities?.();
-        if (capabilities && "torch" in capabilities) {
-          setFlashSupported(true);
-        }
-      }
-
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
         setCameraState("streaming");
+      }
+
+      // Check torch support AFTER video is playing (non-blocking)
+      const videoTrack = stream.getVideoTracks()[0];
+      if (videoTrack) {
+        // Use setTimeout to avoid blocking the main thread
+        setTimeout(() => {
+          const capabilities = videoTrack.getCapabilities?.();
+          if (capabilities && "torch" in capabilities) {
+            setFlashSupported(true);
+          }
+        }, 100);
       }
     } catch (error) {
       console.error("Camera access error:", error);
