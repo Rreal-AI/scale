@@ -175,25 +175,33 @@ export const useOrders = (params: GetOrdersParams = {}) => {
   });
 };
 
-export const useRealTimeOrders = (params: GetOrdersParams = {}) => {
+export const useRealTimeOrders = (
+  params: GetOrdersParams = {},
+  options: { refetchEnabled?: boolean } = {}
+) => {
   const { orgId } = useAuth();
+  const { refetchEnabled = true } = options;
 
   return useQuery({
     queryKey: ["orders", orgId, params],
     queryFn: () => fetchOrders(params),
     enabled: !!orgId,
-    refetchInterval: 3000,
+    refetchInterval: refetchEnabled ? 3000 : false,
   });
 };
 
-export const useOrder = (id: string) => {
+export const useOrder = (
+  id: string,
+  options: { refetchEnabled?: boolean } = {}
+) => {
   const { orgId } = useAuth();
+  const { refetchEnabled = true } = options;
 
   return useQuery({
     queryKey: ["orders", orgId, id],
     queryFn: () => fetchOrder(id),
     enabled: !!orgId && !!id,
-    refetchInterval: 3000,
+    refetchInterval: refetchEnabled ? 3000 : false,
   });
 };
 

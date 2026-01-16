@@ -196,17 +196,24 @@ export function WeighOrderView({
   };
 
   // Fetch orders for sidebar - get all pending_weight and weighed orders
-  const { data: ordersData } = useRealTimeOrders({
-    limit: 100,
-    search: searchQuery || undefined,
-    type: selectedType !== "all" ? selectedType : undefined,
-    // Don't filter by status in API - we filter locally for the new tab structure
-    sort_by: sortBy === "customer" ? "customer_name" : "created_at",
-    sort_order: sortBy === "oldest" ? "asc" : "desc",
-  });
+  // Pause refetch while camera is open to improve performance
+  const { data: ordersData } = useRealTimeOrders(
+    {
+      limit: 100,
+      search: searchQuery || undefined,
+      type: selectedType !== "all" ? selectedType : undefined,
+      // Don't filter by status in API - we filter locally for the new tab structure
+      sort_by: sortBy === "customer" ? "customer_name" : "created_at",
+      sort_order: sortBy === "oldest" ? "asc" : "desc",
+    },
+    { refetchEnabled: !cameraOpen }
+  );
 
   // Fetch selected order details
-  const { data: selectedOrderData } = useOrder(selectedOrderId || "");
+  const { data: selectedOrderData } = useOrder(
+    selectedOrderId || "",
+    { refetchEnabled: !cameraOpen }
+  );
   const selectedOrder = selectedOrderData?.order;
 
   // Debug expected weight
@@ -237,9 +244,7 @@ export function WeighOrderView({
       // Solo abrir si la orden no tiene verificación visual Y no está flagged
       // (si está flagged, queremos que el usuario vea los errores primero)
       if (!isOrderChecked(selectedOrder as Order) && !isOrderFlagged(selectedOrder as Order)) {
-        // Pequeño delay para que la UI se renderice primero
-        const timer = setTimeout(() => setCameraOpen(true), 100);
-        return () => clearTimeout(timer);
+        setCameraOpen(true);
       }
     }
   }, [selectedOrderId, selectedOrder, isMobile, isOrderChecked, isOrderFlagged]);
@@ -405,8 +410,7 @@ export function WeighOrderView({
     // (si está flagged, queremos que el usuario vea los errores primero)
     const order = orders.find(o => o.id === orderId);
     if (order && !isOrderChecked(order) && !isOrderFlagged(order)) {
-      // Pequeño delay para que la UI se renderice primero
-      setTimeout(() => setCameraOpen(true), 100);
+      setCameraOpen(true);
     }
   }, [onOrderSelect, orders, isOrderChecked, isOrderFlagged]);
 
