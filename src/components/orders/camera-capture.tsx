@@ -103,10 +103,23 @@ export function CameraCapture({
 
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        await videoRef.current.play();
+        try {
+          await videoRef.current.play();
+        } catch (playError) {
+          // AbortError occurs when play() is interrupted (e.g., component unmounts)
+          if (playError instanceof DOMException && playError.name === "AbortError") {
+            console.log("Video play was aborted - component likely unmounted");
+            return;
+          }
+          throw playError;
+        }
 
         // Check if still mounted after play
-        if (!isMountedRef.current) return;
+        if (!isMountedRef.current) {
+          // Stop the stream if component unmounted during play
+          stream.getTracks().forEach((track) => track.stop());
+          return;
+        }
 
         setCameraState("streaming");
       }
@@ -170,14 +183,26 @@ export function CameraCapture({
       clearTimeout(flashTimeoutRef.current);
       flashTimeoutRef.current = null;
     }
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
+    try {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => {
+          try {
+            track.stop();
+          } catch {
+            // Track may already be stopped
+          }
+        });
+        streamRef.current = null;
+      }
+      if (videoRef.current) {
+        videoRef.current.srcObject = null;
+      }
+    } catch (error) {
+      console.error("Error stopping camera:", error);
     }
-    if (videoRef.current) {
-      videoRef.current.srcObject = null;
+    if (isMountedRef.current) {
+      setFlashEnabled(false);
     }
-    setFlashEnabled(false);
   }, []);
 
   // Track mounted state for cleanup
@@ -188,12 +213,28 @@ export function CameraCapture({
       // Cleanup timeout on unmount
       if (flashTimeoutRef.current) {
         clearTimeout(flashTimeoutRef.current);
+        flashTimeoutRef.current = null;
+      }
+      // Stop any active streams on unmount
+      if (streamRef.current) {
+        try {
+          streamRef.current.getTracks().forEach((track) => {
+            try {
+              track.stop();
+            } catch {
+              // Ignore errors when stopping tracks
+            }
+          });
+        } catch {
+          // Ignore cleanup errors
+        }
+        streamRef.current = null;
       }
     };
   }, []);
 
   const toggleFlash = useCallback(async () => {
-    if (!streamRef.current) return;
+    if (!streamRef.current || !isMountedRef.current) return;
 
     const videoTrack = streamRef.current.getVideoTracks()[0];
     if (!videoTrack) return;
@@ -203,7 +244,9 @@ export function CameraCapture({
       await videoTrack.applyConstraints({
         advanced: [{ torch: newFlashState } as MediaTrackConstraintSet],
       });
-      setFlashEnabled(newFlashState);
+      if (isMountedRef.current) {
+        setFlashEnabled(newFlashState);
+      }
     } catch (error) {
       console.error("Error toggling flash:", error);
     }
