@@ -67,6 +67,8 @@ export function CameraCapture({
   // Ref to track mounted state and cleanup timeout
   const isMountedRef = useRef(true);
   const flashTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // Lock to prevent concurrent startCamera calls
+  const isStartingRef = useRef(false);
 
   const [cameraState, setCameraState] = useState<CameraState>("idle");
   const [capturedImages, setCapturedImages] = useState<string[]>([]);
@@ -78,14 +80,26 @@ export function CameraCapture({
   const [flashSupported, setFlashSupported] = useState(false);
 
   const startCamera = useCallback(async () => {
-    // Check if still mounted before starting
-    if (!isMountedRef.current) return;
+    // Check if still mounted and not already starting
+    if (!isMountedRef.current || isStartingRef.current) return;
+    isStartingRef.current = true;
 
     setCameraState("requesting");
     setErrorMessage("");
     setFlashSupported(false);
 
     try {
+      // Clean up any existing stream before starting a new one
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => {
+          try { track.stop(); } catch {}
+        });
+        streamRef.current = null;
+      }
+      if (videoRef.current) {
+        videoRef.current.srcObject = null;
+      }
+
       // Simplified constraints for faster camera initialization on mobile
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode },
@@ -96,6 +110,7 @@ export function CameraCapture({
       if (!isMountedRef.current) {
         // Stop the stream immediately if component unmounted
         stream.getTracks().forEach((track) => track.stop());
+        isStartingRef.current = false;
         return;
       }
 
@@ -109,6 +124,7 @@ export function CameraCapture({
           // AbortError occurs when play() is interrupted (e.g., component unmounts)
           if (playError instanceof DOMException && playError.name === "AbortError") {
             console.log("Video play was aborted - component likely unmounted");
+            isStartingRef.current = false;
             return;
           }
           throw playError;
@@ -118,6 +134,7 @@ export function CameraCapture({
         if (!isMountedRef.current) {
           // Stop the stream if component unmounted during play
           stream.getTracks().forEach((track) => track.stop());
+          isStartingRef.current = false;
           return;
         }
 
@@ -174,6 +191,9 @@ export function CameraCapture({
       } else {
         setErrorMessage("Unexpected error accessing camera.");
       }
+    } finally {
+      // Always reset the lock when done
+      isStartingRef.current = false;
     }
   }, [facingMode]);
 
@@ -210,6 +230,8 @@ export function CameraCapture({
     isMountedRef.current = true;
     return () => {
       isMountedRef.current = false;
+      // Reset locks
+      isStartingRef.current = false;
       // Cleanup timeout on unmount
       if (flashTimeoutRef.current) {
         clearTimeout(flashTimeoutRef.current);
@@ -307,18 +329,24 @@ export function CameraCapture({
     }
   }, [open, orderId]);
 
-  // Save draft when closing modal (without explicit cancel)
+  // Save draft and cleanup when closing modal
   useEffect(() => {
     if (!open) {
       // Save draft if there are captured images (use ref for stable orderId)
       if (activeOrderIdRef.current && capturedImages.length > 0) {
         saveDraft(activeOrderIdRef.current, capturedImages);
       }
+
+      // Stop camera and clear all locks
       stopCamera();
-      // Only update state if still mounted
+      isStartingRef.current = false;
+
+      // Reset all states if still mounted
       if (isMountedRef.current) {
         setCameraState("idle");
         setErrorMessage("");
+        setFlashSupported(false);
+        setFlashEnabled(false);
       }
     }
   }, [open, stopCamera, capturedImages]);
@@ -335,10 +363,13 @@ export function CameraCapture({
     }
   }, [open, orderId]);
 
+  // Handle facingMode changes - stop camera and set idle to trigger restart
   useEffect(() => {
     if (cameraState === "streaming" && isMountedRef.current) {
       stopCamera();
-      startCamera();
+      // Setting to idle will trigger the open/cameraState effect to restart
+      // with the new facingMode, avoiding race conditions
+      setCameraState("idle");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [facingMode]);
