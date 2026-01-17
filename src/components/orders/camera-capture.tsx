@@ -33,21 +33,57 @@ interface CameraCaptureProps {
 // Draft management functions
 const saveDraft = (orderId: string, images: string[]) => {
   if (images.length > 0) {
-    localStorage.setItem(`camera-draft-${orderId}`, JSON.stringify(images));
+    try {
+      localStorage.setItem(`camera-draft-${orderId}`, JSON.stringify(images));
+    } catch (error) {
+      // QuotaExceededError - clear old drafts and try again
+      console.error("Failed to save draft:", error);
+      try {
+        // Clear all camera drafts to free space
+        Object.keys(localStorage)
+          .filter(key => key.startsWith("camera-draft-"))
+          .forEach(key => localStorage.removeItem(key));
+        // Try again
+        localStorage.setItem(`camera-draft-${orderId}`, JSON.stringify(images));
+      } catch {
+        // Still failed, give up silently
+        console.error("Failed to save draft after clearing");
+      }
+    }
   }
 };
 
 const loadDraft = (orderId: string): string[] => {
   try {
     const saved = localStorage.getItem(`camera-draft-${orderId}`);
-    return saved ? JSON.parse(saved) : [];
+    if (!saved) return [];
+
+    const parsed = JSON.parse(saved);
+
+    // Validate that it's an array of strings (base64 images)
+    if (!Array.isArray(parsed)) return [];
+    if (!parsed.every(item => typeof item === "string" && item.startsWith("data:image/"))) {
+      // Invalid data, clear it
+      localStorage.removeItem(`camera-draft-${orderId}`);
+      return [];
+    }
+
+    return parsed;
   } catch {
+    // Clear corrupted data
+    try {
+      localStorage.removeItem(`camera-draft-${orderId}`);
+    } catch {}
     return [];
   }
 };
 
 const clearDraft = (orderId: string) => {
-  localStorage.removeItem(`camera-draft-${orderId}`);
+  try {
+    localStorage.removeItem(`camera-draft-${orderId}`);
+  } catch {
+    // Ignore errors when clearing
+  }
 };
 
 type CameraState = "idle" | "requesting" | "streaming" | "error";
