@@ -78,6 +78,9 @@ export function CameraCapture({
   const [flashSupported, setFlashSupported] = useState(false);
 
   const startCamera = useCallback(async () => {
+    // Check if still mounted before starting
+    if (!isMountedRef.current) return;
+
     setCameraState("requesting");
     setErrorMessage("");
     setFlashSupported(false);
@@ -89,11 +92,22 @@ export function CameraCapture({
         audio: false,
       });
 
+      // Check if still mounted after async operation
+      if (!isMountedRef.current) {
+        // Stop the stream immediately if component unmounted
+        stream.getTracks().forEach((track) => track.stop());
+        return;
+      }
+
       streamRef.current = stream;
 
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
+
+        // Check if still mounted after play
+        if (!isMountedRef.current) return;
+
         setCameraState("streaming");
       }
 
@@ -120,6 +134,9 @@ export function CameraCapture({
         }, 100);
       }
     } catch (error) {
+      // Check if still mounted before setting error state
+      if (!isMountedRef.current) return;
+
       console.error("Camera access error:", error);
       setCameraState("error");
 
@@ -235,7 +252,7 @@ export function CameraCapture({
   }, [stopCamera]);
 
   useEffect(() => {
-    if (open && cameraState === "idle") {
+    if (open && cameraState === "idle" && isMountedRef.current) {
       startCamera();
     }
   }, [open, cameraState, startCamera]);
@@ -255,15 +272,17 @@ export function CameraCapture({
         saveDraft(activeOrderIdRef.current, capturedImages);
       }
       stopCamera();
-      setCameraState("idle");
-      // Don't clear capturedImages here - they're saved as draft
-      setErrorMessage("");
+      // Only update state if still mounted
+      if (isMountedRef.current) {
+        setCameraState("idle");
+        setErrorMessage("");
+      }
     }
   }, [open, stopCamera, capturedImages]);
 
   // Load draft when opening modal
   useEffect(() => {
-    if (open && orderId) {
+    if (open && orderId && isMountedRef.current) {
       const draft = loadDraft(orderId);
       if (draft.length > 0) {
         setCapturedImages(draft);
@@ -274,7 +293,7 @@ export function CameraCapture({
   }, [open, orderId]);
 
   useEffect(() => {
-    if (cameraState === "streaming") {
+    if (cameraState === "streaming" && isMountedRef.current) {
       stopCamera();
       startCamera();
     }

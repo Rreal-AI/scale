@@ -43,7 +43,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { SidebarTrigger } from "@/components/ui/sidebar";
 
 interface Order {
   id: string;
@@ -577,10 +576,9 @@ export function WeighOrderView({
     // Mobile List View
     if (mobileView === "list") {
       return (
-        <div className="flex flex-col h-screen bg-gray-50">
-          {/* Mobile Header */}
-          <div className="flex items-center justify-between p-4 bg-white border-b border-gray-200">
-            <SidebarTrigger className="p-2" />
+        <div className="flex flex-col h-[calc(100vh-56px)] bg-gray-50">
+          {/* Page Header - Title and Selection Toggle */}
+          <div className="flex items-center justify-between px-4 py-2 bg-white border-b border-gray-200">
             <h1 className="text-lg font-semibold">Orders</h1>
             <Button
               variant={selectionMode ? "default" : "ghost"}
@@ -834,7 +832,7 @@ export function WeighOrderView({
     // Mobile Detail View
     return (
       <div
-        className="flex flex-col h-screen bg-gray-50"
+        className="flex flex-col h-[calc(100vh-56px)] bg-gray-50"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
