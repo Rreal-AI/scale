@@ -994,6 +994,7 @@ export function WeighOrderView({
         {/* Camera Capture Modal */}
         <CameraCapture
           open={cameraOpen}
+          orderId={cameraOrderId || selectedOrderId || undefined}
           onOpenChange={(open) => {
             setCameraOpen(open);
             if (!open) setCameraOrderId(null);
