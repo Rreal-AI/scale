@@ -325,11 +325,29 @@ export function CameraCapture({
     ctx.drawImage(video, 0, 0);
 
     const imageBase64 = canvas.toDataURL("image/jpeg", 0.8);
-    setCapturedImages((prev) => [...prev, imageBase64]);
+    setCapturedImages((prev) => {
+      const newImages = [...prev, imageBase64];
+      // Save draft immediately after capture
+      if (activeOrderIdRef.current) {
+        saveDraft(activeOrderIdRef.current, newImages);
+      }
+      return newImages;
+    });
   }, []);
 
   const removeImage = useCallback((index: number) => {
-    setCapturedImages((prev) => prev.filter((_, i) => i !== index));
+    setCapturedImages((prev) => {
+      const newImages = prev.filter((_, i) => i !== index);
+      // Update draft immediately after removal
+      if (activeOrderIdRef.current) {
+        if (newImages.length > 0) {
+          saveDraft(activeOrderIdRef.current, newImages);
+        } else {
+          clearDraft(activeOrderIdRef.current);
+        }
+      }
+      return newImages;
+    });
   }, []);
 
   const confirmPhotos = useCallback(() => {
@@ -365,14 +383,9 @@ export function CameraCapture({
     }
   }, [open, orderId]);
 
-  // Save draft and cleanup when closing modal
+  // Cleanup when closing modal (draft is saved in real-time during capture/removal)
   useEffect(() => {
     if (!open) {
-      // Save draft if there are captured images (use ref for stable orderId)
-      if (activeOrderIdRef.current && capturedImages.length > 0) {
-        saveDraft(activeOrderIdRef.current, capturedImages);
-      }
-
       // Stop camera and clear all locks
       stopCamera();
       isStartingRef.current = false;
@@ -385,7 +398,7 @@ export function CameraCapture({
         setFlashEnabled(false);
       }
     }
-  }, [open, stopCamera, capturedImages]);
+  }, [open, stopCamera]);
 
   // Load draft when opening modal
   useEffect(() => {
